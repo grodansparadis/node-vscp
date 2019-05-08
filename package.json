@@ -1,0 +1,24 @@
+{
+  "name": "@vscp/node-vscp",
+  "version": "1.0.0",
+  "description": "Utility and constant package for VSCP",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/grodansparadis/node-vscp.git"
+  },
+  "keywords": [
+    "vscp",
+    "iot",
+    "automation"
+  ],
+  "author": "akhe@grodansparadis.com, Grodans Paradis AB",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/grodansparadis/node-vscp/issues"
+  },
+  "homepage": "https://github.com/grodansparadis/node-vscp#readme"
+}
