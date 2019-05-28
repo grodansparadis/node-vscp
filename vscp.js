@@ -162,6 +162,7 @@ const hostCapabilities = {
     AES256:               (1<<2),
     AES192:               (1<<1),
     AES128:               1
+};
 
 /* ---------------------------------------------------------------------- */
 
@@ -655,7 +656,7 @@ isGuidZero = function (guid) {
     }
 
     return true;
-}
+};
 
 /**
  * Get node id from a node GUID string.
