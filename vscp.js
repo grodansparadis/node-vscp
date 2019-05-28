@@ -139,7 +139,29 @@ const varTypeNames = [
     "Filter"  // Filter for channel
 ];
 
-
+/** VSCP host capabilities (wcyd - What Can You Do)
+ * @enum {number}
+ * @const
+ */
+const hostCapabilities = {
+    REMOTE_VARIABLE:      (1<<63),
+    DECISION_MATRIX:      (1<<62),
+    INTERFACE:            (1<<61),
+    TCPIP:                (1<<15),
+    UDP:                  (1<<14),
+    MULTICAST_ANNOUNCE:   (1<<13),
+    RAWETH:               (1<<12),
+    WEB:                  (1<<11),
+    WEBSOCKET:            (1<<10),
+    REST:                 (1<<9),
+    MULTICAST_CHANNEL:    (1<<8),
+    IP6:                  (1<<6),
+    IP4:                  (1<<5),
+    SSL:                  (1<<4),
+    TWO_CONNECTIONS:      (1<<3),
+    AES256:               (1<<2),
+    AES192:               (1<<1),
+    AES128:               1
 
 /* ---------------------------------------------------------------------- */
 
@@ -162,7 +184,7 @@ const varTypeNames = [
  * @param {string} options.vscpGuid                     - GUID string
  * @param {(number[]|string)} options.vscpData          - Event data
  */
-module.exports = Event = function(options) {
+Event = function(options) {
 
     /** VSCP event head
      * @member {number}
@@ -499,7 +521,7 @@ Event.prototype.setFromText = function(str) {
  * @param {string} input    - Hex or decimal value as string
  * @return {number} Value
  */
-module.exports.readValue = function(input) {
+readValue = function(input) {
     var txtvalue = input.toLowerCase();
     var pos = txtvalue.indexOf("0x");
     if (-1 == pos) {
@@ -515,7 +537,7 @@ module.exports.readValue = function(input) {
  *
  * @return {string} Current time in the format hh:mm:ss.us
  */
-module.exports.getTime = function() {
+getTime = function() {
 
     var now = new Date();
 
@@ -551,7 +573,7 @@ module.exports.getTime = function() {
  * @param {number[]} guid - GUID number array
  * @return {string} GUID string, e.g. 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
  */
-module.exports.guidToStr = function(guid) {
+guidToStr = function(guid) {
 
     var guidStr = "";
     var index = 0;
@@ -577,9 +599,9 @@ module.exports.guidToStr = function(guid) {
  * Converts a GUID string to a GUID number array.
  *
  * @param {string} guid - GUID string, e.g. 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
- * @return {number[]} GUID number array
+ * @return {number[]} GUID number array and array with length != 16 for  invalid GUID
  */
-module.exports.strToGuid = function(str) {
+strToGuid = function(str) {
 
     var guid = [];
     var items = [];
@@ -594,7 +616,7 @@ module.exports.strToGuid = function(str) {
     }
 
     // If GUID is "-" use interface GUID
-    if ("-" === str) {
+    if ("-" === str.trim()) {
         str = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00";
     }
 
@@ -612,12 +634,36 @@ module.exports.strToGuid = function(str) {
 };
 
 /**
+ * Converts a GUID string to a GUID number array.
+ *
+ * @param {string|array} guid - GUID string/array
+ * @return {boolean} True if guid is all nills
+ */
+
+isGuidZero = function (guid) {
+
+    if ("undefined" === typeof guid) {
+        return false;
+    }
+
+    if ("string" === typeof guid) {
+        guid = vscp.strToGuid(guid);
+    }
+
+    for (let i = 0; i < 16; i++) {
+        if (guid[i]) return false;
+    }
+
+    return true;
+}
+
+/**
  * Get node id from a node GUID string.
  *
  * @param {string} guid - GUID string, e.g. 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
  * @return {number} Node id
  */
-module.exports.getNodeId = function(guid) {
+getNodeId = function(guid) {
 
     if ("undefined" === typeof guid) {
         return 0;
@@ -639,7 +685,7 @@ module.exports.getNodeId = function(guid) {
  * @param {string} str  - Unicode string
  * @return {string} Base64
  */
-module.exports.b64EncodeUnicode = function(str) {
+b64EncodeUnicode = function(str) {
     return new Buffer.from(str, 'binary').toString('base64');
 };
 
@@ -648,7 +694,7 @@ module.exports.b64EncodeUnicode = function(str) {
  * @return {string} Unicode string
  * Note: prior to Node v4, use new Buffer rather than Buffer.from.
  */
-module.exports.b64DecodeUnicode = function(str) {
+b64DecodeUnicode = function(str) {
     return new Buffer.from(str, 'base64').toString('binary');
 };
 
@@ -657,7 +703,7 @@ module.exports.b64DecodeUnicode = function(str) {
  * @return {string} Variable type name
  * Note: prior to Node v4, use new Buffer rather than Buffer.from.
  */
-module.exports.getVarTypeName = function(n) {
+getVarTypeName = function(n) {
     if (varTypes.UNASSIGNED == n) {
         return "unassigned";
     } else if (varTypes.STRING == n) {
@@ -727,7 +773,7 @@ module.exports.getVarTypeName = function(n) {
  * @param {string} str  - Variable type name
  * @return {number} Variable type numerical code
  */
-module.exports.getVarTypeNumerical = function(str) {
+getVarTypeNumerical = function(str) {
     if ("unassigned" === str.toLowerCase()) {
         return varTypes.UNASSIGNED;
     } else if ("string" === str.toLowerCase()) {
@@ -795,7 +841,7 @@ module.exports.getVarTypeNumerical = function(str) {
  * @param {number} n    - Variable type numerical code
  * @return {string} Ace editro formation mode string
  */
-module.exports.getEditorModeFromType = function(n) {
+getEditorModeFromType = function(n) {
     if (varTypes.UNASSIGNED == n) {
         return "text";
     } else if (varTypes.STRING == n) {
@@ -861,7 +907,23 @@ module.exports.getEditorModeFromType = function(n) {
     }
 };
 
-module.exports.version = version;
-module.exports.priorities = priorities;
-module.exports.varTypes = varTypes;
-module.exports.varTypeNames = varTypeNames;
+module.exports = {
+    Event: Event
+}
+module.exports.readValue = readValue
+module.exports.getTime = getTime
+module.exports.guidToStr = guidToStr
+module.exports.strToGuid = strToGuid
+module.exports-isGuidZero = isGuidZero
+module.exports.getNodeId = getNodeId
+module.exports.b64EncodeUnicode = b64EncodeUnicode
+module.exports.b64DecodeUnicode = b64DecodeUnicode
+module.exports.getVarTypeName = getVarTypeName
+module.exports.getVarTypeNumerical = getVarTypeNumerical
+module.exports.getEditorModeFromType = getEditorModeFromType
+
+module.exports.version = version
+module.exports.priorities = priorities
+module.exports.varTypes = varTypes
+module.exports.varTypeNames = varTypeNames
+module.exports.hostCapabilities = hostCapabilities
