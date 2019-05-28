@@ -1,10 +1,10 @@
 {
   "name": "node-vscp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility and constant package for VSCP",
   "main": "vscp.js",
   "scripts": {
-    "test": "test"
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",
@@ -16,12 +16,13 @@
     "automation"
   ],
   "author": "Ake Hedman, <akhe@grodansparadis.com> (https://www.vscp.org)",
-  "contributors":[
+  "contributors": [
     "Andreas Merkle <vscp@blue-andi.de>"
   ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/grodansparadis/node-vscp/issues"
   },
-  "homepage": "https://github.com/grodansparadis/node-vscp#readme"
+  "homepage": "https://github.com/grodansparadis/node-vscp#readme",
+  "dependencies": {}
 }
