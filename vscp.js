@@ -979,7 +979,7 @@ module.exports.getEditorModeFromType = getEditorModeFromType
 module.exports.isGuidIpv6 = isGuidIpv6
 module.exports.isDumbNode = isDumbNode
 module.exports.getPriority = getPriority
-module.exports.isDumbNode = isDumbNode
+module.exports.isHardCoded = isHardCoded
 module.exports.isNoCrc = isNoCrc
 module.exports.getRollingIndex = getRollingIndex
 
