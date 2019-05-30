@@ -55,14 +55,17 @@ const version = {
  * @const
  */
 const priorities = {
+    PRIORITY_0: 0,
     PRIORITY_0_HIGH: 0,
     PRIORITY_1: 1,
     PRIORITY_2: 2,
-    PRIORITY_3_NORMAL: 3,
+    PRIORITY_3: 3,
+    PRIORITY_NORMAL: 3,
     PRIORITY_4: 4,
     PRIORITY_5: 5,
     PRIORITY_6: 6,
-    PRIORITY_7_LOW: 7
+    PRIORITY_7: 7,
+    PRIORITY_LOW: 7
 };
 
 
@@ -908,6 +911,57 @@ getEditorModeFromType = function(n) {
     }
 };
 
+// Header helpers
+
+///////////////////////////////////////////////////////////////////////////////
+// isGuidIpv6
+//
+
+isGuidIpv6 = function(head) {
+    return (head & (1<<15));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// isDumbNode
+//
+
+isDumbNode = function(head) {
+    return (head & (1<<14));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// getPriority
+//
+
+getPriority = function (head) {
+    return ((head >> 5) & 7);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// isHardCoded
+//
+
+isHardCoded = function(head) {
+    return (head & (1<<4));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// isNoCrc
+//
+
+isNoCrc = function(head) {
+    return (head & (1<<3));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// getRollingIndex
+//
+
+getRollingIndex = function (head) {
+    return (head & 7);
+}
+
+
 module.exports = {
     Event: Event
 }
@@ -922,6 +976,12 @@ module.exports.b64DecodeUnicode = b64DecodeUnicode
 module.exports.getVarTypeName = getVarTypeName
 module.exports.getVarTypeNumerical = getVarTypeNumerical
 module.exports.getEditorModeFromType = getEditorModeFromType
+module.exports.isGuidIpv6 = isGuidIpv6
+module.exports.isDumbNode = isDumbNode
+module.exports.getPriority = getPriority
+module.exports.module.exports.isDumbNode = isDumbNode
+module.exports.isNoCrc = isNoCrc
+module.exports.getRollingIndex = getRollingIndex
 
 module.exports.version = version
 module.exports.priorities = priorities
