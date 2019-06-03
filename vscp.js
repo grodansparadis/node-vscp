@@ -147,24 +147,24 @@ const varTypeNames = [
  * @const
  */
 const hostCapabilities = {
-    REMOTE_VARIABLE:      (1<<63),
-    DECISION_MATRIX:      (1<<62),
-    INTERFACE:            (1<<61),
-    TCPIP:                (1<<15),
-    UDP:                  (1<<14),
-    MULTICAST_ANNOUNCE:   (1<<13),
-    RAWETH:               (1<<12),
-    WEB:                  (1<<11),
-    WEBSOCKET:            (1<<10),
-    REST:                 (1<<9),
-    MULTICAST_CHANNEL:    (1<<8),
-    IP6:                  (1<<6),
-    IP4:                  (1<<5),
-    SSL:                  (1<<4),
-    TWO_CONNECTIONS:      (1<<3),
-    AES256:               (1<<2),
-    AES192:               (1<<1),
-    AES128:               1
+    REMOTE_VARIABLE: (1 << 63),
+    DECISION_MATRIX: (1 << 62),
+    INTERFACE: (1 << 61),
+    TCPIP: (1 << 15),
+    UDP: (1 << 14),
+    MULTICAST_ANNOUNCE: (1 << 13),
+    RAWETH: (1 << 12),
+    WEB: (1 << 11),
+    WEBSOCKET: (1 << 10),
+    REST: (1 << 9),
+    MULTICAST_CHANNEL: (1 << 8),
+    IP6: (1 << 6),
+    IP4: (1 << 5),
+    SSL: (1 << 4),
+    TWO_CONNECTIONS: (1 << 3),
+    AES256: (1 << 2),
+    AES192: (1 << 1),
+    AES128: 1
 };
 
 /* ---------------------------------------------------------------------- */
@@ -188,7 +188,7 @@ const hostCapabilities = {
  * @param {string} options.vscpGuid                     - GUID string
  * @param {(number[]|string)} options.vscpData          - Event data
  */
-Event = function(options) {
+Event = function (options) {
 
     /** VSCP event head
      * @member {number}
@@ -294,7 +294,7 @@ Event = function(options) {
         if ("string" === typeof options.vscpDateTime) {
             // Time in UTC for events but conversion
             // is done in send routine
-            this.vscpDateTime  = new Date(options.vscpDateTime);
+            this.vscpDateTime = new Date(options.vscpDateTime);
         } else if (true === (options.vscpDateTime instanceof Date)) {
             // Time should be local
             this.vscpDateTime = options.vscpDateTime;
@@ -314,7 +314,7 @@ Event = function(options) {
 /**
  * Set GUID as IP v6 address
  */
-Event.prototype.setIPV6Addr = function() {
+Event.prototype.setIPV6Addr = function () {
     this.vscpHead |= 0x8000;
 };
 
@@ -323,7 +323,7 @@ Event.prototype.setIPV6Addr = function() {
  *
  * @return {boolean} If the GUID is a IP v6 address, it will return true, otherwise false.
  */
-Event.prototype.isIPV6Addr = function() {
+Event.prototype.isIPV6Addr = function () {
     var result = false;
 
     if (0 < (this.vscpHead & 0x8000)) {
@@ -336,7 +336,7 @@ Event.prototype.isIPV6Addr = function() {
 /**
  * Set dumb node. No MDF, registers, nothing.
  */
-Event.prototype.setDumbNode = function() {
+Event.prototype.setDumbNode = function () {
     this.vscpHead |= 0x4000;
 };
 
@@ -346,7 +346,7 @@ Event.prototype.setDumbNode = function() {
  *
  * @return {boolean} If the node is a dumb node, it will return true, otherwise false.
  */
-Event.prototype.isDumbNode = function() {
+Event.prototype.isDumbNode = function () {
     var result = false;
 
     if (0 < (this.vscpHead & 0x4000)) {
@@ -361,7 +361,7 @@ Event.prototype.isDumbNode = function() {
  *
  * @param {number} priority  -  Priority
  */
-Event.prototype.setPriority = function(priority) {
+Event.prototype.setPriority = function (priority) {
     if ((0 <= priority) && (7 >= priority)) {
         this.vscpHead &= 0xff1f;
         this.vscpHead |= (priority << 5);
@@ -373,14 +373,14 @@ Event.prototype.setPriority = function(priority) {
  *
  * @return {number} Priority of the event.
  */
-Event.prototype.getPriority = function() {
+Event.prototype.getPriority = function () {
     return (this.vscpHead >> 5) & 0x0007;
 };
 
 /**
  * Set the node id of the event sender as hard coded?
  */
-Event.prototype.setHardCodedAddr = function() {
+Event.prototype.setHardCodedAddr = function () {
     this.vscpHead |= 0x0010;
 };
 
@@ -389,7 +389,7 @@ Event.prototype.setHardCodedAddr = function() {
  *
  * @return {boolean} If the node id is hard coded, it will return true, otherwise false.
  */
-Event.prototype.isHardCodedAddr = function() {
+Event.prototype.isHardCodedAddr = function () {
     var result = false;
 
     if (0 < (this.vscpHead & 0x0010)) {
@@ -402,7 +402,7 @@ Event.prototype.isHardCodedAddr = function() {
 /**
  * Set flag for no CRC calculation?
  */
-Event.prototype.setDoNotCalcCRC = function() {
+Event.prototype.setDoNotCalcCRC = function () {
     this.vscpHead |= 0x0008;
 };
 
@@ -411,7 +411,7 @@ Event.prototype.setDoNotCalcCRC = function() {
  *
  * @return {boolean} If nor CRC should be calculated true is returned.
  */
-Event.prototype.isDoNotCalcCRC = function() {
+Event.prototype.isDoNotCalcCRC = function () {
     var result = false;
 
     if (0 < (this.vscpHead & 0x0008)) {
@@ -425,7 +425,7 @@ Event.prototype.isDoNotCalcCRC = function() {
  * Get event as string.
  * @return {string} Event as string
  */
-Event.prototype.getText = function() {
+Event.prototype.getText = function () {
     var index = 0;
     var str = '';
 
@@ -469,7 +469,7 @@ Event.prototype.getText = function() {
  * Set event from string.
  * @return {string} Event as string
  */
-Event.prototype.setFromText = function(str) {
+Event.prototype.setFromText = function (str) {
     if ("string" !== typeof str) {
         console.error(vscp.getTime() + " VSCP event is not in string form.");
         reject(Error("VSCP event is not in string form."));
@@ -478,41 +478,41 @@ Event.prototype.setFromText = function(str) {
     ea = str.spit(',');
 
     // Get head
-    if ( ea.length ) {
+    if (ea.length) {
         this.vscpHead = readValue(ea[0]);
     }
 
     // Get VSCP class
-    if ( ea.length > 1 ) {
+    if (ea.length > 1) {
         this.vscpClass = readValue(ea[1]);
     }
 
     // Get VSCP type
-    if ( ea.length > 2 ) {
+    if (ea.length > 2) {
         this.vscpType = readValue(ea[2]);
     }
 
     // Get VSCP obid
-    if ( ea.length > 3 ) {
+    if (ea.length > 3) {
         this.vscpObId = readValue(ea[3]);
     }
 
     // Get VSCP datetime
     vscpDateTime = new Date(Date.UTC(0, 0, 0, 0, 0, 0));  //  Sun, 31 Dec 1899 00:00:00 GMT
-    if ( ea.length > 4 ) {
+    if (ea.length > 4) {
         this.vscpDateTime(ea[4]);
     }
 
     // Get VSCP GUID
     this.vscpGuid = "-";
-    if ( ea.length > 5 ) {
+    if (ea.length > 5) {
         this.vscpGuid = ea[5];
     }
 
     // Get VSCP data
     this.vscpData = [];
-    if ( ea.length > 6 ) {
-        for (let i=6; i<ea.length; i++) {
+    if (ea.length > 6) {
+        for (let i = 6; i < ea.length; i++) {
             this.vscpData[i] = readValue(ea[i]);
         }
     }
@@ -525,7 +525,7 @@ Event.prototype.setFromText = function(str) {
  * @param {string} input    - Hex or decimal value as string
  * @return {number} Value
  */
-readValue = function(input) {
+readValue = function (input) {
     var txtvalue = input.toLowerCase();
     var pos = txtvalue.indexOf("0x");
     if (-1 == pos) {
@@ -541,11 +541,11 @@ readValue = function(input) {
  *
  * @return {string} Current time in the format hh:mm:ss.us
  */
-getTime = function() {
+getTime = function () {
 
     var now = new Date();
 
-    var paddingHead = function(num, size) {
+    var paddingHead = function (num, size) {
         var str = num + "";
 
         while (str.length < size) {
@@ -555,7 +555,7 @@ getTime = function() {
         return str;
     };
 
-    var paddingTail = function(num, size) {
+    var paddingTail = function (num, size) {
         var str = num + "";
 
         while (str.length < size) {
@@ -577,7 +577,7 @@ getTime = function() {
  * @param {number[]} guid - GUID number array
  * @return {string} GUID string, e.g. 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
  */
-guidToStr = function(guid) {
+guidToStr = function (guid) {
 
     var guidStr = "";
     var index = 0;
@@ -605,7 +605,7 @@ guidToStr = function(guid) {
  * @param {string} guid - GUID string, e.g. 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
  * @return {number[]} GUID number array and array with length != 16 for  invalid GUID
  */
-strToGuid = function(str) {
+strToGuid = function (str) {
 
     var guid = [];
     var items = [];
@@ -667,7 +667,7 @@ isGuidZero = function (guid) {
  * @param {string} guid - GUID string, e.g. 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
  * @return {number} Node id
  */
-getNodeId = function(guid) {
+getNodeId = function (guid) {
 
     if ("undefined" === typeof guid) {
         return 0;
@@ -689,7 +689,7 @@ getNodeId = function(guid) {
  * @param {string} str  - Unicode string
  * @return {string} Base64
  */
-b64EncodeUnicode = function(str) {
+b64EncodeUnicode = function (str) {
     return new Buffer.from(str, 'binary').toString('base64');
 };
 
@@ -698,7 +698,7 @@ b64EncodeUnicode = function(str) {
  * @return {string} Unicode string
  * Note: prior to Node v4, use new Buffer rather than Buffer.from.
  */
-b64DecodeUnicode = function(str) {
+b64DecodeUnicode = function (str) {
     return new Buffer.from(str, 'base64').toString('binary');
 };
 
@@ -707,7 +707,7 @@ b64DecodeUnicode = function(str) {
  * @return {string} Variable type name
  * Note: prior to Node v4, use new Buffer rather than Buffer.from.
  */
-getVarTypeName = function(n) {
+getVarTypeName = function (n) {
     if (varTypes.UNASSIGNED == n) {
         return "unassigned";
     } else if (varTypes.STRING == n) {
@@ -777,7 +777,7 @@ getVarTypeName = function(n) {
  * @param {string} str  - Variable type name
  * @return {number} Variable type numerical code
  */
-getVarTypeNumerical = function(str) {
+getVarTypeNumerical = function (str) {
     if ("unassigned" === str.toLowerCase()) {
         return varTypes.UNASSIGNED;
     } else if ("string" === str.toLowerCase()) {
@@ -845,7 +845,7 @@ getVarTypeNumerical = function(str) {
  * @param {number} n    - Variable type numerical code
  * @return {string} Ace editro formation mode string
  */
-getEditorModeFromType = function(n) {
+getEditorModeFromType = function (n) {
     if (varTypes.UNASSIGNED == n) {
         return "text";
     } else if (varTypes.STRING == n) {
@@ -917,16 +917,16 @@ getEditorModeFromType = function(n) {
 // isGuidIpv6
 //
 
-isGuidIpv6 = function(head) {
-    return (head & (1<<15));
+isGuidIpv6 = function (head) {
+    return (head & (1 << 15));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // isDumbNode
 //
 
-isDumbNode = function(head) {
-    return (head & (1<<14));
+isDumbNode = function (head) {
+    return (head & (1 << 14));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -941,16 +941,16 @@ getPriority = function (head) {
 // isHardCoded
 //
 
-isHardCoded = function(head) {
-    return (head & (1<<4));
+isHardCoded = function (head) {
+    return (head & (1 << 4));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // isNoCrc
 //
 
-isNoCrc = function(head) {
-    return (head & (1<<3));
+isNoCrc = function (head) {
+    return (head & (1 << 3));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -961,6 +961,265 @@ getRollingIndex = function (head) {
     return (head & 7);
 }
 
+/* ---------------------------------------------------------------------- */
+
+///////////////////////////////////////////////////////////////////////////////
+// toFixed
+//
+// Round value to a fixed precision.
+//
+// @param {number} value        - Value
+// @param {number} precision    - Precision
+//
+// @return {number} Rounded value
+//
+
+toFixed = function (value, precision) {
+    var power = Math.pow(10, precision || 0);
+    return String((Math.round(value * power) / power).toFixed(precision));
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// varInteger2Float
+// Convert a integer value to float
+//
+// @param {number[]} data - Byte array
+// @return {number} Float value
+//
+
+varInteger2Float = function (data) {
+    var rval = 0.0;
+    var bNegative = false;
+    var i = 0;
+
+    if (0 !== (data[0] & 0x80)) {
+        bNegative = true;
+
+        for (i = 0; i < data.length; i++) {
+            data[i] = ~data[i] & 0xff;
+        }
+    }
+
+    for (i = 0; i < data.length; i++) {
+        rval = rval << 8;
+        rval += data[i];
+    }
+
+    if (true === bNegative) {
+        rval = -1.0 * (rval + 1);
+    }
+
+    return rval;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// getDataCoding
+//
+// Get data coding.
+//
+// @param {number} data - Data
+// @return {number} Coding
+//
+
+getDataCoding = function (data) {
+    return (data >> 5) & 7;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// getUnitFromDataCoding
+//
+// Get unit from data coding.
+//
+// @param {number} data - Data coding
+// @return {number} Unit
+//
+
+getUnitFromDataCoding = function (data) {
+    return (data >> 3) & 3;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// getSensorIndexFromDataCoding
+//
+// Get sensor index from data coding.
+//
+// @param {number} data - Data coding
+// @return {number} Sensor index
+//
+
+getSensorIndexFromDataCoding = function (data) {
+    return data & 7;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// decodeClass10
+//
+// Decode a class 10 measurement.
+//
+// @param {number[]} data - Data (event data array where first data byte is the data coding)
+// @return {number} Value as float
+//
+
+decodeClass10 = function (data) {
+    var rval = 0.0;
+    var newData = [];
+    var sign = 0;
+    var exp = 0;
+    var mantissa = 0;
+    var str = "";
+    var i = 0;
+
+    switch (module.exports.getDataCoding(data[0])) {
+        case 0: // Bits
+        case 1: // Bytes
+        case 3: // Integer
+            for (i = 1; i < data.length; i++) {
+                newData[i - 1] = data[i];
+            }
+            rval = module.exports.varInteger2Float(newData);
+            break;
+
+        case 2: // String
+            for (i = 1; i < data.length; i++) {
+                str += String.fromCharCode(data[i]);
+            }
+            rval = parseFloat(str);
+            break;
+
+        case 4: // Normalized integer
+            exp = data[1];
+
+            for (i = 2; i < data.length; i++) {
+                newData[i - 2] = data[i];
+            }
+
+            rval = module.exports.varInteger2Float(newData);
+
+            // Handle mantissa
+            if (0 !== (exp & 0x80)) {
+                exp &= 0x7f;
+                rval = rval / Math.pow(10, exp);
+            } else {
+                exp &= 0x7f;
+                rval = rval * Math.pow(10, exp);
+            }
+            break;
+
+        case 5: // Floating point
+            if (5 === data.length) {
+                sign = data[1] & 0x80; // Negative if != 0
+                exp = (data[1] & 0x7f) << 1 + (data[2] & 0x80) ? 1 : 0;
+                mantissa = (data[2] & 0x7f) << 16 + data[3] << 8 + data[4];
+                // sign * 2^exponent * mantissa
+                rval = Math.pow(2, exp) * mantissa;
+                if (sign) {
+                    rval = -1 * rval;
+                }
+            }
+            break;
+
+        case 6: // Reserved
+            break;
+
+        case 7: // Reserved
+            break;
+
+        default:
+            break;
+    }
+
+    return rval;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// decodeClass60Number
+//
+// Decode a class 60 measurement.
+// @param {number}  data - Data
+// @return {number} Value as float
+//
+
+decodeClass60Number = function (data) {
+    var rval = 0;
+    var sign = 0;
+    var exp = 0;
+    var mantissa = 0;
+
+    if (8 === data.length) {
+
+        sign = data[0] & 0x80; // Negative if != 0
+        exp = (data[0] & 0x7f) << 4 + (data[1] & 0xf0) >> 4;
+        mantissa = (data[1] & 0x0f) << 48 +
+            data[2] << 40 +
+            data[3] << 32 +
+            data[4] << 24 +
+            data[5] << 16 +
+            data[6] << 8 +
+            data[7];
+
+        // sign * 2^exponent * mantissa
+        rval = Math.pow(2, exp) * mantissa;
+
+        if (0 !== sign) {
+            rval = -1 * rval;
+        }
+    }
+
+    return rval;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// decodeClass65Number
+//
+// Decode a class 65 measurement.
+//
+// @param {number} data - Data
+// @return {number} Value as float
+//
+decodeClass65Number = function (data) {
+    var rval = 0;
+    var exp = data[3];
+    var i = 0;
+
+    for (i = 4; i < data.length; i++) {
+        rval = rval << 8;
+        rval += data[i];
+    }
+
+    // Handle exponent
+    if (0 !== (exp & 128)) {
+        exp &= 0x7f;
+        rval = rval * Math.pow(10, (-1 * exp));
+    } else {
+        rval = rval * Math.pow(10, exp);
+    }
+
+    return rval;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// isMeasurement
+//
+// Returns true if vscpClass is a measurement class
+//
+// @param {number} vscpClass - VSCP class to check
+// @return {boolean True if vscpClass is a measurement class, false otherwise
+//
+
+isMeasurement = function (vscpClass) {
+    let rv = false;
+
+    if ((10 == vscpClass) ||
+        (60 == vscpClass) ||
+        (65 == vscpClass) ||
+        (70 == vscpClass) ||
+        (85 == vscpClass) ||
+        (1040 == vscpClass) ||
+        (1060 == vscpClass)) {
+        rv = true;
+    }
+    return rv;
+}
 
 module.exports = {
     Event: Event
@@ -982,6 +1241,16 @@ module.exports.getPriority = getPriority
 module.exports.isHardCoded = isHardCoded
 module.exports.isNoCrc = isNoCrc
 module.exports.getRollingIndex = getRollingIndex
+
+// Measurements
+module.exports.isMeasurement = isMeasurement
+module.exports.toFixed = toFixed
+module.exports.varInteger2Float = varInteger2Float
+module.exports.getDataCoding = getDataCoding
+module.exports.getUnitFromDataCoding = getUnitFromDataCoding
+module.exports.decodeClass10 = decodeClass10
+module.exports.decodeClass60Number = decodeClass60Number
+module.exports.decodeClass65Number = decodeClass65Number
 
 module.exports.version = version
 module.exports.priorities = priorities
