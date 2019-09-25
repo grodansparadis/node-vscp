@@ -1,6 +1,6 @@
 {
   "name": "node-vscp",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Utility and constant package for VSCP",
   "main": "vscp.js",
   "scripts": {
@@ -15,10 +15,7 @@
     "iot",
     "automation"
   ],
-  "author": "Ake Hedman, <akhe@grodansparadis.com> (https://www.vscp.org)",
-  "contributors": [
-    "Andreas Merkle <vscp@blue-andi.de>"
-  ],
+  "author": "Andreas Merkle/Ake Hedman, <vscp@blue-andi.de>/<vscp@blue-andi.de>/<akhe@grodansparadis.com> (https://www.vscp.org)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/grodansparadis/node-vscp/issues"
