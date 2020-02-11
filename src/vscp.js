@@ -498,9 +498,9 @@ Event.prototype.setFromText = function (str) {
     }
 
     // Get VSCP datetime
-    vscpDateTime = new Date(Date.UTC(0, 0, 0, 0, 0, 0));  //  Sun, 31 Dec 1899 00:00:00 GMT
+    this.vscpDateTime = new Date(Date.UTC(0, 0, 0, 0, 0, 0));  //  Sun, 31 Dec 1899 00:00:00 GMT
     if (ea.length > 4) {
-        this.vscpDateTime(ea[4]);
+        this.vscpDateTime = new Date(ea[4]);
     }
 
     // Get VSCP GUID
