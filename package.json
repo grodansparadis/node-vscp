@@ -1,8 +1,8 @@
 {
   "name": "node-vscp",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Utility and constant package for VSCP",
-  "main": "vscp.js",
+  "main": "src/vscp.js",
   "scripts": {
     "test": "node test/test.js",
     "readme2html": "./node_modules/.bin/markdown README.md -f gfm",
