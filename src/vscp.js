@@ -503,17 +503,23 @@ Event.prototype.setFromText = function (str) {
         this.vscpDateTime = new Date(ea[4]);
     }
 
+    // Timestamp
+    this.vscpTimeStamp = 0;
+    if (ea.length > 5) {
+        this.vscpTimeStamp = parseInt(ea[5]);
+    }
+
     // Get VSCP GUID
     this.vscpGuid = "-";
-    if (ea.length > 5) {
-        this.vscpGuid = ea[5];
+    if (ea.length > 6) {
+        this.vscpGuid = ea[6];
     }
 
     // Get VSCP data
     this.vscpData = [];
-    if (ea.length > 6) {
-        for (let i = 6; i < ea.length; i++) {
-            this.vscpData[i] = readValue(ea[i]);
+    if (ea.length > 7) {
+        for (let i = 7; i < ea.length; i++) {
+            this.vscpData[7-i] = readValue(ea[i]);
         }
     }
 }
