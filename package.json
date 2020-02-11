@@ -1,6 +1,6 @@
 {
   "name": "node-vscp",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Utility and constant package for VSCP",
   "main": "src/vscp.js",
   "scripts": {
@@ -27,6 +27,8 @@
   "devDependencies": {
     "markdown-to-html": "0.0.13",
     "mocha": "^7.0.1",
+    "node-vscp-class": "^1.0.3",
+    "node-vscp-type": "^1.0.3",
     "npm-check-updates": "^4.0.1"
   }
 }
