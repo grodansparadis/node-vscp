@@ -52,6 +52,10 @@ e5 = new vscp.Event({
 console.log(e5);
 console.log(typeof e5.vscpDateTime);
 
-
+console.log("readValue(\"77\")",vscp.readValue("77"));
+console.log("readValue(\"0x77\")",vscp.readValue("0x77"));
+console.log("readValue(\"0b1010\")",vscp.readValue("0b1010"));
+console.log("readValue(\"0o77\")",vscp.readValue("0o77"));
+console.log("readValue(\"0y77\")",vscp.readValue("0y77"));
 
 
