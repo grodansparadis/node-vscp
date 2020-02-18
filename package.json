@@ -1,6 +1,6 @@
 {
   "name": "node-vscp",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Utility and constant package for VSCP",
   "main": "src/vscp.js",
   "scripts": {
