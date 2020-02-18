@@ -25,7 +25,6 @@
   "homepage": "https://github.com/grodansparadis/node-vscp#readme",
   "dependencies": {},
   "devDependencies": {
-    "markdown-to-html": "0.0.13",
     "mocha": "^7.0.1",
     "node-vscp-class": "^1.0.4",
     "node-vscp-type": "^1.0.4",
