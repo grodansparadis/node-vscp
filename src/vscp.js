@@ -352,6 +352,7 @@ Event = function(options) {
     if ('string' === typeof options.text) {
       this.setFromText(options.text);
     }
+
   }
 };
 
@@ -748,7 +749,7 @@ isGuidZero = function(guid) {
 };
 
 /**
- * Get node id from a node GUID string.
+ * Get node id from a node GUID string. TODO should be 16-bit!
  *
  * @param {string} guid - GUID string, e.g.
  *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
@@ -763,7 +764,48 @@ getNodeId = function(guid) {
     return 0;
   }
 
-  return parseInt(guid.split(':')[15], 16);
+  return ( (parseInt(guid.split(':')[14], 16) << 8) + 
+            parseInt(guid.split(':')[15], 16));
+};
+
+/**
+ * Set node to a node GUID string. TODO should be 16-bit!
+ * 
+ * @param {string} guid - GUID string, e.g.
+ *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+ * @param {number} nodeid - Node is to set (16-bit). 
+ * @return {string} guid with LSB set to node id, or null
+ *                  on error.
+ */
+
+setNodeId = function(guid, nodeid) {
+
+  if ( ('undefined' === typeof guid) ||
+       ('undefined' === typeof nodeid) ) {
+    return null;
+  }
+
+  if ('string' !== typeof guid) {
+    return null;
+  }
+
+  if ('number' !== typeof nodeid) {
+    return null;
+  }
+
+  var guidArray = guid.split(':');
+
+  guidArray[14] = ((nodeid >> 8) & 0xff).toString(16);
+  if ( 2 != guidArray[14].length ) {
+    guidArray[14] = "0" + guidArray[14];
+  }
+
+  guidArray[15] = (nodeid & 0xff).toString(16);
+  if ( 2 != guidArray[15].length ) {
+    guidArray[15] = "0" + guidArray[15];
+  }
+
+  return elements.join('-');
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#The_Unicode_Problem
@@ -1086,8 +1128,7 @@ decodeClass65Number = function(data) {
 // @return {boolean True if vscpClass is a measurement class, false otherwise
 //
 
-isMeasurement =
-    function(vscpClass) {
+isMeasurement = function(vscpClass) {
   let rv = false;
 
   if ((10 == vscpClass) || (60 == vscpClass) || (65 == vscpClass) ||
@@ -1141,7 +1182,7 @@ getNicknameFromCANALid = function(id) {
 // getCANALidFromData
 //
 
-getCANALidFromData(priority,
+getCANALidFromData = function(priority,
                       vscp_class,
                       vscp_type)
 {
@@ -1151,25 +1192,53 @@ getCANALidFromData(priority,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// convertEventToCanMsg
+// getCanMsgFromEvent
 //
+// @param {Event} ev Event to convert
+// @return {object} Can message object on success or 
+//                  null on failure.
 
-convertEventToCanMsg = function(ev) {
-  msg = {}; // CAN message
-  msg.ext = true;
-  msg.rtr = false;
+getCanMsgFromEvent = function(ev) {
+
+  if (true !== (e instanceof Event)) {
+    return null;
+  }
+
+  msg = {};         // CAN message
+  msg.ext = true;   // VSCP CAN messages are always extended
+  msg.rtr = false;  // This is no remote transmission request
   msg.canid = getCANALidFromData(ev.priority, 
                                   ev.vscpClass, 
-                                  ev.vscpType );
-  msg.data                                  
-
+                                  ev.vscpType ); 
+  msg.canid += getNodeId(ev.vscpGuid);
+  msg.timestamp = ev.vscpTimeStamp;
+  msg.dlc = ev.vscpData.length;
+  if ( msg.dlc > 8 ) return null;
+  msg.data = ev.vscpData;
+  
+  return msg;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // convertCanMsgToEvent
 //
+// @param {object} msg CAN message object
+// @return {Event} Converted event or null on failure.
 
 convertCanMsgToEvent = function(msg) {
+
+  // must be object
+  if ( typeof msg !== 'object') {
+    return nuĺl;
+  }
+
+  ev = new Event();
+  ev.head      = getHeadFromCANALid(msg.canid);
+  ev.vscpClass = getVscpClassFromCANALid(msg.canid);
+  ev.vscpType  = getVscpTypeFromCANALid(msg.canid);
+  ev.setNickname(getNicknameFromCANALid(msg.canid)); 
+  
+  ev = new Event();
 
 }
 
@@ -1185,9 +1254,6 @@ module.exports.isGuidZero = isGuidZero
 module.exports.getNodeId = getNodeId
 module.exports.b64EncodeUnicode = b64EncodeUnicode
 module.exports.b64DecodeUnicode = b64DecodeUnicode
-module.exports.getVarTypeName = getVarTypeName
-module.exports.getVarTypeNumerical = getVarTypeNumerical
-module.exports.getEditorModeFromType = getEditorModeFromType
 module.exports.isGuidIpv6 = isGuidIpv6
 module.exports.isDumbNode = isDumbNode
 module.exports.getPriority = getPriority
