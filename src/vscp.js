@@ -790,218 +790,6 @@ b64DecodeUnicode = function(str) {
   return new Buffer.from(str, 'base64').toString('binary');
 };
 
-/**
- * Get variable type name as string by numerical code.
- * @param {number} n    - Numerical code
- * @return {string} Variable type name
- * Note: prior to Node v4, use new Buffer rather than Buffer.from.
- */
-getVarTypeName = function(n) {
-  if (varTypes.UNASSIGNED == n) {
-    return 'unassigned';
-  } else if (varTypes.STRING == n) {
-    return 'String';
-  } else if (varTypes.BOOLEAN == n) {
-    return 'Boolean';
-  } else if (varTypes.INTEGER == n) {
-    return 'Integer';
-  } else if (varTypes.LONG == n) {
-    return 'Long';
-  } else if (varTypes.DOUBLE == n) {
-    return 'Double';
-  } else if (varTypes.MEASUREMENT == n) {
-    return 'Measurement';
-  } else if (varTypes.EVENT == n) {
-    return 'Event';
-  } else if (varTypes.GUID == n) {
-    return 'GUID';
-  } else if (varTypes.EVENT_DATA == n) {
-    return 'Event data';
-  } else if (varTypes.EVENT_CLASS == n) {
-    return 'Event class';
-  } else if (varTypes.EVENT_TYPE == n) {
-    return 'Event type';
-  } else if (varTypes.EVENT_TIMESTAMP == n) {
-    return 'Event timestamp';
-  } else if (varTypes.DATE_TIME == n) {
-    return 'Date and Time';
-  } else if (varTypes.DATE == n) {
-    return 'Date';
-  } else if (varTypes.TIME == n) {
-    return 'Time';
-  } else if (varTypes.BLOB == n) {
-    return 'Blob';
-  } else if (varTypes.MIME == n) {
-    return 'Mime';
-  } else if (varTypes.HTML == n) {
-    return 'HTML';
-  } else if (varTypes.JAVASCIPT == n) {
-    return 'Javascript';
-  } else if (varTypes.JSON == n) {
-    return 'JSON';
-  } else if (varTypes.XML == n) {
-    return 'XML';
-  } else if (varTypes.SQL == n) {
-    return 'SQL';
-  } else if (varTypes.LUA == n) {
-    return 'LUA';
-  } else if (varTypes.LUARES == n) {
-    return 'LUA result';
-  } else if (varTypes.UXTYPE1 == n) {
-    return 'UX Type 1';
-  } else if (varTypes.DMROW == n) {
-    return 'DM-row';
-  } else if (varTypes.DRIVER == n) {
-    return 'Driver';
-  } else if (varTypes.USER == n) {
-    return 'User';
-  } else if (varTypes.FILTER == n) {
-    return 'Filter';
-  } else {
-    return 'Unknown variable type';
-  }
-};
-
-/**
- * Get numerical code of variable type from string.
- * @param {string} str  - Variable type name
- * @return {number} Variable type numerical code
- */
-getVarTypeNumerical = function(str) {
-  if ('unassigned' === str.toLowerCase()) {
-    return varTypes.UNASSIGNED;
-  } else if ('string' === str.toLowerCase()) {
-    return varTypes.STRING;
-  } else if ('boolean' == str.toLowerCase()) {
-    return varTypes.BOOLEAN;
-  } else if ('integer' == str.toLowerCase()) {
-    return varTypes.INTEGER;
-  } else if ('long' == str.toLowerCase()) {
-    return varTypes.LONG;
-  } else if ('double' == str.toLowerCase()) {
-    return varTypes.DOUBLE;
-  } else if ('measurement' == str.toLowerCase()) {
-    return varTypes.MEASUREMENT;
-  } else if ('event' == str.toLowerCase()) {
-    return varTypes.EVENT;
-  } else if ('guid' == str.toLowerCase()) {
-    return varTypes.GUID;
-  } else if ('event data' == str.toLowerCase()) {
-    return varTypes.EVENT_DATA;
-  } else if ('event class' == str.toLowerCase()) {
-    return varTypes.EVENT_CLASS;
-  } else if ('event type' == str.toLowerCase()) {
-    return varTypes.EVENT_TYPE;
-  } else if ('event timestamp' == str.toLowerCase()) {
-    return varTypes.EVENT_TIMESTAMP;
-  } else if ('date and time' == str.toLowerCase()) {
-    return varTypes.DATE_TIME;
-  } else if ('date' == str.toLowerCase()) {
-    return varTypes.DATE;
-  } else if ('time' == str.toLowerCase()) {
-    return varTypes.TIME;
-  } else if ('blob' == str.toLowerCase()) {
-    return varTypes.BLOB;
-  } else if ('mime' == str.toLowerCase()) {
-    return varTypes.MIME;
-  } else if ('html' == str.toLowerCase()) {
-    return varTypes.HTML;
-  } else if ('javascript' == str.toLowerCase()) {
-    return varTypes.JAVASCIPT;
-  } else if ('json' == str.toLowerCase()) {
-    return varTypes.JSON;
-  } else if ('xml' == str.toLowerCase()) {
-    return varTypes.XML;
-  } else if ('sql' == str.toLowerCase()) {
-    return varTypes.SQL;
-  } else if ('lua' == str.toLowerCase()) {
-    return varTypes.LUA;
-  } else if ('lua result' == str.toLowerCase()) {
-    return varTypes.LUARES;
-  } else if ('ux Type 1' == str.toLowerCase()) {
-    return varTypes.UXTYPE1;
-  } else if ('dm-row' == str.toLowerCase()) {
-    return varTypes.DMROW;
-  } else if ('driver' == str.toLowerCase()) {
-    return varTypes.DRIVER;
-  } else if ('user' == str.toLowerCase()) {
-    return varTypes.USER;
-  } else if ('filter' == str.toLowerCase()) {
-    return varTypes.FILTER;
-  }
-};
-
-/**
- * Get ace editor formation mode string from numerical variable type code.
- * @param {number} n    - Variable type numerical code
- * @return {string} Ace editro formation mode string
- */
-getEditorModeFromType = function(n) {
-  if (varTypes.UNASSIGNED == n) {
-    return 'text';
-  } else if (varTypes.STRING == n) {
-    return 'text';
-  } else if (varTypes.BOOLEAN == n) {
-    return 'text';
-  } else if (varTypes.INTEGER == n) {
-    return 'text';
-  } else if (varTypes.LONG == n) {
-    return 'text';
-  } else if (varTypes.DOUBLE == n) {
-    return 'text';
-  } else if (varTypes.MEASUREMENT == n) {
-    return 'c_cpp';
-  } else if (varTypes.EVENT == n) {
-    return 'c_cpp';
-  } else if (varTypes.GUID == n) {
-    return 'asciidoc';
-  } else if (varTypes.EVENT_DATA == n) {
-    return 'c_cpp';
-  } else if (varTypes.EVENT_CLASS == n) {
-    return 'c_cpp';
-  } else if (varTypes.EVENT_TYPE == n) {
-    return 'c_cpp';
-  } else if (varTypes.EVENT_TIMESTAMP == n) {
-    return 'c_cpp';
-  } else if (varTypes.DATE_TIME == n) {
-    return 'text';
-  } else if (varTypes.DATE == n) {
-    return 'c_cpp';
-  } else if (varTypes.TIME == n) {
-    return 'c_cpp';
-  } else if (varTypes.BLOB == n) {
-    return 'c_cpp';
-  } else if (varTypes.MIME == n) {
-    return 'c_cpp';
-  } else if (varTypes.HTML == n) {
-    return 'html';
-  } else if (varTypes.JAVASCIPT == n) {
-    return 'javascript';
-  } else if (varTypes.JSON == n) {
-    return 'json';
-  } else if (varTypes.XML == n) {
-    return 'xml';
-  } else if (varTypes.SQL == n) {
-    return 'sql';
-  } else if (varTypes.LUA == n) {
-    return 'lua';
-  } else if (varTypes.LUARES == n) {
-    return 'lua';
-  } else if (varTypes.UXTYPE1 == n) {
-    return 'xml';
-  } else if (varTypes.DMROW == n) {
-    return 'c_cpp';
-  } else if (varTypes.DRIVER == n) {
-    return 'c_cpp';
-  } else if (varTypes.USER == n) {
-    return 'c_cpp';
-  } else if (varTypes.FILTER == n) {
-    return 'c_cpp';
-  } else {
-    return 'text';
-  }
-};
-
 // Header helpers
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1310,7 +1098,82 @@ isMeasurement =
   return rv;
 }
 
-    module.exports = {
+///////////////////////////////////////////////////////////////////////////////
+// vscp_getHeadFromCANALid
+//
+
+getHeadFromCANALid = function(id) {
+  var hardcoded = 0;
+  priority  = (0x07 & (id >> 26));
+  
+  if (id & (1 << 25)) {
+    hardcoded = VSCP_HEADER_HARD_CODED;
+  }
+
+  return ((priority << 5) | hardcoded);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// getVscpClassFromCANALid
+//
+
+getVscpClassFromCANALid = function(id) {
+  return (0x1ff & (id >> 16));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// getVscpTypeFromCANALid
+//
+
+getVscpTypeFromCANALid = function(id) {
+  return (0xff & (id >> 8));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// getNicknameFromCANALid
+//
+
+getNicknameFromCANALid = function(id) {
+  return (id & 0xff);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// getCANALidFromData
+//
+
+getCANALidFromData(priority,
+                      vscp_class,
+                      vscp_type)
+{
+    return ((priority << 26) |
+            (vscp_class << 16) |
+            (vscp_type << 8) | 0);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// convertEventToCanMsg
+//
+
+convertEventToCanMsg = function(ev) {
+  msg = {}; // CAN message
+  msg.ext = true;
+  msg.rtr = false;
+  msg.canid = getCANALidFromData(ev.priority, 
+                                  ev.vscpClass, 
+                                  ev.vscpType );
+  msg.data                                  
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// convertCanMsgToEvent
+//
+
+convertCanMsgToEvent = function(msg) {
+
+}
+
+module.exports = {
   Event: Event
 } 
 
