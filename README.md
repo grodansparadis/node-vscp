@@ -503,6 +503,9 @@ console.log("Event on string form: ", e5.getAsString());
 console.log("Type of:" + typeof e5.vscpDateTime);
 ```
 
+#### toString
+See **getAsString**
+
 #### setFromString
 Set the event data from a text string on the following format
 

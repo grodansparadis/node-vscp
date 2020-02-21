@@ -525,6 +525,15 @@ class Event {
   };
 
   /**
+   * Get event as string.
+   * @return {string} Event as string with the following format
+   * vscpHead,vscpClass,vscpType,vscpObId,vscpDateTime,vscpTimeStamp,vscpGuid,vspData
+   */
+  toString = function() {
+    return this.getAsString();
+  }
+
+  /**
    * Set event from string.
    * @return {string} Event as string
    */
