@@ -958,6 +958,128 @@ This flow is defined as
 
 well this is not so revolutionary code by you probably get what can be done.
 
+### Using the Event class
+
+![Send VSCP event](./images/send-vscp-event.png)
+
+Import also the class/type symbolic files to your project
+
+```bash
+npm install node-vscp-class
+npm install node-vscp-class
+```
+
+and add to
+
+
+```javascript
+functionGlobalContext: {
+    vscp:require('node-vscp')
+    vscp_class:require('node-vscp-class')
+    vscptype:require('node-vscp-type')
+}
+```
+
+The two extra modules are needed because we want to use symbols instead of numbers for VSCP class/type definitions.
+
+The code for the flow is
+
+```javascript
+[
+    {
+        "id": "180fcbf0.3b2644",
+        "type": "inject",
+        "z": "e12ba6da.b3f8e",
+        "name": "Send event",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 340,
+        "wires": [
+            [
+                "4feb88c6.c208f"
+            ]
+        ]
+    },
+    {
+        "id": "4feb88c6.c208f",
+        "type": "function",
+        "z": "e12ba6da.b3f8e",
+        "name": "Send VSCP Event",
+        "func": "var ev = new (global.get('vscp')).Event({\n    vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,\n    vscpClass: global.get('vscp_class').VSCP_CLASS1_MEASUREMENT,\n    vscpType: global.get('vscp_type').VSCP_TYPE_MEASUREMENT_TEMPERATURE,\n    vscpGuid: \"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01\",\n    vscpsizeData: 4,\n    vscpData: [0x89,0x82,0xFE,0xDC]\n});\nmsg.payload = ev;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 320,
+        "y": 340,
+        "wires": [
+            [
+                "d82c7d24.d6d0b8"
+            ]
+        ]
+    },
+    {
+        "id": "d82c7d24.d6d0b8",
+        "type": "debug",
+        "z": "e12ba6da.b3f8e",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 450,
+        "y": 400,
+        "wires": []
+    }
+]
+```
+
+If you look at the code in the function node you see
+
+```javascript
+var ev = new (global.get('vscp')).Event({
+    vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,
+    vscpClass: global.get('vscp_class').VSCP_CLASS1_MEASUREMENT,
+    vscpType: global.get('vscp_type').VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+    vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
+    vscpsizeData: 4,
+    vscpData: [0x89,0x82,0xFE,0xDC]
+});
+msg.payload = ev;
+return msg;
+```
+
+Here a new event is defined. Then the ebent is filled with data. 
+
+The event data is set symbolic instead of numeric to be self doucumenting. 
+
+Last the event object is returned and the debug node prints the object when the inject button is pressed. 
+
+In a real world example the debug node would be a VSCP send node such as the output node found in [node-red-contrib-vscp-tcp](https://www.npmjs.com/package/ node-red-contib-vscp-tcp). By defining
+
+```javascript
+var ev = new (global.get('vscp')).Event({
+    vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,
+    vscpClass: global.get('vscp_class').VSCP_CLASS1_CONTROL,
+    vscpType: global.get('vscp_type').VSCP_TYPE_CONTROL_ALL_LAMPS,
+    vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
+    vscpsizeData: 4,
+    vscpData: [0x00,0x11,0x01]
+});
+msg.payload = ev;
+return msg;
+```
+
+we could turn of all lamps in zone=17, subzone=1
+
+
+
 ---
 
 This package is part of the [VSCP(Very Simple Control Protocol)](https://www.vscp.org) IoT framework.
