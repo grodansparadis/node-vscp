@@ -57,9 +57,9 @@ const version = {
  * @enum {number}
  * @const
  */
-const priorities = {
+const priority = {
   PRIORITY_0: 0,
-  PRIORITY_0_HIGH: 0,
+  PRIORITY_HIGH: 0,
   PRIORITY_1: 1,
   PRIORITY_2: 2,
   PRIORITY_3: 3,
@@ -71,13 +71,23 @@ const priorities = {
   PRIORITY_LOW: 7
 };
 
+const guidtype = {
+  GUIDTYPE_0: 0,    // Standard GUID
+  GUIDTYPE_STANDARD: 0,
+  GUIDTYPE_1: 1, // GUID is IP.v6 address
+  GUIDTYPE_IPV6: 1,
+  GUIDTYPE_2: 2, // GUID is RFC 4122 Version 1
+  GUIDTYPE_RFC4122_1: 2,
+  GUIDTYPE_3: 3, // GUID is RFC 4122 Version 4 
+  GUIDTYPE_RFC4122_4: 2
+}
 
 /**
  * VSCP host capabilities (wcyd - What Can You Do)
  * @enum {number}
  * @const
  */
-const hostCapabilities = {
+const hostCapability = {
   REMOTE_VARIABLE: (1 << 63),
   DECISION_MATRIX: (1 << 62),
   INTERFACE: (1 << 61),
@@ -98,6 +108,31 @@ const hostCapabilities = {
   AES128: 1
 };
 
+/* 
+  Measurement data format masks 
+*/
+const measurementDataCodingMask = {
+  MASK_DATACODING_TYPE:  0xE0, /* Bits 5,6,7 */
+  MASK_DATACODING_UNIT:  0x18, /* Bits 3,4   */
+  MASK_DATACODING_INDEX: 0x07  /* Bits 0,1,2 */
+};
+
+/*
+  These bits are coded in the three MSB bits of the first data byte
+  of measurement data and tells the type of the data that follows.             
+*/
+const measurementDataCoding = {
+  DATACODING_BIT:        0x00,
+  DATACODING_BYTE:       0x20,
+  DATACODING_STRING:     0x40,
+  DATACODING_INTEGER:    0x60,
+  DATACODING_NORMALIZED: 0x80,
+  DATACODING_SINGLE:     0xA0, /* single precision float */
+  DATACODING_RESERVED1:  0xC0,
+  DATACODING_RESERVED2:  0xE0
+};
+
+
 /* ---------------------------------------------------------------------- */
 
 
@@ -110,6 +145,7 @@ const hostCapabilities = {
  * @param {boolean} options.guidIsIpV6Addr              - GUID is a IPv6 address
  * @param {boolean} options.dumbNode                    - Node is a dumb node
  * @param {number} options.vscpPriority                 - Priority
+ * @param {number} options.vscpGuidType                 - GUID Type
  * @param {boolean} options.vscpHardCoded               - Hard coded node id
  * @param {boolean} options.vscpCalcCRC                 - Calculate CRC
  * @param {number} options.vscpClass                    - VSCP class
@@ -176,6 +212,7 @@ class Event {
     this.vscpData = [];
 
     if ('undefined' !== typeof options) {
+
       if ('number' === typeof options.vscpHead) {
         this.vscpHead = options.vscpHead;
       } else if ('string' === typeof options.vscpHead) {
@@ -186,25 +223,38 @@ class Event {
         if (false === options.guidIsIpV6Addr) {
           this.vscpHead &= 0xefff;
         } else {
-          this.vscpHead |= 0x8000;
+          setIPV6Addr();
         }
       }
 
       if ('boolean' === typeof options.dumbNode) {
         if (false === options.dumbNode) {
-          this.vscpHead &= 0xfff;
+          this.vscpHead &= 0x7fff;
         } else {
           this.vscpHead |= 0x8000;
         }
       }
 
+      // 0 - 7
       if ('number' === typeof options.vscpPriority) {
         if ((0 <= options.vscpPriority) && (7 >= options.vscpPriority)) {
           this.vscpHead &= 0xff1f;
           this.vscpHead |= (options.vscpPriority << 5);
         }
-      } else if ('string' === typeof options.vscpHead) {
-        let n = parseInt(options.vscpHead);
+      } else if ('string' === typeof options.vscpPriority) {
+        let n = parseInt(options.vscpPriority);
+        this.vscpHead &= 0xff1f;
+        this.vscpHead |= (n << 5);
+      }
+
+      // 0 - 7
+      if ('number' === typeof options.vscpGuidType) {
+        if ((0 <= options.vscpGuidType) && (7 >= options.vscpGuidType)) {
+          this.vscpHead &= 0x8fff;
+          this.vscpHead |= (options.vscpGuidType << 12);
+        }
+      } else if ('string' === typeof options.vscpGuidType) {
+        let n = parseInt(options.vscpGuidType);
         this.vscpHead &= 0xff1f;
         this.vscpHead |= (n << 5);
       }
@@ -272,7 +322,7 @@ class Event {
 
       // 'text' to init from string form
       if ('string' === typeof options.text) {
-        this.setFromText(options.text);
+        this.setFromString(options.text);
       }
 
     }
@@ -282,7 +332,8 @@ class Event {
    * Set bit in header that mark GUID as IP v6 address
    */
   setIPV6Addr = function() {
-    this.vscpHead |= 0x8000;
+    this.vscpHead &= 0x8FFF;
+    this.vscpHead |= 0x1000;
   };
 
   /**
@@ -294,7 +345,7 @@ class Event {
   isIPV6Addr = function() {
     var result = false;
 
-    if (0 < (this.vscpHead & 0x8000)) {
+    if ( 0x1000 === (this.vscpHead & 0x7000)) {
       result = true;
     }
 
@@ -305,7 +356,7 @@ class Event {
    * Set bit that mark this event as coming from a dumb node (No MDF, registers, nothing).
    */
   setDumbNode = function() {
-    this.vscpHead |= 0x4000;
+    this.vscpHead |= 0x8000;
   };
 
   /**
@@ -318,7 +369,7 @@ class Event {
   isDumbNode = function() {
     var result = false;
 
-    if (0 < (this.vscpHead & 0x4000)) {
+    if (0 < (this.vscpHead & 0x8000)) {
       result = true;
     }
 
@@ -344,6 +395,27 @@ class Event {
    */
   getPriority = function() {
     return (this.vscpHead >> 5) & 0x0007;
+  };
+
+  /**
+   * Set the VSCP GUID type (0-7).
+   *
+   * @param {number} type  -  Priority
+   */
+  setGuidType = function(type) {
+    if ((0 <= type) && (7 >= type)) {
+      this.vscpHead &= 0x8fff;
+      this.vscpHead |= (type << 12);
+    }
+  };
+
+  /**
+   * Get the VSCP event GUID type (0-7).
+   *
+   * @return {number} Priority of the event.
+   */
+  getGuidType = function() {
+    return (this.vscpHead >> 12) & 0x0007;
   };
 
   /**
@@ -390,6 +462,24 @@ class Event {
 
     return result;
   };
+
+  /*!
+    getRollingIndex
+
+    Some nodes keep a rolling index of there frames (typically
+    wireless nodes). This function get the index.
+
+    @param {number} head VSCP head (16-bit or 8-bit)
+    @return {number} Rolling index 0-7.
+  */
+
+  getRollingIndex = function(head) {
+  
+    if ( 'number' !== typeof head ) {
+      throw(new Error("Parameter error: 'head' should be a number."))
+    }
+    return (head & 7);
+  }
 
   /**
    * Get event as string.
@@ -515,6 +605,7 @@ class Event {
 
 } // Event
 
+
 /* ---------------------------------------------------------------------- */
 
 
@@ -620,16 +711,17 @@ var guidToStr = function(guid) {
  *     GUID
  */
 var strToGuid = function(str) {
+
   var guid = [];
   var items = [];
   var index = 0;
 
   if ('undefined' === typeof str) {
-    return guid;
+    throw(new Error("Missing argument"));
   }
 
   if ('string' !== typeof str) {
-    return guid;
+    throw(new Error("Argument should be string"));
   }
 
   // If GUID is "-" use interface GUID
@@ -640,7 +732,7 @@ var strToGuid = function(str) {
   items = str.split(':');
 
   if (16 !== items.length) {
-    return guid;
+    trow(new Error("A VSCP GUID consist of 16 items"));
   }
 
   for (index = 0; index < items.length; ++index) {
@@ -658,23 +750,32 @@ var strToGuid = function(str) {
  */
 
 var isGuidZero = function(guid) {
+  
+  var guidArray = [];
+  
   if ('undefined' === typeof guid) {
-    return false;
+    throw(new Error("Missing argument"));
   }
 
   if ('string' === typeof guid) {
-    guid = vscp.strToGuid(guid);
+    guidArray = strToGuid(guid);
+  }
+
+  if ( Array.isArray(guid) ) {
+    guidArray = guid;
   }
 
   for (let i = 0; i < 16; i++) {
-    if (guid[i]) return false;
+    if (guidArray[i]) return false;
   }
 
   return true;
 };
 
 /**
- * Get node id from a node GUID string. TODO should be 16-bit!
+ * getNodeId
+ * 
+ * Get node id from a node GUID string. 
  *
  * @param {string} guid - GUID string, e.g.
  *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
@@ -694,6 +795,22 @@ var getNodeId = function(guid) {
 };
 
 /**
+ * getNickName
+ * 
+ * Get node id from a node GUID string. 
+ *
+ * @param {string} guid - GUID string, e.g.
+ *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+ * @return {number} Node id
+ */
+
+var getNickName = function(guid) {
+  return getNodeId(guid);
+}
+
+/**
+ * setNodeId
+ * 
  * Set node to a node GUID string. TODO should be 16-bit!
  * 
  * @param {string} guid - GUID string, e.g.
@@ -707,15 +824,15 @@ var setNodeId = function(guid, nodeid) {
 
   if ( ('undefined' === typeof guid) ||
        ('undefined' === typeof nodeid) ) {
-    return null;
+      throw(new Error("Missing argument"));
   }
 
   if ('string' !== typeof guid) {
-    return null;
+    throw(new Error("guid argument should be a string"));
   }
 
   if ('number' !== typeof nodeid) {
-    return null;
+    throw(new Error("nodeid argument should be a 16-bit number."));
   }
 
   var guidArray = guid.split(':');
@@ -730,8 +847,24 @@ var setNodeId = function(guid, nodeid) {
     guidArray[15] = "0" + guidArray[15];
   }
 
-  return elements.join('-');
+  return guidArray.join(':');
 };
+
+/**
+ * setNickName
+ * 
+ * Set node to a node GUID string. TODO should be 16-bit!
+ * 
+ * @param {string} guid - GUID string, e.g.
+ *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+ * @param {number} nodeid - Node is to set (16-bit). 
+ * @return {string} guid with LSB set to node id, or null
+ *                  on error.
+ */
+
+var setNickName = function(guid, nodeid) {
+  return setNodeId(guid, nodeid);
+}
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#The_Unicode_Problem
 // Since DOMStrings are 16-bit-encoded strings, in most browsers calling
@@ -772,7 +905,17 @@ var b64DecodeUnicode = function(str) {
 */
 
 var isGuidIpv6 = function(head) {
-  return (head & (1 << 12));
+  var result = false;
+
+  if ( 'number' !== typeof head ) {
+    throw(new Error("Parameter error: 'head' should be a number."))
+  }
+
+  if ( 0x1000 === (this.vscpHead & 0x7000)) {
+    result = true;
+  }
+
+  return result;
 }
 
 /*!
@@ -786,10 +929,13 @@ var isGuidIpv6 = function(head) {
 */
 
 var isDumbNode = function(head) {
+
   if ( 'number' !== typeof head ) {
     throw(new Error("Parameter error: 'head' should be a number."))
   }
-  return (head & (1 << 15));
+
+  return (head & (1 << 15) ? true : false );
+
 }
 
 /*!
@@ -809,6 +955,17 @@ var getPriority = function(head) {
 }
 
 /*!
+  Get the VSCP event GUID type (0-7).
+  
+  @return {number} Priority of the event.
+*/
+
+var getGuidType = function(vscpHead) {
+  return (this.vscpHead >> 12) & 0x0007;
+};
+
+
+/*!
   isHardCoded
 
   A hardcoded node is a node where the address is
@@ -821,6 +978,7 @@ var getPriority = function(head) {
 */
 
 var isHardCoded = function(head) {
+
   if ( 'number' !== typeof head ) {
     throw(new Error("Parameter error: 'head' should be a number."))
   }
@@ -857,6 +1015,7 @@ var isNoCrc = function(head) {
 */
 
 var getRollingIndex = function(head) {
+
   if ( 'number' !== typeof head ) {
     throw(new Error("Parameter error: 'head' should be a number."))
   }
@@ -872,12 +1031,13 @@ var getRollingIndex = function(head) {
 
   @param {number} value        - Value
   @param {number} precision    - Precision
-  @return {number} Rounded value
+  @return {string} Rounded value
 */
 
 var toFixed = function(value, precision) {
+
   if ( ('number' !== typeof value) || 
-     ('number' !== typeof precision) ) {
+       ('number' !== typeof precision) ) {
     throw(new Error("Parameter error: 'value' and precision' should be numbers."))
   }
   var power = Math.pow(10, precision || 0);
@@ -886,7 +1046,9 @@ var toFixed = function(value, precision) {
 
 /*! 
   varInteger2Float
-  Convert a integer value to float
+  Convert an integer value to floating point value. 
+  The integer is stored in a byte array with MSB to LSB 
+  storage order.
 
   @param {number[]} data - Byte array
   @return {number} Float value
@@ -896,6 +1058,10 @@ var varInteger2Float = function(data) {
   var rval = 0.0;
   var bNegative = false;
   var i = 0;
+
+  if ( !Array.isArray(data) ) {
+    throw(new Error("Data must be a byte array."))
+  }
 
   if (0 !== (data[0] & 0x80)) {
     bNegative = true;
@@ -927,6 +1093,7 @@ var varInteger2Float = function(data) {
 */
 
 var getDataCoding = function(data) {
+
   if ( 'number' !== typeof data ) {
     throw(new Error("Parameter error: 'data' should be a number."))
   }
@@ -934,7 +1101,7 @@ var getDataCoding = function(data) {
 };
 
 /*! 
-  getUnitFromDataCoding
+  getUnit
 
   Get unit from data coding.
 
@@ -942,7 +1109,8 @@ var getDataCoding = function(data) {
   @return {number} Unit
 */
 
-var getUnitFromDataCoding = function(data) {
+var getUnit = function(data) {
+
   if ( 'number' !== typeof data ) {
     throw(new Error("Parameter error: 'data' should be a number."))
   }
@@ -950,7 +1118,7 @@ var getUnitFromDataCoding = function(data) {
 };
 
 /*! 
-  getSensorIndexFromDataCoding
+  getSensorIndex
 
    Get sensor index from data coding.
 
@@ -958,7 +1126,7 @@ var getUnitFromDataCoding = function(data) {
    @return {number} Sensor index
 */
 
-var getSensorIndexFromDataCoding = function(data) {
+var getSensorIndex = function(data) {
   
   if ( 'number' !== typeof data ) {
     throw(new Error("Parameter error: 'data' should be a number."))
@@ -987,8 +1155,8 @@ var decodeClass10 = function(data) {
   var str = '';
   var i = 0;
 
-  if ( 'number' !== typeof data ) {
-    throw(new Error("Parameter error: 'data' should be a number."))
+  if ( !Array.isArray(data) ) {
+    throw(new Error("Parameter error: 'data' should be a numeric array."))
   }
 
   switch (module.exports.getDataCoding(data[0])) {
@@ -1068,8 +1236,8 @@ var decodeClass60Number = function(data) {
   var exp = 0;
   var mantissa = 0;
 
-  if ( 'number' !== typeof data ) {
-    throw(new Error("Parameter error: 'data' should be a number."))
+  if ( !Array.isArray(data) ) {
+    throw(new Error("Parameter error: 'data' should be a numeric array."))
   }
 
   if (8 === data.length) {
@@ -1303,22 +1471,30 @@ module.exports = {
 
   // Constants
   version,
-  priorities,
-  hostCapabilities,
+  priority,
+  guidtype,
+  hostCapability,
+  measurementDataCodingMask,
+  measurementDataCoding,
 
+  // Helpers  
   readValue,
   getTime,
   guidToStr,
   strToGuid,
   isGuidZero,
   getNodeId,
+  getNickName,
+  setNodeId,
+  setNickName,
   b64EncodeUnicode,
   b64DecodeUnicode,
   isGuidIpv6,
   isDumbNode,
-  getPriority,
   isHardCoded,
   isNoCrc,
+  getPriority,
+  getGuidType,
   getRollingIndex,
 
   // Measurements
@@ -1326,7 +1502,8 @@ module.exports = {
   toFixed,
   varInteger2Float,
   getDataCoding,
-  getUnitFromDataCoding,
+  getUnit,
+  getSensorIndex,
   decodeClass10,
   decodeClass60Number,
   decodeClass65Number,
