@@ -163,6 +163,7 @@ console.log("Nodeid - ",vscp.getNodeId(strguid1),vscp.getNickName(strguid1));
 
 // setNodeId / setNickName
 console.log(vscp.setNodeId(strguid1,255));
+console.log(vscp.setNickName(strguid1,115));
 
 console.log(vscp.b64EncodeUnicode("This is a test string"));
 
@@ -203,3 +204,63 @@ console.log("Measurement data [0x89,0x82,0xFE,0xDC]is ",
             vscp.decodeClass10(d));
 
 console.log(e5.toString());
+
+// --------------------------------------------------------------
+// convertCanMsgToEvent
+// --------------------------------------------------------------
+
+console.log(vscp.getCANALid(7,10,6)+42);
+console.log(vscp.getNicknameFromCANALid(vscp.getCANALid(7,10,6)+42));
+
+console.log(" --- convertCanMsgToEvent 1");
+console.log( vscp.convertCanMsgToEvent({
+    canid: vscp.getCANALid(7,10,6)+42,
+    ext: true,
+    rtr: false,
+    dlc: 4,
+    data: "1,2,3,4"
+  }
+));
+
+console.log(" --- convertCanMsgToEvent 2");
+console.log( vscp.convertCanMsgToEvent({
+    canid: vscp.getCANALid(7,10,6)+42,
+    ext: true,
+    rtr: false,
+    dlc: 4,
+    data: [1,2,3,4]
+  }
+));
+
+console.log(" --- convertCanMsgToEvent 3");
+console.log( vscp.convertCanMsgToEvent({
+    canid: vscp.getCANALid(7,10,6)+42,
+    ext: true,
+    rtr: false,
+    dlc: 4,
+    data: new Buffer.from([1,2,3,4])
+  }
+));
+
+console.log(" --- convertCanMsgToEvent 4");
+console.log( vscp.convertCanMsgToEvent({
+    canid: vscp.getCANALid(7,10,6)+42,
+    ext: true,
+    rtr: false,
+  }
+));
+
+console.log(" --- convertCanMsgToEvent 5");
+console.log( vscp.convertCanMsgToEvent({
+    canid: vscp.getCANALid(7,10,6)+42,
+    ext: true,
+    rtr: false,
+    dlc: 4,
+  }
+));
+
+
+// convertEventToCanMsg
+
+console.log(" --- convertEventToCanMsg");
+console.log(vscp.convertEventToCanMsg(e5));

@@ -1329,11 +1329,12 @@ var isMeasurement = function(vscpClass) {
 */
 
 var getVscpHeadFromCANALid = function(id) {
+
   var hardcoded = 0;
   var priority  = (0x07 & (id >> 26));
   
   if (id & (1 << 25)) {
-    hardcoded = VSCP_HEADER_HARD_CODED;
+    hardcoded = 0x10;
   }
 
   return ((priority << 5) | hardcoded);
@@ -1441,6 +1442,7 @@ var convertEventToCanMsg = function(ev) {
       rtr: false,
       timestamp: 1233,
       canid: 123,
+      dlc: 4,
       data: [1,2,3,4]
    }
 */
@@ -1450,17 +1452,37 @@ var convertCanMsgToEvent = function(msg) {
   // must be object
   if ( typeof msg !== 'object') {
     throw(new Error("Parameter error: 'msg' should be canmsg object."));
-  }
-
-  ev = new Event();
-  ev.guid      = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
-  ev.head      = getVscpHeadFromCANALid(msg.canid);
+  } 
+  
+  var ev = new Event();
+  ev.vscpGuid  = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
+  ev.vscpHead  = getVscpHeadFromCANALid(msg.canid);
   ev.vscpClass = getVscpClassFromCANALid(msg.canid);
   ev.vscpType  = getVscpTypeFromCANALid(msg.canid);
-  ev.setNickname(getNicknameFromCANALid(msg.canid));
-  ev.timestamp = msg.timestamp;
-  ev.dateTime
+  ev.vscpTimestamp = msg.timestamp || new Date().getTime();
+  var d = new Date(new Date().toUTCString());
+  ev.vscpDateTime = d.toISOString();
+  ev.vscpGuid = setNickName(ev.vscpGuid, getNicknameFromCANALid(msg.canid));
   
+  // Handle data
+  if (msg.data) { 
+    if ( 'string' === typeof msg.data ) {
+      ev.vscpData = msg.data.split(',');
+    }
+    else if ( Array.isArray(msg.data) ) {
+      ev.vscpData = msg.data;
+    }
+    else if (Buffer.isBuffer(msg.data) ) {
+      ev.vscpData = Array.prototype.slice.call(msg.data, 0)
+    }
+  }
+  else {
+    if ( msg.dlc && (msg.dlc > 0 )) {
+      console.error("CAN message has no message data but dlc =",msg.dlc);
+    }
+    ev.vscpData = [];
+  }
+
   return ev;
 }
 

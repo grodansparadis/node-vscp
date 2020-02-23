@@ -775,11 +775,11 @@ Output is an object with the following format
 }
 ```
 
-### convertCanMsgToEvent(canmsg)
+### {event} convertCanMsgToEvent(canmsg)
 
-Convert a canmsg to a VSCP event.
+Convert a canmsg to a level I VSCP event.
 
-canmsg is an object with the following format
+A canmsg is an object with the following format
 
 ```json
 {
@@ -790,6 +790,26 @@ canmsg is an object with the following format
   dlc: 4,
   data: [ 137, 130, 254, 220 ]
 }
+```
+
+data can be _string_, _array_, _buffer_ or _null_. **ext** should always be true and **rtr** always false for a VSCP event. 
+
+If timestamp is not given it will get sensible default. 
+
+The resulting GUID will be all nills with the nickname in the LSB.
+
+**Example**
+```javsacript
+console.log( vscp.convertCanMsgToEvent(
+  {
+   canid: vscp.getCANALid(7,10,6)+42,
+   ext: true,
+   rtr: false,
+   dlc: 4,
+   data: new Buffer.from([1,2,3,4])
+  }
+));
+```
 
 ---
 
