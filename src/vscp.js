@@ -607,9 +607,10 @@ class Event {
     this.vscpData = [];
     if (ea.length > 7) {
       for (let i = 7; i < ea.length; i++) {
-        this.vscpData[7 - i] = readValue(ea[i]);
+        this.vscpData.push(readValue(ea[i]));
       }
     }
+
   }
 
 } // Event
@@ -1429,11 +1430,12 @@ var convertEventToCanMsg = function(ev) {
                                           ev.vscpType ); 
   msg.canid += getNodeId(ev.vscpGuid);
   msg.timestamp = ev.vscpTimeStamp;
+  msg.data = ev.vscpData;
   msg.dlc = ev.vscpData.length;
   if ( msg.dlc > 8 ) {
     throw(new Error("Data length is > 8 [" + msg.dlc + "]"));
   }
-  msg.data = ev.vscpData;
+  
   
   return msg;
 }
