@@ -262,5 +262,22 @@ console.log( vscp.convertCanMsgToEvent({
 
 // convertEventToCanMsg
 
-console.log(" --- convertEventToCanMsg");
+console.log(" --- convertEventToCanMsg 1");
 console.log(vscp.convertEventToCanMsg(e5));
+
+console.log(" --- convertEventToCanMsg 2");
+console.log(vscp.convertEventToCanMsg(
+    {
+        "vscpHead": 80,
+        "vscpClass": 10,
+        "vscpType": 6,
+        "vscpData": [
+            11,
+            22,
+            33,
+            44,
+            55
+        ],
+        "vscpTimeStamp": 3456
+    }
+));

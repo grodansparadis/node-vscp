@@ -799,6 +799,11 @@ var getNodeId = function(guid) {
     throw new Error("Parameter error: GUID should be on string form.");
   }
 
+  // Short for all nulls?  
+  if (('-' === guid)  || ('' === guid) ) {
+    return 0;
+  }
+
   return ( (parseInt(guid.split(':')[14], 16) << 8) + 
             parseInt(guid.split(':')[15], 16));
 };
@@ -1409,7 +1414,10 @@ var getCANALid = function(vscpPriority,
 
 var convertEventToCanMsg = function(ev) {
 
-  if (true !== (ev instanceof Event)) {
+  if ( ('object' === typeof ev ) && !(ev instanceof Event)) {
+    ev = new Event(ev);
+  }
+  else if (!(ev instanceof Event)) {
     throw(new Error("Parameter should be VSCP Event"));
   }
 
