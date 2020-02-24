@@ -238,7 +238,7 @@ console.log( vscp.convertCanMsgToEvent({
     ext: true,
     rtr: false,
     dlc: 4,
-    data: new Buffer.from([1,2,3,4])
+    data: new Buffer.from([1,22,3,44])
   }
 ));
 

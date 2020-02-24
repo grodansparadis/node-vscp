@@ -1454,7 +1454,7 @@ var convertCanMsgToEvent = function(msg) {
     throw(new Error("Parameter error: 'msg' should be canmsg object."));
   } 
   
-  var ev = new Event();
+  var ev = {};
   ev.vscpGuid  = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
   ev.vscpHead  = getVscpHeadFromCANALid(msg.canid);
   ev.vscpClass = getVscpClassFromCANALid(msg.canid);
