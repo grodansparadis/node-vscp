@@ -291,3 +291,14 @@ e6.setFromString("0,20,3,,2001-11-02T18:00:01,,-,0x88,1,35");
 console.log(e6);
 console.log(vscp.convertEventToCanMsg(e6));
 
+var e7 = new vscp.Event({
+    "vscpHead": 80,
+    "vscpClass": 10,
+    "vscpType": 6,
+    "vscpData": "100,200,99",
+    "vscpTimeStamp": 3456
+});
+console.log(vscp.convertEventToCanMsg(e7));
+
+
+

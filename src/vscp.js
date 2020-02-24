@@ -313,12 +313,15 @@ class Event {
       }
 
       // VSCP data
-      if (('string' === typeof options.vscpData) ||
-          (true === (options.vscpData instanceof Array))) {
+      else if (Array.isArray(options.vscpData)) {
         this.vscpData = options.vscpData;
-      } else if (Array.isArray(options.vscpData)) {
-        this.vscpData = options.vscpData.toString();
-      }
+      } else if (('string' === typeof options.vscpData) ) {
+        this.vscpData = options.vscpData.split(',');
+        // Make data numeric
+        for ( var n in this.vscpData ) {
+          this.vscpData[n] = readValue(this.vscpData[n]);
+        }
+      } 
 
       // 'text' to init from string form
       if ('string' === typeof options.text) {
