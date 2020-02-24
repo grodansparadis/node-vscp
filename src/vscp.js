@@ -579,7 +579,7 @@ class Event {
           this.vscpDateTime.getUTCFullYear(), this.vscpDateTime.getUTCMonth(), this.vscpDateTime.getUTCDate(),
           this.vscpDateTime.getUTCHours(), this.vscpDateTime.getUTCMinutes(), this.vscpDateTime.getUTCSeconds());
       this.vscpDateTime = new Date(this.vscpDateTime);
-    } else if ((ea.length > 4) && (0 == ea[4].length)) {
+    } else if ((ea.length > 4) && (0 !== ea[4].length)) {
       this.vscpDateTime = new Date(ea[4]);
     }
 
