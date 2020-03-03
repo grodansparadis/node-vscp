@@ -1426,20 +1426,20 @@ var convertEventToCanMsg = function(ev) {
   }
 
   var msg = {};         // CAN message
-  msg.ext = true;   // VSCP CAN messages are always extended
-  msg.rtr = false;  // This is no remote transmission request
-  msg.canid = getCANALid( getPriority(ev.vscpHead), 
-                                          ev.vscpClass,
-                                          ev.vscpType );
+  // msg.ext = true;   // VSCP CAN messages are always extended
+  // msg.rtr = false;  // This is no remote transmission request
+  msg.id = getCANALid( getPriority(ev.vscpHead), 
+                                      ev.vscpClass,
+                                      ev.vscpType );
+  msg.id += getNodeId(ev.vscpGuid);
   msg.flags = 1; //CANAL extended id
-  msg.canid += getNodeId(ev.vscpGuid);
-  msg.id = msg.canid;
+  msg.obid = ev.obid;
   msg.timestamp = ev.vscpTimeStamp;
   msg.data = ev.vscpData;
-  msg.dlc = ev.vscpData.length;
-  if ( msg.dlc > 8 ) {
-    throw(new Error("Data length is > 8 [" + msg.dlc + "]"));
-  }
+  // msg.dlc = ev.vscpData.length;
+  // if ( msg.dlc > 8 ) {
+  //   throw(new Error("Data length is > 8 [" + msg.dlc + "]"));
+  // }
   
   
   return msg;
