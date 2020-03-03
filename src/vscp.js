@@ -1430,8 +1430,10 @@ var convertEventToCanMsg = function(ev) {
   msg.rtr = false;  // This is no remote transmission request
   msg.canid = getCANALid( getPriority(ev.vscpHead), 
                                           ev.vscpClass,
-                                          ev.vscpType ); 
+                                          ev.vscpType );
+  msg.flags = 1; //CANAL extended id
   msg.canid += getNodeId(ev.vscpGuid);
+  msg.id = msg.canid;
   msg.timestamp = ev.vscpTimeStamp;
   msg.data = ev.vscpData;
   msg.dlc = ev.vscpData.length;
@@ -1466,13 +1468,18 @@ var convertCanMsgToEvent = function(msg) {
   if ( typeof msg !== 'object') {
     throw(new Error("Parameter error: 'msg' should be canmsg object."));
   } 
+
+  // VSCP use id not canid
+  if ('undefined' === msg.canid) {
+    msg.canid = msg.id;
+  }
   
   var ev = {};
   ev.vscpGuid  = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
   ev.vscpHead  = getVscpHeadFromCANALid(msg.canid);
   ev.vscpClass = getVscpClassFromCANALid(msg.canid);
   ev.vscpType  = getVscpTypeFromCANALid(msg.canid);
-  ev.vscpTimestamp = msg.timestamp || new Date().getTime();
+  ev.vscpTimeStamp = msg.timestamp || new Date().getTime();
   var d = new Date(new Date().toUTCString());
   ev.vscpDateTime = d.toISOString();
   ev.vscpGuid = setNickName(ev.vscpGuid, getNicknameFromCANALid(msg.canid));
