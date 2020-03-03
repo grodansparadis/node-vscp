@@ -1488,12 +1488,15 @@ var convertCanMsgToEvent = function(msg) {
   if (msg.data) { 
     if ( 'string' === typeof msg.data ) {
       ev.vscpData = msg.data.split(',');
+      ev.sizeData = ev.vscpData.length;
     }
     else if ( Array.isArray(msg.data) ) {
       ev.vscpData = msg.data;
+      ev.sizeData = ev.vscpData.length;
     }
     else if (Buffer.isBuffer(msg.data) ) {
       ev.vscpData = Array.prototype.slice.call(msg.data, 0)
+      ev.sizeData = ev.vscpData.length;
     }
   }
   else {
@@ -1501,20 +1504,11 @@ var convertCanMsgToEvent = function(msg) {
       console.error("CAN message has no message data but dlc =",msg.dlc);
     }
     ev.vscpData = [];
+    ev.sizeData = 0;
   }
 
   return ev;
-}
-
-// module.exports = {
-
-//   Event: Event,
-
-//   // Constants
-//   version: version,
-//   priorities: priorities,
-//   hostCapabilities: hostCapabilities,
-// } 
+} 
 
 module.exports = {
 
