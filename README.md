@@ -766,11 +766,10 @@ Output is an object with the following format
 
 ```json
 {
-  ext: true,
-  rtr: false,
   canid: 656897,
+  flags: 1,
   timestamp: 0,
-  dlc: 4,
+  obid: 0,
   data: [ 137, 130, 254, 220 ]
 }
 ```
@@ -783,11 +782,11 @@ A canmsg is an object with the following format
 
 ```json
 {
-  ext: true,
-  rtr: false,
-  canid: 656897,
+  id: 656897,
   timestamp: 0,
-  dlc: 4,
+  flags: 1,
+  obid: 0,
+  timestamp: 0,
   data: [ 137, 130, 254, 220 ]
 }
 ```

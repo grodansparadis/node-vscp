@@ -214,7 +214,7 @@ console.log(vscp.getNicknameFromCANALid(vscp.getCANALid(7,10,6)+42));
 
 console.log(" --- convertCanMsgToEvent 1");
 console.log( vscp.convertCanMsgToEvent({
-    canid: vscp.getCANALid(7,10,6)+42,
+    id: vscp.getCANALid(7,10,6)+42,
     ext: true,
     rtr: false,
     dlc: 4,
@@ -224,7 +224,7 @@ console.log( vscp.convertCanMsgToEvent({
 
 console.log(" --- convertCanMsgToEvent 2");
 console.log( vscp.convertCanMsgToEvent({
-    canid: vscp.getCANALid(7,10,6)+42,
+    id: vscp.getCANALid(7,10,6)+42,
     ext: true,
     rtr: false,
     dlc: 4,
@@ -234,7 +234,7 @@ console.log( vscp.convertCanMsgToEvent({
 
 console.log(" --- convertCanMsgToEvent 3");
 console.log( vscp.convertCanMsgToEvent({
-    canid: vscp.getCANALid(7,10,6)+42,
+    id: vscp.getCANALid(7,10,6)+42,
     ext: true,
     rtr: false,
     dlc: 4,
@@ -244,7 +244,7 @@ console.log( vscp.convertCanMsgToEvent({
 
 console.log(" --- convertCanMsgToEvent 4");
 console.log( vscp.convertCanMsgToEvent({
-    canid: vscp.getCANALid(7,10,6)+42,
+    id: vscp.getCANALid(7,10,6)+42,
     ext: true,
     rtr: false,
   }
@@ -252,7 +252,7 @@ console.log( vscp.convertCanMsgToEvent({
 
 console.log(" --- convertCanMsgToEvent 5");
 console.log( vscp.convertCanMsgToEvent({
-    canid: vscp.getCANALid(7,10,6)+42,
+    id: vscp.getCANALid(7,10,6)+42,
     ext: true,
     rtr: false,
     dlc: 4,

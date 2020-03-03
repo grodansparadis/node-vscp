@@ -1470,7 +1470,7 @@ var convertCanMsgToEvent = function(msg) {
   } 
 
   // VSCP use id not canid
-  if ('undefined' === msg.canid) {
+  if ('undefined' === typeof msg.canid) {
     msg.canid = msg.id;
   }
   
@@ -1483,7 +1483,7 @@ var convertCanMsgToEvent = function(msg) {
   var d = new Date(new Date().toUTCString());
   ev.vscpDateTime = d.toISOString();
   ev.vscpGuid = setNickName(ev.vscpGuid, getNicknameFromCANALid(msg.canid));
-  
+  ev.obid = msg.obid || 0;
   // Handle data
   if (msg.data) { 
     if ( 'string' === typeof msg.data ) {
