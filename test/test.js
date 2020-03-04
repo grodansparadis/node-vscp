@@ -300,5 +300,27 @@ var e7 = new vscp.Event({
 });
 console.log(vscp.convertEventToCanMsg(e7));
 
+var e7 = new vscp.Event({
+    "vscpHead": 80,
+    "vscpClass": 10,
+    "vscpType": 6,
+    "vscpGuid": "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:2a",
+    "vscpObid": 0,
+    "vscpData": [
+        11,
+        22,
+        33,
+        44,
+        55
+    ],
+    "vscpTimeStamp": 34565634,
+    "vscpDateTime": "2020-02-24T11:10:59.807Z"
+});
 
+console.log(e7.toJSONObj());
+
+e8 = new vscp.Event({
+    text : '3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32'
+});
+console.log(e8);
 

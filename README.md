@@ -189,9 +189,9 @@ console.log("Is this a normalized integer",
 
 This is a helper class that defines a VSCP event. You can use it in the following way
 
-```
+```javascript
 // Define event with object in constructor and data in array
-e4 = new vscp.Event({
+e2 = new vscp.Event({
     vscpHead: 0,
     vscpClass: 10,
     vscpType: 6,
@@ -201,7 +201,7 @@ e4 = new vscp.Event({
 
 or 
 
-```
+```javascript
 // Define event with members
 e2 = new vscp.Event();
 e2.vscpClass = 10;
@@ -209,9 +209,21 @@ e2.vscpType = 6;
 e2.data = [1,2,3,4,5];
 ```
 
+or
+
+```javascript
+// Define event from text form
+e2 = new vscp.Event({
+    text : '3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32'
+});
+console.log(e2);
+```
+
+see setFromString below.
+
 The full definitions is like this
 
-```
+```javascript
  * @param {object} options                              - Options
  * @param {number} options.vscpHead                     - Event head
  * @param {boolean} options.guidIsIpV6Addr              - GUID is a IPv6 address
@@ -227,6 +239,8 @@ The full definitions is like this
  * @param {number} options.vscpTimeStamp                - Timestamp
  * @param {string} options.vscpGuid                     - GUID string
  * @param {(number[]|string)} options.vscpData
+ text
+ * @param {string} options.text
 ```
 
 ### Methods
@@ -475,7 +489,7 @@ console.log("Calculate CRC :",
 #### getAsString
 Get event in string form on the following format
 
-```
+```javascript
 "vscpHead,vscpClass,vscpType,vscpObId,vscpDateTime,vscpTimeStamp,vscpGuid,vspData"
 ```
 
@@ -509,7 +523,7 @@ See **getAsString**
 #### setFromString
 Set the event data from a text string on the following format
 
-```
+```javascript
 "vscpHead,vscpClass,vscpType,vscpObId,vscpDateTime,vscpTimeStamp,vscpGuid,vspData"
 ```
 
@@ -523,6 +537,29 @@ if (true === (e instanceof vscp.Event)) {
 e.setFromString('3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
 console.log(e);
 ```
+#### toJSONObj
+
+Get event as a JSON object on the form
+
+```javascript
+{
+  vscpHead: 80,
+  vscpClass: 10,
+  vscpType: 6,
+  vscpGuid: '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:2a',
+  vscpObId: 0,
+  vscpTimeStamp: 34565634,
+  vscpDateTime: 2020-02-24T11:10:59.807Z,
+  vscpData: [ 11, 22, 33, 44, 55 ]
+}
+```
+**Example**
+```javascript
+var e = new Event('3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
+console.log(e.toJSONObj());
+```
+
+
 
 ## Other functionality
 

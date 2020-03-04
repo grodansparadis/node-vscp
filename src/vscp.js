@@ -308,12 +308,13 @@ class Event {
         this.vscpDateTime = options.vscpDateTime;
       }
 
+      // GUID
       if ('string' === typeof options.vscpGuid) {
         this.vscpGuid = options.vscpGuid;
       }
 
       // VSCP data
-      else if (Array.isArray(options.vscpData)) {
+      if (Array.isArray(options.vscpData)) {
         this.vscpData = options.vscpData;
       } else if (('string' === typeof options.vscpData) ) {
         this.vscpData = options.vscpData.split(',');
@@ -501,7 +502,8 @@ class Event {
     str += this.vscpTimeStamp.toString() + ',';
     str += this.vscpGuid;
 
-    if (this.vscpData instanceof Array) {
+    if ( Array.isArray(this.vscpData)) {
+
       if (0 < this.vscpData.length) {
         str += ',';
       }
@@ -615,6 +617,23 @@ class Event {
     }
 
   }
+
+  /**
+   * return JSON object representation of event
+   * @return {object} Event as JSON object
+   */
+  toJSONObj = function() {
+        var ev = {};
+        ev.vscpHead = this.vscpHead;
+        ev.vscpClass = this.vscpClass;
+        ev.vscpType = this.vscpType;
+        ev.vscpGuid = this.vscpGuid;
+        ev.vscpObId = this.vscpObId;
+        ev.vscpTimeStamp = this.vscpTimeStamp;
+        ev.vscpDateTime = this.vscpDateTime
+        ev.vscpData = this.vscpData;
+        return ev;
+      }
 
 } // Event
 
