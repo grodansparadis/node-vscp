@@ -155,6 +155,7 @@ const measurementDataCoding = {
  * @param {number} options.vscpTimeStamp                - Timestamp
  * @param {string} options.vscpGuid                     - GUID string
  * @param {(number[]|string)} options.vscpData          - Event data
+ * @param {string} options.text                         - Event on text form
  */
 class Event {
   
