@@ -224,7 +224,7 @@ class Event {
         if (false === options.guidIsIpV6Addr) {
           this.vscpHead &= 0xefff;
         } else {
-          setIPV6Addr();
+          this.setIPV6Addr();
         }
       }
 
@@ -331,15 +331,15 @@ class Event {
       }
 
     }
-  };
+  }
 
   /**
    * Set bit in header that mark GUID as IP v6 address
    */
-  setIPV6Addr = function() {
+  setIPV6Addr() {
     this.vscpHead &= 0x8FFF;
     this.vscpHead |= 0x1000;
-  };
+  }
 
   /**
    * Check if GUID for this event is a IP v6 address or not?
@@ -347,7 +347,7 @@ class Event {
    * @return {boolean} If the GUID is a IP v6 address, it will return true,
    *     otherwise false.
    */
-  isIPV6Addr = function() {
+  isIPV6Addr() {
     var result = false;
 
     if ( 0x1000 === (this.vscpHead & 0x7000)) {
@@ -355,14 +355,14 @@ class Event {
     }
 
     return result;
-  };
+  }
 
   /**
    * Set bit that mark this event as coming from a dumb node (No MDF, registers, nothing).
    */
-  setDumbNode = function() {
+  setDumbNode() {
     this.vscpHead |= 0x8000;
-  };
+  }
 
   /**
    * Check if this event is marked as coming from a dumb node.
@@ -371,7 +371,7 @@ class Event {
    * @return {boolean} If the node is a dumb node, it will return true, otherwise
    *     false.
    */
-  isDumbNode = function() {
+  isDumbNode() {
     var result = false;
 
     if (0 < (this.vscpHead & 0x8000)) {
@@ -379,56 +379,56 @@ class Event {
     }
 
     return result;
-  };
+  }
 
   /**
    * Set the VSCP event priority (0-7). Lower value is higher priority.
    *
    * @param {number} priority  -  Priority
    */
-  setPriority = function(priority) {
+  setPriority(priority) {
     if ((0 <= priority) && (7 >= priority)) {
       this.vscpHead &= 0xff1f;
       this.vscpHead |= (priority << 5);
     }
-  };
+  }
 
   /**
    * Get the VSCP event priority (0-7). Lower value is higher priority.
    *
    * @return {number} Priority of the event.
    */
-  getPriority = function() {
+  getPriority() {
     return (this.vscpHead >> 5) & 0x0007;
-  };
+  }
 
   /**
    * Set the VSCP GUID type (0-7).
    *
    * @param {number} type  -  Priority
    */
-  setGuidType = function(type) {
+  setGuidType(type) {
     if ((0 <= type) && (7 >= type)) {
       this.vscpHead &= 0x8fff;
       this.vscpHead |= (type << 12);
     }
-  };
+  }
 
   /**
    * Get the VSCP event GUID type (0-7).
    *
    * @return {number} Priority of the event.
    */
-  getGuidType = function() {
+  getGuidType() {
     return (this.vscpHead >> 12) & 0x0007;
-  };
+  }
 
   /**
    * Set the node id of the event sender as hard coded?
    */
-  setHardCodedAddr = function() {
+  setHardCodedAddr() {
     this.vscpHead |= 0x0010;
-  };
+  }
 
   /**
    * Is the node id of the event sender hard coded or not?
@@ -436,7 +436,7 @@ class Event {
    * @return {boolean} If the node id is hard coded, it will return true,
    *     otherwise false.
    */
-  isHardCodedAddr = function() {
+  isHardCodedAddr() {
     var result = false;
 
     if (0 < (this.vscpHead & 0x0010)) {
@@ -444,21 +444,21 @@ class Event {
     }
 
     return result;
-  };
+  }
 
   /**
    * Set flag for no CRC calculation?
    */
-  setDoNotCalcCRC = function() {
+  setDoNotCalcCRC() {
     this.vscpHead |= 0x0008;
-  };
+  }
 
   /**
    * Is CRC calculated or not?
    *
    * @return {boolean} If nor CRC should be calculated true is returned.
    */
-  isDoNotCalcCRC = function() {
+  isDoNotCalcCRC() {
     var result = false;
 
     if (0 < (this.vscpHead & 0x0008)) {
@@ -466,7 +466,9 @@ class Event {
     }
 
     return result;
-  };
+  }
+
+  // ---------------------------------------------------
 
   /*!
     getRollingIndex
@@ -478,7 +480,7 @@ class Event {
     @return {number} Rolling index 0-7.
   */
 
-  getRollingIndex = function(head) {
+  getRollingIndex(head) {
   
     if ( 'number' !== typeof head ) {
       throw(new Error("Parameter error: 'head' should be a number."))
@@ -491,7 +493,7 @@ class Event {
    * @return {string} Event as string with the following format
    * vscpHead,vscpClass,vscpType,vscpObId,vscpDateTime,vscpTimeStamp,vscpGuid,vspData
    */
-  getAsString = function() {
+  getAsString() {
     var index = 0;
     var str = '';
 
@@ -528,14 +530,14 @@ class Event {
     }
 
     return str;
-  };
+  }
 
   /**
    * Get event as string.
    * @return {string} Event as string with the following format
    * vscpHead,vscpClass,vscpType,vscpObId,vscpDateTime,vscpTimeStamp,vscpGuid,vspData
    */
-  toString = function() {
+  toString() {
     return this.getAsString();
   }
 
@@ -543,11 +545,10 @@ class Event {
    * Set event from string.
    * @return {string} Event as string
    */
-  setFromString =
-      function(str) {
+  setFromString(str) {
     if ('string' !== typeof str) {
       console.error('VSCP event is not in string form.');
-      reject(Error('VSCP event is not in string form.'));
+      throw('VSCP event is not in string form.');
     }
 
     var ea = str.split(',');
@@ -623,7 +624,7 @@ class Event {
    * return JSON object representation of event
    * @return {object} Event as JSON object
    */
-  toJSONObj = function() {
+  toJSONObj() {
         var ev = {};
         ev.vscpHead = this.vscpHead;
         ev.vscpClass = this.vscpClass;
@@ -765,7 +766,7 @@ var strToGuid = function(str) {
   items = str.split(':');
 
   if (16 !== items.length) {
-    trow(new Error("A VSCP GUID consist of 16 items"));
+    throw 'A VSCP GUID consist of 16 items';
   }
 
   for (index = 0; index < items.length; ++index) {
@@ -844,7 +845,7 @@ var getNodeId = function(guid) {
 
 var getNickName = function(guid) {
   return getNodeId(guid);
-}
+};
 
 /**
  * setNodeId
@@ -902,7 +903,7 @@ var setNodeId = function(guid, nodeid) {
 
 var setNickName = function(guid, nodeid) {
   return setNodeId(guid, nodeid);
-}
+};
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#The_Unicode_Problem
 // Since DOMStrings are 16-bit-encoded strings, in most browsers calling
@@ -915,7 +916,8 @@ var setNickName = function(guid, nodeid) {
  * @return {string} Base64
  */
 var b64EncodeUnicode = function(str) {
-  return new Buffer.from(str, 'binary').toString('base64');
+  var rv = Buffer.from(str, 'binary');
+  return rv.toString('base64');
 };
 
 /**
@@ -925,7 +927,7 @@ var b64EncodeUnicode = function(str) {
  * Note: prior to Node v4, use new Buffer rather than Buffer.from.
  */
 var b64DecodeUnicode = function(str) {
-  return new Buffer.from(str, 'base64').toString('binary');
+  return Buffer.from(str, 'base64').toString('binary');
 };
 
 // ----------------------------------------------------------------------------
@@ -954,7 +956,7 @@ var isGuidIpv6 = function(head) {
   }
 
   return result;
-}
+};
 
 /*!
   isDumbNode
@@ -974,7 +976,7 @@ var isDumbNode = function(head) {
 
   return (head & (1 << 15) ? true : false );
 
-}
+};
 
 /*!
   getPriority
@@ -990,7 +992,7 @@ var getPriority = function(head) {
   }
   head = (head & 0xff); // In case 16-bit head 
   return ((head >> 5) & 7);
-}
+};
 
 /*!
   Get the VSCP event GUID type (0-7).
@@ -999,7 +1001,7 @@ var getPriority = function(head) {
 */
 
 var getGuidType = function(vscpHead) {
-  return (this.vscpHead >> 12) & 0x0007;
+  return (vscpHead >> 12) & 0x0007;
 };
 
 
@@ -1022,7 +1024,7 @@ var isHardCoded = function(head) {
   }
 
   return (head & (1 << 4));
-}
+};
 
 /*! 
   isNoCrc
@@ -1040,7 +1042,7 @@ var isNoCrc = function(head) {
     throw(new Error("Parameter error: 'head' should be a number."))
   }
   return (head & (1 << 3));
-}
+};
 
 /*!
   getRollingIndex
@@ -1058,7 +1060,7 @@ var getRollingIndex = function(head) {
     throw(new Error("Parameter error: 'head' should be a number."))
   }
   return (head & 7);
-}
+};
 
 /* ---------------------------------------------------------------------- */
 
@@ -1197,14 +1199,14 @@ var decodeClass10 = function(data) {
     throw(new Error("Parameter error: 'data' should be a numeric array."))
   }
 
-  switch (module.exports.getDataCoding(data[0])) {
+  switch (getDataCoding(data[0])) {
     case 0:  // Bits
     case 1:  // Bytes
     case 3:  // Integer
       for (i = 1; i < data.length; i++) {
         newData[i - 1] = data[i];
       }
-      rval = module.exports.varInteger2Float(newData);
+      rval = varInteger2Float(newData);
       break;
 
     case 2:  // String
@@ -1221,7 +1223,7 @@ var decodeClass10 = function(data) {
         newData[i - 2] = data[i];
       }
 
-      rval = module.exports.varInteger2Float(newData);
+      rval = varInteger2Float(newData);
 
       // Handle mantissa
       if (0 !== (exp & 0x80)) {
@@ -1348,7 +1350,7 @@ var isMeasurement = function(vscpClass) {
     rv = true;
   }
   return rv;
-}
+};
 
 /*! 
   vscp_getVscpHeadFromCANALid
@@ -1367,7 +1369,7 @@ var getVscpHeadFromCANALid = function(id) {
   }
 
   return ((priority << 5) | hardcoded);
-}
+};
 
 /*!
   getVscpClassFromCANALid
@@ -1378,7 +1380,7 @@ var getVscpHeadFromCANALid = function(id) {
 
 var getVscpClassFromCANALid = function(id) {
   return (0x1ff & (id >> 16));
-}
+};
 
 /*!
   getVscpTypeFromCANALid
@@ -1389,7 +1391,7 @@ var getVscpClassFromCANALid = function(id) {
 
 var getVscpTypeFromCANALid = function(id) {
   return (0xff & (id >> 8));
-}
+};
 
 /*!
   getNicknameFromCANALid
@@ -1400,7 +1402,7 @@ var getVscpTypeFromCANALid = function(id) {
 
 var getNicknameFromCANALid = function(id) {
   return (id & 0xff);
-}
+};
 
 /*! 
   getCANALid
@@ -1426,7 +1428,7 @@ var getCANALid = function(vscpPriority,
     return ((vscpPriority << 26) |
             (vscpClass << 16) |
             (vscpType << 8) | 0);
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // convertEventToCanMsg
@@ -1463,7 +1465,7 @@ var convertEventToCanMsg = function(ev) {
   
   
   return msg;
-}
+};
 
 /*! 
   convertCanMsgToEvent
@@ -1514,7 +1516,7 @@ var convertCanMsgToEvent = function(msg) {
       ev.vscpData = msg.data;
       ev.sizeData = ev.vscpData.length;
     }
-    else if (Buffer.isBuffer(msg.data) ) {
+    else if ( Buffer.isBuffer(msg.data) ) {
       ev.vscpData = Array.prototype.slice.call(msg.data, 0)
       ev.sizeData = ev.vscpData.length;
     }
@@ -1522,13 +1524,14 @@ var convertCanMsgToEvent = function(msg) {
   else {
     if ( msg.dlc && (msg.dlc > 0 )) {
       console.error("CAN message has no message data but dlc =",msg.dlc);
+      console.error("Setting to length zero");
     }
     ev.vscpData = [];
     ev.sizeData = 0;
   }
 
   return ev;
-} 
+};
 
 module.exports = {
 

@@ -115,9 +115,10 @@ console.log("Nickname = " + vscp.getNicknameFromCANALid(470418944 + 9) )
 console.log("priority=7, vscpClass=10, vscpType=6  canid=" + vscp.getCANALid(7,10,6) );
 try {
     console.log("priority=7, vscpClass=10, vscpType=600  canid=" + vscp.getCANALid(7,10,600) );
+    console.log("* * * Should give error...");
 }
 catch(err) {
-    console.log("Catched invalid parameter error: (vscpType value is to big)", err.message );
+    console.log("Test catch - OK : Catches invalid parameter error: (vscpType value is to big)", err.message );
 }
 
 console.log("\nTesting Event conversions\n\n",e5);
@@ -250,6 +251,7 @@ console.log( vscp.convertCanMsgToEvent({
   }
 ));
 
+// This one should give error
 console.log(" --- convertCanMsgToEvent 5");
 console.log( vscp.convertCanMsgToEvent({
     id: vscp.getCANALid(7,10,6)+42,
