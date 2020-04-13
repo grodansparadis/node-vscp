@@ -1095,12 +1095,19 @@ var toFixed = function(value, precision) {
 */
 
 var varInteger2Float = function(data) {
+
   var rval = 0.0;
   var bNegative = false;
   var i = 0;
 
-  if ( !Array.isArray(data) ) {
-    throw(new Error("Data must be a byte array."))
+  // If argument is array convert to buffer
+  if ( Array.isArray(data) ) {
+    data = Buffer.from(data);
+  }
+
+  // We must have a buffer
+  if ( !Buffer.isBuffer(data) ) {
+    throw(new Error("Parameter error: 'data' should be a numeric array or buffer."))
   }
 
   if (0 !== (data[0] & 0x80)) {
@@ -1154,6 +1161,7 @@ var getUnit = function(data) {
   if ( 'number' !== typeof data ) {
     throw(new Error("Parameter error: 'data' should be a number."))
   }
+
   return (data >> 3) & 3;
 };
 
@@ -1176,16 +1184,44 @@ var getSensorIndex = function(data) {
 };
 
 /*! 
-  decodeClass10
+  isMeasurement
+
+  Returns true if vscpClass is a measurement class
+
+  @param {number} vscpClass - VSCP class to check
+  @return {boolean True if vscpClass is a measurement class, false otherwise
+*/
+
+var isMeasurement = function(vscpClass) {
+
+  let rv = false;
+
+  if (( (vscpClass >= 10) && (vscpClass <=14) ) || 
+      ( (vscpClass >= 60) && (vscpClass <=64) ) ||
+      ( (vscpClass >= 65) && (vscpClass <=69) ) ||
+      ( (vscpClass >= 70) && (vscpClass <=79) ) || 
+      ( (vscpClass >= 85) && (vscpClass <=89) ) ||
+      (1040 == vscpClass) ||
+      (1060 == vscpClass)) {
+    rv = true;
+  }
+
+  return rv;
+};
+
+/*! 
+  decodeMeasurementClass10
 
   Decode a class 10 measurement.
 
-  @param {number[]} data - Data (event data array where first data byte is the
-  data coding)
+  CLASS1.MEASUREMENT
+
+  @param {number[]} data - Data (event data array/buffer 
+    where first data byte is the data coding)
   @return {number} Value as float
 */
 
-var decodeClass10 = function(data) {
+var decodeMeasurementClass10 = function(data) {
 
   var rval = 0.0;
   var newData = [];
@@ -1195,18 +1231,26 @@ var decodeClass10 = function(data) {
   var str = '';
   var i = 0;
 
-  if ( !Array.isArray(data) ) {
-    throw(new Error("Parameter error: 'data' should be a numeric array."))
+  // If argument is array convert to buffer
+  if ( Array.isArray(data) ) {
+    data = Buffer.from(data);
+  }
+
+  // We must have a buffer
+  if ( !Buffer.isBuffer(data) ) {
+    throw(new Error("Parameter error: 'data' should be a numeric array or buffer."))
+  }
+
+  // We must have size that fit the expected data
+  if ( data.length < 2 ) {
+    throw(new Error("Parameter error: 'data' should have a length >= 2."))
   }
 
   switch (getDataCoding(data[0])) {
     case 0:  // Bits
     case 1:  // Bytes
     case 3:  // Integer
-      for (i = 1; i < data.length; i++) {
-        newData[i - 1] = data[i];
-      }
-      rval = varInteger2Float(newData);
+      rval = varInteger2Float(data.slice(1));
       break;
 
     case 2:  // String
@@ -1218,18 +1262,14 @@ var decodeClass10 = function(data) {
 
     case 4:  // Normalized integer
       exp = data[1];
-
-      for (i = 2; i < data.length; i++) {
-        newData[i - 2] = data[i];
-      }
-
-      rval = varInteger2Float(newData);
+      rval = varInteger2Float(data.slice(1));
 
       // Handle mantissa
       if (0 !== (exp & 0x80)) {
         exp &= 0x7f;
         rval = rval / Math.pow(10, exp);
-      } else {
+      } 
+      else {
         exp &= 0x7f;
         rval = rval * Math.pow(10, exp);
       }
@@ -1237,14 +1277,7 @@ var decodeClass10 = function(data) {
 
     case 5:  // Floating point
       if (5 === data.length) {
-        sign = data[1] & 0x80;  // Negative if != 0
-        exp = (data[1] & 0x7f) << 1 + (data[2] & 0x80) ? 1 : 0;
-        mantissa = (data[2] & 0x7f) << 16 + data[3] << 8 + data[4];
-        // sign * 2^exponent * mantissa
-        rval = Math.pow(2, exp) * mantissa;
-        if (sign) {
-          rval = -1 * rval;
-        }
+        rval = data.readFloatBE(1);
       }
       break;
 
@@ -1262,95 +1295,225 @@ var decodeClass10 = function(data) {
 };
 
 /*! 
-  decodeClass60Number
+  decodeMeasurementClass60
 
-  Decode a class 60 measurement.
-  @param {number}  data - Data
+  CLASS1.MEASUREMENT32
+
+  Decode a class 60 measurement. Data is a 
+  64-bit double floating point number.
+
+  @param {number[]}  data - Data array/buffer
   @return {number} Value as float
 */
 
-var decodeClass60Number = function(data) {
+var decodeMeasurementClass60 = function(data) {
 
-  var rval = 0;
-  var sign = 0;
-  var exp = 0;
-  var mantissa = 0;
-
-  if ( !Array.isArray(data) ) {
-    throw(new Error("Parameter error: 'data' should be a numeric array."))
+  // If argument is array convert to buffer
+  if ( Array.isArray(data) ) {
+    data = Buffer.from(data);
   }
 
-  if (8 === data.length) {
-    sign = data[0] & 0x80;  // Negative if != 0
-    exp = (data[0] & 0x7f) << 4 + (data[1] & 0xf0) >> 4;
-    mantissa = (data[1] & 0x0f) << 48 + data[2] << 40 + data[3] << 32 + data[4]
-                                << 24 + data[5] << 16 + data[6] << 8 + data[7];
-
-    // sign * 2^exponent * mantissa
-    rval = Math.pow(2, exp) * mantissa;
-
-    if (0 !== sign) {
-      rval = -1 * rval;
-    }
+  // We must have a buffer
+  if ( !Buffer.isBuffer(data) ) {
+    throw(new Error("Parameter error: 'data' should be a numeric array or buffer."))
   }
 
-  return rval;
+  // We must have size that fit the expected data
+  if ( data.length < 8 ) {
+    throw(new Error("Parameter error: 'data' should have a length >= 8."))
+  }
+
+  return data.readDoubleBE(0);
 };
 
 /*! 
-  decodeClass65Number
+  decodeMeasurementClass65
 
   Decode a class 65 measurement.
 
-  @param {number} data - Data
+  CLASS1.MEASUREZONE
+
+  0   - Index (Not sensor index)
+  1   - Zone
+  2   - subzone
+  3   - data coding
+  4-7 - Data with format defined by data 
+        coding byte.
+
+  @param {number[]} data - Data array/buffer
   @return {number} Value as float
 */
 
-var decodeClass65Number = function(data) {
+var decodeMeasurementClass65 = function(data) {
 
-  var rval = 0;
-  var exp = data[3];
+  // If argument is array convert to buffer
+  if ( Array.isArray(data) ) {
+    data = Buffer.from(data);
+  }
+
+  // We must have a buffer
+  if ( !Buffer.isBuffer(data) ) {
+    throw(new Error("Parameter error: 'data' should be a numeric array or buffer."))
+  }
+
+  // We must have size that fit the expected data
+  if ( data.length < 5 ) {
+    throw(new Error("Parameter error: 'data' should have a length >= 5."))
+  }
+
+  var b = Buffer.slice(3);
+  return decodeMeasurementClass10(b);
+};
+
+/*!
+  decodeMeasurementClass70
+
+  CLASS1.MEASUREMENT32
+
+  Decode a class 70 measurement. 
+  Data is a 32-bit floating
+  point value.
+
+  @param {number[]} data - Data array/buffer
+  @return {number} Value as float  
+*/
+
+var decodeMeasurementClass70 = function(data) {
+
+  // If argument is array convert to buffer
+  if ( Array.isArray(data) ) {
+    data = Buffer.from(data);
+  }
+
+  // We must have a buffer
+  if ( !Buffer.isBuffer(data) ) {
+    throw(new Error("Parameter error: 'data' should be a numeric array or buffer."))
+  }
+
+  // We must have size that fit the expected data
+  if ( data.length < 4 ) {
+    throw(new Error("Parameter error: 'data' should have a length >= 4."))
+  }
+
+  return data.readFloatBE(0);
+
+};
+
+/*!
+  decodeMeasurementClass85
+  
+  CLASS1.SETVALUEZONE
+
+  Decode a class 85 measurement (setvalue)
+  Data is
+  0   - Sensor index
+  1   - Zone
+  2   - Subzone
+  3   - Data coding
+  4-7 - Data Value
+
+  @param {number[]} data - Data array/buffer
+  @return {number} Value as float  
+*/
+
+var decodeMeasurementClass85 = function(data) {
+
+  return decodeMeasurementClass65(data);
+};
+
+/*!
+  decodeMeasurementClass1040
+
+  Decode a class 1040 measurement
+
+  CLASS2.MEASUREMENT_STR
+
+  Data is measurement in string form.
+
+  0    - Sensor index
+  1    - Zone
+  2    - Subzone
+  3    - Unit
+  4..  - String up to the maximum data size of
+         483 digits including a possible decimal 
+         point. The decimal point should always be 
+         a "." independent of locale.
+
+  @param {number[]} data - Data array/buffer
+  @return {number} Value as float  
+*/
+
+var decodeMeasurementClass1040 = function(data) {
+
+  var str = "0";
   var i = 0;
 
-  if ( 'number' !== typeof data ) {
-    throw(new Error("Parameter error: 'data' should be a number."))
+  // If argument is array convert to buffer
+  if ( Array.isArray(data) ) {
+    data = Buffer.from(data);
+  }
+
+  // We must have a buffer
+  if ( !Buffer.isBuffer(data) ) {
+    throw(new Error("Parameter error: 'data' should be a numeric array or buffer."))
+  }
+
+  // We must have size that fit the expected data
+  if ( data.length < 4 ) {
+    throw(new Error("Parameter error: 'data' should have a length >= 4."))
   }
 
   for (i = 4; i < data.length; i++) {
-    rval = rval << 8;
-    rval += data[i];
+    str += String.fromCharCode(data[i]);
   }
 
-  // Handle exponent
-  if (0 !== (exp & 128)) {
-    exp &= 0x7f;
-    rval = rval * Math.pow(10, (-1 * exp));
-  } else {
-    rval = rval * Math.pow(10, exp);
-  }
-
-  return rval;
+  return parseFloat(str);
 };
 
-/*! 
-  isMeasurement
+/*!
+  decodeMeasurementClass1060
 
-  Returns true if vscpClass is a measurement class
+  Decode a class 1060 measurement
 
-  @param {number} vscpClass - VSCP class to check
-  @return {boolean True if vscpClass is a measurement class, false otherwise
+  CLASS2.MEASUREMENT_FLOAT
+
+  Data is measurement in floating point 
+  double form.
+
+  0    - Sensor index
+  1    - Zone
+  2    - Subzone
+  3    - Unit
+  4-11 - 64-bit double precision floating point 
+       value stored MSB first. 
+
+  @param {number[]} data - Data array/buffer
+  @return {number} Value as float  
 */
 
-var isMeasurement = function(vscpClass) {
-  let rv = false;
+var decodeMeasurementClass1060 = function(data) {
 
-  if ((10 == vscpClass) || (60 == vscpClass) || (65 == vscpClass) ||
-      (70 == vscpClass) || (85 == vscpClass) || (1040 == vscpClass) ||
-      (1060 == vscpClass)) {
-    rv = true;
+  // If argument is array convert to buffer
+  if ( Array.isArray(data) ) {
+    data = Buffer.from(data);
   }
-  return rv;
-};
+
+  // We must have a buffer
+  if ( !Buffer.isBuffer(data) ) {
+    throw(new Error("Parameter error: 'data' should be a numeric array or buffer."))
+  }
+
+  // We must have size that fit the expected data
+  if ( data.length < 12 ) {
+    throw(new Error("Parameter error: 'data' should have a length >= 12."))
+  }
+
+  return data.readDoubleBE(4);
+}
+
+
+// ----------------------------------------------------------------------------
+
 
 /*! 
   vscp_getVscpHeadFromCANALid
@@ -1572,9 +1735,9 @@ module.exports = {
   getDataCoding,
   getUnit,
   getSensorIndex,
-  decodeClass10,
-  decodeClass60Number,
-  decodeClass65Number,
+  decodeMeasurementClass10,
+  decodeMeasurementClass60,
+  decodeMeasurementClass65,
 
   // CANAL conversions
   getVscpHeadFromCANALid,
