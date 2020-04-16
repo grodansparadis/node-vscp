@@ -79,33 +79,40 @@ const guidtype = {
   GUIDTYPE_2: 2, // GUID is RFC 4122 Version 1
   GUIDTYPE_RFC4122_1: 2,
   GUIDTYPE_3: 3, // GUID is RFC 4122 Version 4 
-  GUIDTYPE_RFC4122_4: 2
+  GUIDTYPE_RFC4122_4: 3
 }
 
 /**
  * VSCP host capabilities (wcyd - What Can You Do)
+ * 
+ * Due to Javascripts incapability to handle 64-bit numbers
+ * values are bit positions instead of proper constants. That is
+ * the constant is gotten with 2^bit. The capabilitues 64-bit 
+ * integer can them be divided into two 32-bit integers and with
+ * that be handle also in Javascript
+ * 
  * @enum {number}
  * @const
  */
 const hostCapability = {
-  REMOTE_VARIABLE: (1 << 63),
-  DECISION_MATRIX: (1 << 62),
-  INTERFACE: (1 << 61),
-  TCPIP: (1 << 15),
-  UDP: (1 << 14),
-  MULTICAST_ANNOUNCE: (1 << 13),
-  RAWETH: (1 << 12),
-  WEB: (1 << 11),
-  WEBSOCKET: (1 << 10),
-  REST: (1 << 9),
-  MULTICAST_CHANNEL: (1 << 8),
-  IP6: (1 << 6),
-  IP4: (1 << 5),
-  SSL: (1 << 4),
-  TWO_CONNECTIONS: (1 << 3),
-  AES256: (1 << 2),
-  AES192: (1 << 1),
-  AES128: 1
+  REMOTE_VARIABLE: 63,
+  DECISION_MATRIX: 62,
+  INTERFACE: 61,
+  TCPIP: 15,
+  UDP: 14,
+  MULTICAST_ANNOUNCE: 13,
+  RAWETH: 12,
+  WEB: 11,
+  WEBSOCKET: 10,
+  REST: 9,
+  MULTICAST_CHANNEL: 8,
+  IP6: 6,
+  IP4: 5,
+  SSL: 4,
+  TWO_CONNECTIONS: 3,
+  AES256: 2,
+  AES192: 1,
+  AES128: 0
 };
 
 /* 
@@ -160,6 +167,7 @@ const measurementDataCoding = {
 class Event {
   
   constructor(options) {
+
     /**
      * VSCP event head
      * @member {number}
@@ -204,7 +212,7 @@ class Event {
      * Node global unique id LSB(15) -> MSB(0)
      * @member {string}
      */
-    this.vscpGuid = '-';
+    this.vscpGuid = '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00';
 
     /**
      * Data array or string
@@ -214,120 +222,127 @@ class Event {
 
     if ('undefined' !== typeof options) {
 
-      if ('number' === typeof options.vscpHead) {
-        this.vscpHead = options.vscpHead;
-      } else if ('string' === typeof options.vscpHead) {
-        this.vscpHead = parseInt(options.vscpHead);
+      if ('string' === typeof options) {
+        this.setFromString(options);
       }
+      else {
 
-      if ('boolean' === typeof options.guidIsIpV6Addr) {
-        if (false === options.guidIsIpV6Addr) {
-          this.vscpHead &= 0xefff;
-        } else {
-          this.setIPV6Addr();
+        if ('number' === typeof options.vscpHead) {
+          this.vscpHead = options.vscpHead;
+        } else if ('string' === typeof options.vscpHead) {
+          this.vscpHead = parseInt(options.vscpHead);
         }
-      }
 
-      if ('boolean' === typeof options.dumbNode) {
-        if (false === options.dumbNode) {
-          this.vscpHead &= 0x7fff;
-        } else {
-          this.vscpHead |= 0x8000;
+        if ('boolean' === typeof options.guidIsIpV6Addr) {
+          if (false === options.guidIsIpV6Addr) {
+            this.vscpHead &= 0xefff;
+          } else {
+            this.setIPV6Addr();
+          }
         }
-      }
 
-      // 0 - 7
-      if ('number' === typeof options.vscpPriority) {
-        if ((0 <= options.vscpPriority) && (7 >= options.vscpPriority)) {
+        if ('boolean' === typeof options.dumbNode) {
+          if (false === options.dumbNode) {
+            this.vscpHead &= 0x7fff;
+          } else {
+            this.vscpHead |= 0x8000;
+          }
+        }
+
+        // 0 - 7
+        if ('number' === typeof options.vscpPriority) {
+          if ((0 <= options.vscpPriority) && (7 >= options.vscpPriority)) {
+            this.vscpHead &= 0xff1f;
+            this.vscpHead |= (options.vscpPriority << 5);
+          }
+        } else if ('string' === typeof options.vscpPriority) {
+          let n = parseInt(options.vscpPriority);
           this.vscpHead &= 0xff1f;
-          this.vscpHead |= (options.vscpPriority << 5);
+          this.vscpHead |= (n << 5);
         }
-      } else if ('string' === typeof options.vscpPriority) {
-        let n = parseInt(options.vscpPriority);
-        this.vscpHead &= 0xff1f;
-        this.vscpHead |= (n << 5);
-      }
 
-      // 0 - 7
-      if ('number' === typeof options.vscpGuidType) {
-        if ((0 <= options.vscpGuidType) && (7 >= options.vscpGuidType)) {
-          this.vscpHead &= 0x8fff;
-          this.vscpHead |= (options.vscpGuidType << 12);
+        // 0 - 7
+        if ('number' === typeof options.vscpGuidType) {
+          if ((0 <= options.vscpGuidType) && (7 >= options.vscpGuidType)) {
+            this.vscpHead &= 0x8fff;
+            this.vscpHead |= (options.vscpGuidType << 12);
+          }
+        } else if ('string' === typeof options.vscpGuidType) {
+          let n = parseInt(options.vscpGuidType);
+          this.vscpHead &= 0xff1f;
+          this.vscpHead |= (n << 5);
         }
-      } else if ('string' === typeof options.vscpGuidType) {
-        let n = parseInt(options.vscpGuidType);
-        this.vscpHead &= 0xff1f;
-        this.vscpHead |= (n << 5);
-      }
 
-      if ('boolean' === typeof options.vscpHardCoded) {
-        if (false === options.vscpHardCoded) {
-          this.vscpHead &= 0xffef;
-        } else {
-          this.vscpHead |= 0x0010;
+        if ('boolean' === typeof options.vscpHardCoded) {
+          if (false === options.vscpHardCoded) {
+            this.vscpHead &= 0xffef;
+          } else {
+            this.vscpHead |= 0x0010;
+          }
         }
-      }
 
-      if ('boolean' === typeof options.vscpCalcCRC) {
-        if (false === options.vscpCalcCRC) {
-          this.vscpHead &= 0xfff7;
-        } else {
-          this.vscpHead |= 0x0008;
+        if ('boolean' === typeof options.vscpCalcCRC) {
+          if (false === options.vscpCalcCRC) {
+            this.vscpHead &= 0xfff7;
+          } else {
+            this.vscpHead |= 0x0008;
+          }
         }
-      }
 
-      if ('number' === typeof options.vscpClass) {
-        this.vscpClass = options.vscpClass;
-      } else if ('string' === typeof options.vscpClass) {
-        this.vscpClass = parseInt(options.vscpClass);
-      }
-
-      if ('number' === typeof options.vscpType) {
-        this.vscpType = options.vscpType;
-      } else if ('string' === typeof options.vscpType) {
-        this.vscpType = parseInt(options.vscpType);
-      }
-
-      if ('number' === typeof options.vscpObId) {
-        this.vscpObId = options.vscpObId;
-      } else if ('string' === typeof options.vscpObId) {
-        this.vscpObId = parseInt(options.vscpObId);
-      }
-
-      if ('number' === typeof options.vscpTimeStamp) {
-        this.vscpTimeStamp = options.vscpTimeStamp;
-      } else if ('string' === typeof options.vscpTimeStamp) {
-        this.vscpTimeStamp = parseInt(options.vscpTimeStamp);
-      }
-
-      if ('string' === typeof options.vscpDateTime) {
-        // Time in UTC for events but conversion
-        // is done in send routine
-        this.vscpDateTime = new Date(options.vscpDateTime);
-      } else if (true === (options.vscpDateTime instanceof Date)) {
-        // Time should be GMT
-        this.vscpDateTime = options.vscpDateTime;
-      }
-
-      // GUID
-      if ('string' === typeof options.vscpGuid) {
-        this.vscpGuid = options.vscpGuid;
-      }
-
-      // VSCP data
-      if (Array.isArray(options.vscpData)) {
-        this.vscpData = options.vscpData;
-      } else if (('string' === typeof options.vscpData) ) {
-        this.vscpData = options.vscpData.split(',');
-        // Make data numeric
-        for ( var n in this.vscpData ) {
-          this.vscpData[n] = readValue(this.vscpData[n]);
+        if ('number' === typeof options.vscpClass) {
+          this.vscpClass = options.vscpClass;
+        } else if ('string' === typeof options.vscpClass) {
+          this.vscpClass = parseInt(options.vscpClass);
         }
-      } 
 
-      // 'text' to init from string form
-      if ('string' === typeof options.text) {
-        this.setFromString(options.text);
+        if ('number' === typeof options.vscpType) {
+          this.vscpType = options.vscpType;
+        } else if ('string' === typeof options.vscpType) {
+          this.vscpType = parseInt(options.vscpType);
+        }
+
+        if ('number' === typeof options.vscpObId) {
+          this.vscpObId = options.vscpObId;
+        } else if ('string' === typeof options.vscpObId) {
+          this.vscpObId = parseInt(options.vscpObId);
+        }
+
+        if ('number' === typeof options.vscpTimeStamp) {
+          this.vscpTimeStamp = options.vscpTimeStamp;
+        } else if ('string' === typeof options.vscpTimeStamp) {
+          this.vscpTimeStamp = parseInt(options.vscpTimeStamp);
+        }
+
+        if ('string' === typeof options.vscpDateTime) {
+          // Time in UTC for events but conversion
+          // is done in send routine
+          this.vscpDateTime = new Date(options.vscpDateTime);
+        } else if (true === (options.vscpDateTime instanceof Date)) {
+          // Time should be GMT
+          this.vscpDateTime = options.vscpDateTime;
+        }
+
+        // GUID
+        if ('string' === typeof options.vscpGuid) {
+          this.vscpGuid = options.vscpGuid;
+        }
+
+        // VSCP data
+        if (Array.isArray(options.vscpData)) {
+          this.vscpData = options.vscpData;
+        } else if (('string' === typeof options.vscpData) ) {
+          this.vscpData = options.vscpData.split(',');
+          // Make data numeric
+          for ( var n in this.vscpData ) {
+            this.vscpData[n] = readValue(this.vscpData[n]);
+          }
+        } 
+
+        // 'text' to init from string form
+        if ('string' === typeof options.text) {
+          this.setFromString(options.text);
+        }
+
       }
 
     }
@@ -468,25 +483,34 @@ class Event {
     return result;
   }
 
-  // ---------------------------------------------------
-
   /*!
     getRollingIndex
 
     Some nodes keep a rolling index of there frames (typically
     wireless nodes). This function get the index.
 
-    @param {number} head VSCP head (16-bit or 8-bit)
     @return {number} Rolling index 0-7.
   */
 
-  getRollingIndex(head) {
-  
-    if ( 'number' !== typeof head ) {
-      throw(new Error("Parameter error: 'head' should be a number."))
-    }
-    return (head & 7);
+  getRollingIndex() {
+    return (this.vscpHead & 7);
   }
+
+  /*!
+    setRollingIndex 
+    
+    Set rolling index (0-7)
+
+    @param rindex Rolling index to set (0-7)
+  */
+
+  setRollingIndex(rindex) {
+    rindex &= 7;
+    this.vscpHead &= 0xfff8;
+    this.vscpHead += rindex;
+  }
+
+// ---------------------------------------------------
 
   /**
    * Get event as string.
@@ -494,6 +518,7 @@ class Event {
    * vscpHead,vscpClass,vscpType,vscpObId,vscpDateTime,vscpTimeStamp,vscpGuid,vspData
    */
   getAsString() {
+    
     var index = 0;
     var str = '';
 
@@ -603,9 +628,9 @@ class Event {
     // Get VSCP GUID
     // If left empty set default
     if (0 == ea[6]) {
-      ea[6] = '-';
+      ea[6] = '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00';
     }
-    this.vscpGuid = '-';
+    this.vscpGuid = '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00';
     if (ea.length > 6) {
       this.vscpGuid = ea[6];
     }
@@ -626,13 +651,13 @@ class Event {
    */
   toJSONObj() {
         var ev = {};
-        ev.vscpHead = this.vscpHead;
-        ev.vscpClass = this.vscpClass;
-        ev.vscpType = this.vscpType;
+        ev.vscpHead = this.vscpHead & 0xffff;
+        ev.vscpClass = this.vscpClass & 0xffff;
+        ev.vscpType = this.vscpType & 0xffff;
         ev.vscpGuid = this.vscpGuid;
         ev.vscpObId = this.vscpObId;
         ev.vscpTimeStamp = this.vscpTimeStamp;
-        ev.vscpDateTime = this.vscpDateTime
+        ev.vscpDateTime = this.vscpDateTime;
         ev.vscpData = this.vscpData;
         return ev;
       }

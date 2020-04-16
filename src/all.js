@@ -202,7 +202,7 @@ console.log("Sensor index: ",
     vscp.getSensorIndex(d[0]));
 
 console.log("Measurement data [0x89,0x82,0xFE,0xDC]is ",
-            vscp.decodeClass10(d));
+            vscp.decodeMeasurementClass10(d));
 
 console.log(e5.toString());
 
