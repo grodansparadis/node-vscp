@@ -12,6 +12,9 @@
     "type": "git",
     "url": "git+https://github.com/grodansparadis/node-vscp.git"
   },
+  "engines": {
+    "node": ">=10.4.0"
+  },
   "keywords": [
     "vscp",
     "iot",

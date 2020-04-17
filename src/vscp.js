@@ -34,6 +34,8 @@
 // Alternative licenses for VSCP & Friends may be arranged by contacting
 // Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
 //
+// This code requires node.js > 10.4 as bigint support is needed.
+//
 
 'use strict';
 
@@ -675,10 +677,12 @@ class Event {
  * @return {number} Value
  */
 var readValue = function(input) {
+
   var txtvalue = input.toLowerCase();
   var poshex = txtvalue.indexOf('0x');
   var posbin = txtvalue.indexOf('0b');
   var posoct = txtvalue.indexOf('0o');
+
   if ((-1 == poshex) && (-1 == posbin) && (-1 == posoct)) {
     return parseInt(txtvalue);
   } else if (-1 != poshex) {
@@ -694,7 +698,7 @@ var readValue = function(input) {
     return parseInt(txtvalue, 8);
   }
   else {
-    return 0;
+    return NaN;
   }
 };
 
@@ -702,9 +706,11 @@ var readValue = function(input) {
  * Utility function which returns the current time in the following format:
  * hh:mm:ss.us
  *
- * @return {string} Current time in the format hh:mm:ss.us
+ * @return {string} Current time in the format 
+ *                  hh:mm:ss.us
  */
 var getTime = function() {
+
   var now = new Date();
 
   var paddingHead = function(num, size) {
@@ -741,9 +747,20 @@ var getTime = function() {
  *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
  */
 var guidToStr = function(guid) {
+
   var guidStr = '';
   var index = 0;
   var hexValue = '';
+
+  // If buffer . convert to array
+  if ( Buffer.isBuffer(guid) ) {
+    var arr = Array.prototype.slice.call(guid, 0);
+    guid = arr;  
+  }
+
+  if ( !Array.isArray(guid) ) {
+    throw(new Error("Argument must be array or buffer"));
+  }
 
   for (index = 0; index < guid.length; ++index) {
     hexValue = guid[index].toString(16).toUpperCase();
@@ -776,11 +793,11 @@ var strToGuid = function(str) {
   var index = 0;
 
   if ('undefined' === typeof str) {
-    throw(new Error("Missing argument"));
+    throw(new Error("Parameter error: Missing argument"));
   }
 
   if ('string' !== typeof str) {
-    throw(new Error("Argument should be string"));
+    throw(new Error("Parameter error: Argument should be string"));
   }
 
   // If GUID is "-" use interface GUID
@@ -791,7 +808,7 @@ var strToGuid = function(str) {
   items = str.split(':');
 
   if (16 !== items.length) {
-    throw 'A VSCP GUID consist of 16 items';
+    throw 'Parameter error: A VSCP GUID consist of 16 items';
   }
 
   for (index = 0; index < items.length; ++index) {
@@ -802,7 +819,7 @@ var strToGuid = function(str) {
 };
 
 /**
- * Converts a GUID string to a GUID number array.
+ * Check for all null GUID
  *
  * @param {string|array} guid - GUID string/array
  * @return {boolean} True if guid is all nills
@@ -813,16 +830,23 @@ var isGuidZero = function(guid) {
   var guidArray = [];
   
   if ('undefined' === typeof guid) {
-    throw(new Error("Missing argument"));
+    throw(new Error("Parameter error: Missing argument"));
   }
 
   if ('string' === typeof guid) {
     guidArray = strToGuid(guid);
   }
-
-  if ( Array.isArray(guid) ) {
+  else if ( Array.isArray(guid) ) {
     guidArray = guid;
   }
+  // If buffer . convert to array
+  else if ( Buffer.isBuffer(guid) ) {
+    guidArray = Array.prototype.slice.call(guid, 0);  
+  }
+  else {
+    throw(new Error("Parameter error: Argument must be of type string, array or buffer"));
+  }
+  
 
   for (let i = 0; i < 16; i++) {
     if (guidArray[i]) return false;
@@ -836,26 +860,37 @@ var isGuidZero = function(guid) {
  * 
  * Get node id from a node GUID string. 
  *
- * @param {string} guid - GUID string, e.g.
+ * @param {string|array|buffer} guid - GUID string, e.g.
  *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
  * @return {number} Node id
  */
 var getNodeId = function(guid) {
+
   if ('undefined' === typeof guid) {
     throw new Error("Parameter error: GUID is undefined.");
   }
 
-  if ('string' !== typeof guid) {
-    throw new Error("Parameter error: GUID should be on string form.");
-  }
+  if ('string' === typeof guid) {
+    // Short for all nulls?  
+    if (('-' === guid)  || ('' === guid) ) {
+      return 0;
+    }
 
-  // Short for all nulls?  
-  if (('-' === guid)  || ('' === guid) ) {
-    return 0;
-  }
-
-  return ( (parseInt(guid.split(':')[14], 16) << 8) + 
+    return ( (parseInt(guid.split(':')[14], 16) << 8) + 
             parseInt(guid.split(':')[15], 16));
+  }
+  else if ( Array.isArray(guid) ) {
+    return ((guid[14] << 8) + guid[15]);
+  }
+  // If buffer . convert to array
+  else if ( Buffer.isBuffer(guid) ) {
+    var guidArray = Array.prototype.slice.call(guid, 0);  
+    return ((guidArray[14] << 8) + guidArray[15]);
+  }
+  else {
+    throw("Parameter error: Argument must be of type string, array or buffer");
+  }
+
 };
 
 /**
@@ -863,7 +898,7 @@ var getNodeId = function(guid) {
  * 
  * Get node id from a node GUID string. 
  *
- * @param {string} guid - GUID string, e.g.
+ * @param {string|array|buffer} guid - GUID string, e.g.
  *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
  * @return {number} Node id
  */
@@ -886,32 +921,54 @@ var getNickName = function(guid) {
 
 var setNodeId = function(guid, nodeid) {
 
+  var guidArray = [];
+  var rtype = 0;  // Return type 0=string,1=array,2=buffer
+
   if ( ('undefined' === typeof guid) ||
        ('undefined' === typeof nodeid) ) {
       throw(new Error("Missing argument"));
   }
 
-  if ('string' !== typeof guid) {
-    throw(new Error("guid argument should be a string"));
-  }
-
   if ('number' !== typeof nodeid) {
-    throw(new Error("nodeid argument should be a 16-bit number."));
+    throw("nodeid argument should be a 16-bit number.");
   }
 
-  var guidArray = guid.split(':');
-
-  guidArray[14] = ((nodeid >> 8) & 0xff).toString(16);
-  if ( 2 != guidArray[14].length ) {
-    guidArray[14] = "0" + guidArray[14];
+  if ('string' === typeof guid) {
+    rtype = 0; // Return string
+    guidArray = guid.split(':');
+  }
+  else if ( Array.isArray(guid) ) {
+    rtype = 1; // Return array
+    guidArray = guid;
+  }
+  // If buffer . convert to array
+  else if ( Buffer.isBuffer(guid) ) {
+    rtype = 2; // Return buffer
+    guidArray = Array.prototype.slice.call(guid, 0);  
+  }
+  else {
+    throw("guid argument should be a string,array or buffer");
   }
 
-  guidArray[15] = (nodeid & 0xff).toString(16);
-  if ( 2 != guidArray[15].length ) {
-    guidArray[15] = "0" + guidArray[15];
+  guidArray[14] = ((nodeid >> 8) & 0xff);
+  guidArray[15] = nodeid & 0xff;
+
+  switch (rtype) {
+
+    case 0:   // String
+      return guidToStr(guidArray);
+      break;
+
+    case 1:   // Array
+      return guidArray;
+      break;
+
+    case 2:   // Buffer
+      return Buffer.from(guidArray);
+      break;
+
   }
 
-  return guidArray.join(':');
 };
 
 /**
@@ -931,17 +988,20 @@ var setNickName = function(guid, nodeid) {
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#The_Unicode_Problem
-// Since DOMStrings are 16-bit-encoded strings, in most browsers calling
-// window.btoa on a Unicode string will cause a Character Out Of Range exception
-// if a character exceeds the range of a 8-bit ASCII-encoded character.
+// Since DOMStrings are 16-bit-encoded strings, in most browsers 
+// calling window.btoa on a Unicode string will cause a Character 
+// Out Of Range exception if a character exceeds the range of a 
+// 8-bit ASCII-encoded character.
 
 /**
  * Encode base64 unicode safe.
+ * https://stackabuse.com/encoding-and-decoding-base64-strings-in-node-js/
+ * 
  * @param {string} str  - Unicode string
  * @return {string} Base64
  */
 var b64EncodeUnicode = function(str) {
-  var rv = Buffer.from(str, 'binary');
+  var rv = Buffer.from(str, 'utf8');
   return rv.toString('base64');
 };
 
@@ -952,7 +1012,7 @@ var b64EncodeUnicode = function(str) {
  * Note: prior to Node v4, use new Buffer rather than Buffer.from.
  */
 var b64DecodeUnicode = function(str) {
-  return Buffer.from(str, 'base64').toString('binary');
+  return Buffer.from(str, 'base64').toString('utf8');
 };
 
 // ----------------------------------------------------------------------------
@@ -960,7 +1020,7 @@ var b64DecodeUnicode = function(str) {
 // Header helpers
 
 /*!
-  isGuidIpv6
+  isIPV6Addr
 
   A node that use an IPv6 address can use this address as its's 
   GUID and then should set this bit to indicate this.
@@ -969,14 +1029,15 @@ var b64DecodeUnicode = function(str) {
   @return {boolean} true if this is a Ipv6 GUID.
 */
 
-var isGuidIpv6 = function(head) {
+var isIPV6Addr = function(head) {
+
   var result = false;
 
   if ( 'number' !== typeof head ) {
     throw(new Error("Parameter error: 'head' should be a number."))
   }
 
-  if ( 0x1000 === (this.vscpHead & 0x7000)) {
+  if ( 0x1000 === (head & 0x7000)) {
     result = true;
   }
 
@@ -1031,7 +1092,7 @@ var getGuidType = function(vscpHead) {
 
 
 /*!
-  isHardCoded
+  isHardCodedAddr
 
   A hardcoded node is a node where the address is
   set and can not be changed. This is important for
@@ -1042,17 +1103,23 @@ var getGuidType = function(vscpHead) {
   @return {boolean} true if this is a hardcoded address node.
 */
 
-var isHardCoded = function(head) {
+var isHardCodedAddr = function(head) {
+
+  var result = false;
 
   if ( 'number' !== typeof head ) {
-    throw(new Error("Parameter error: 'head' should be a number."))
+    throw("Parameter error: 'head' should be a number.")
   }
 
-  return (head & (1 << 4));
+  if (0 < (head & 0x0010)) {
+    result = true;
+  }
+
+  return result;
 };
 
 /*! 
-  isNoCrc
+  isDoNotCalcCRC
 
   Check if the don't calculate CRC bit is set.  This is 
   present for wireless devices and similar.
@@ -1062,11 +1129,19 @@ var isHardCoded = function(head) {
 
 */
 
-var isNoCrc = function(head) {
+var isDoNotCalcCRC = function(head) {
+  
+  var result = false;
+  
   if ( 'number' !== typeof head ) {
     throw(new Error("Parameter error: 'head' should be a number."))
   }
-  return (head & (1 << 3));
+  
+  if (0 < (head & 0x0008)) {
+    result = true;
+  }
+
+  return result;
 };
 
 /*!
@@ -1110,18 +1185,19 @@ var toFixed = function(value, precision) {
 };
 
 /*! 
-  varInteger2Float
+  varInt2BigInt
   Convert an integer value to floating point value. 
   The integer is stored in a byte array with MSB to LSB 
   storage order.
 
   @param {number[]} data - Byte array
-  @return {number} Float value
+  @return {bigint} BigInt value
 */
 
-var varInteger2Float = function(data) {
+var varInt2BigInt = function(data) {
 
   var rval = 0.0;
+  var work = 0n;  
   var bNegative = false;
   var i = 0;
 
@@ -1144,15 +1220,15 @@ var varInteger2Float = function(data) {
   }
 
   for (i = 0; i < data.length; i++) {
-    rval = rval << 8;
-    rval += data[i];
+    work = work << 8n;
+    work += BigInt(data[i]);
   }
 
   if (true === bNegative) {
-    rval = -1.0 * (rval + 1);
+    work = -1n * (work + 1n);
   }
 
-  return rval;
+  return work;
 };
 
 /*! 
@@ -1164,12 +1240,12 @@ var varInteger2Float = function(data) {
   @return {number} Coding
 */
 
-var getDataCoding = function(data) {
+var getDataCoding = function(datacoding) {
 
-  if ( 'number' !== typeof data ) {
-    throw(new Error("Parameter error: 'data' should be a number."))
+  if ( 'number' !== typeof datacoding ) {
+    throw("Parameter error: 'datacoding' should be a number.")
   }
-  return (data >> 5) & 7;
+  return (datacoding & measurementDataCodingMask.MASK_DATACODING_TYPE);
 };
 
 /*! 
@@ -1181,13 +1257,13 @@ var getDataCoding = function(data) {
   @return {number} Unit
 */
 
-var getUnit = function(data) {
+var getUnit = function(datacoding) {
 
-  if ( 'number' !== typeof data ) {
-    throw(new Error("Parameter error: 'data' should be a number."))
+  if ( 'number' !== typeof datacoding ) {
+    throw("Parameter error: 'datacoding' should be a number.")
   }
 
-  return (data >> 3) & 3;
+  return ((datacoding & measurementDataCodingMask.MASK_DATACODING_UNIT) >> 3);
 };
 
 /*! 
@@ -1199,13 +1275,13 @@ var getUnit = function(data) {
    @return {number} Sensor index
 */
 
-var getSensorIndex = function(data) {
+var getSensorIndex = function(datacoding) {
   
-  if ( 'number' !== typeof data ) {
-    throw(new Error("Parameter error: 'data' should be a number."))
+  if ( 'number' !== typeof datacoding ) {
+    throw("Parameter error: 'datacoding' should be a number.")
   }
 
-  return (data & 7);
+  return (datacoding & measurementDataCodingMask.MASK_DATACODING_INDEX);
 };
 
 /*! 
@@ -1275,7 +1351,7 @@ var decodeMeasurementClass10 = function(data) {
     case 0:  // Bits
     case 1:  // Bytes
     case 3:  // Integer
-      rval = varInteger2Float(data.slice(1));
+      rval = varInt2BigInt(data.slice(1));
       break;
 
     case 2:  // String
@@ -1287,7 +1363,7 @@ var decodeMeasurementClass10 = function(data) {
 
     case 4:  // Normalized integer
       exp = data[1];
-      rval = varInteger2Float(data.slice(1));
+      rval = varInt2BigInt(data.slice(1));
 
       // Handle mantissa
       if (0 !== (exp & 0x80)) {
@@ -1745,10 +1821,10 @@ module.exports = {
   setNickName,
   b64EncodeUnicode,
   b64DecodeUnicode,
-  isGuidIpv6,
+  isIPV6Addr,
   isDumbNode,
-  isHardCoded,
-  isNoCrc,
+  isHardCodedAddr,
+  isDoNotCalcCRC,
   getPriority,
   getGuidType,
   getRollingIndex,
@@ -1756,7 +1832,7 @@ module.exports = {
   // Measurements
   isMeasurement,
   toFixed,
-  varInteger2Float,
+  varInt2BigInt,
   getDataCoding,
   getUnit,
   getSensorIndex,
