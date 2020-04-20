@@ -39,6 +39,8 @@
 
 'use strict';
 
+const vscp_class = require('node-vscp-class');
+
 /**
  * VSCP core javascript library version
  * @property {number} major - Major version number
@@ -1297,13 +1299,28 @@ var isMeasurement = function(vscpClass) {
 
   let rv = false;
 
-  if (( (vscpClass >= 10) && (vscpClass <=14) ) || 
-      ( (vscpClass >= 60) && (vscpClass <=64) ) ||
-      ( (vscpClass >= 65) && (vscpClass <=69) ) ||
-      ( (vscpClass >= 70) && (vscpClass <=79) ) || 
-      ( (vscpClass >= 85) && (vscpClass <=89) ) ||
-      (1040 == vscpClass) ||
-      (1060 == vscpClass)) {
+  if (( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) && 
+        (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) || 
+      ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
+        (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) ||
+      ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
+        (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) ||
+      ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
+        (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) || 
+      ( (vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
+        (vscpClass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) ||
+      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
+        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) || 
+      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
+        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) ||
+      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
+        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) ||
+      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
+        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) || 
+      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
+        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) ||  
+      (vscp_class.VSCP_CLASS2_MEASUREMENT_STR == vscpClass) ||
+      (vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT == vscpClass)) {
     rv = true;
   }
 
@@ -1318,19 +1335,24 @@ var isMeasurement = function(vscpClass) {
   CLASS1.MEASUREMENT
 
   @param {number[]} data - Data (event data array/buffer 
-    where first data byte is the data coding)
-  @return {number} Value as float
+    where first data byte is the VSCP data coding)
+  @return bits    -  {logical[]} Array of bits
+          bytes   - {number[]} Array of bytes
+          integer . {bigint} Integer as bigint
+          string  - {number} String value as number.
+          float   - {number} Floating point value as number.
 */
 
 var decodeMeasurementClass10 = function(data) {
 
-  var rval = 0.0;
+  var rval;
   var newData = [];
   var sign = 0;
   var exp = 0;
   var mantissa = 0;
   var str = '';
   var i = 0;
+  var j = 0;
 
   // If argument is array convert to buffer
   if ( Array.isArray(data) ) {
@@ -1347,23 +1369,39 @@ var decodeMeasurementClass10 = function(data) {
     throw(new Error("Parameter error: 'data' should have a length >= 2."))
   }
 
-  switch (getDataCoding(data[0])) {
-    case 0:  // Bits
-    case 1:  // Bytes
-    case 3:  // Integer
+  switch (getDataCoding( data[0] & measurementDataCodingMask.MASK_DATACODING_TYPE ) ) {
+
+    case measurementDataCoding.DATACODING_BIT:  // Bits
+      rval = [];
+      for (i=1; i<data.length; i++) {
+        for (j=0;j<8;j++) {
+          rval.push((data[i] & (1<<(7-j))) ? true : false);
+        }
+      }
+      break;
+
+    case measurementDataCoding.DATACODING_BYTE:  // Bytes
+      rval = [];
+      for (i=1; i<data.length; i++) {
+        rval.push(data[i]);
+      }
+      break;
+
+    case measurementDataCoding.DATACODING_INTEGER:  // Integer
       rval = varInt2BigInt(data.slice(1));
       break;
 
-    case 2:  // String
+    case measurementDataCoding.DATACODING_STRING:  // String
       for (i = 1; i < data.length; i++) {
         str += String.fromCharCode(data[i]);
       }
       rval = parseFloat(str);
       break;
 
-    case 4:  // Normalized integer
+    case measurementDataCoding.DATACODING_NORMALIZED:  // Normalized integer
+      
       exp = data[1];
-      rval = varInt2BigInt(data.slice(1));
+      rval = Number(varInt2BigInt(data.slice(2)));
 
       // Handle mantissa
       if (0 !== (exp & 0x80)) {
@@ -1376,16 +1414,16 @@ var decodeMeasurementClass10 = function(data) {
       }
       break;
 
-    case 5:  // Floating point
+    case measurementDataCoding.DATACODING_SINGLE:  // Floating point
       if (5 === data.length) {
         rval = data.readFloatBE(1);
       }
       break;
 
-    case 6:  // Reserved
+    case measurementDataCoding.DATACODING_RESERVED1:  // Reserved
       break;
 
-    case 7:  // Reserved
+    case measurementDataCoding.DATACODING_RESERVED1:  // Reserved
       break;
 
     default:
@@ -1398,7 +1436,7 @@ var decodeMeasurementClass10 = function(data) {
 /*! 
   decodeMeasurementClass60
 
-  CLASS1.MEASUREMENT32
+  CLASS1.MEASUREMENT64
 
   Decode a class 60 measurement. Data is a 
   64-bit double floating point number.
@@ -1462,7 +1500,7 @@ var decodeMeasurementClass65 = function(data) {
     throw(new Error("Parameter error: 'data' should have a length >= 5."))
   }
 
-  var b = Buffer.slice(3);
+  var b = data.slice(3);
   return decodeMeasurementClass10(b);
 };
 
@@ -1546,7 +1584,7 @@ var decodeMeasurementClass85 = function(data) {
 
 var decodeMeasurementClass1040 = function(data) {
 
-  var str = "0";
+  var str = "";
   var i = 0;
 
   // If argument is array convert to buffer
@@ -1839,6 +1877,10 @@ module.exports = {
   decodeMeasurementClass10,
   decodeMeasurementClass60,
   decodeMeasurementClass65,
+  decodeMeasurementClass70,
+  decodeMeasurementClass85,
+  decodeMeasurementClass1040,
+  decodeMeasurementClass1060,
 
   // CANAL conversions
   getVscpHeadFromCANALid,
