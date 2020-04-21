@@ -22,7 +22,7 @@ console.log(e);
 e2 = new vscp.Event();
 e2.vscpClass = 10;
 e2.vscpType = 6;
-e2.data = [1,2,3,4,5];
+e2.vscpData = [1,2,3,4,5];
 console.log(e2);
 
 // Define event with string in constructor

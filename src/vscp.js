@@ -1698,7 +1698,8 @@ var getVscpTypeFromCANALid = function(id) {
 /*!
   getNicknameFromCANALid
 
-  @param {number} id canid from which nodeid/nickname should be extracted
+  @param {number} id canid from which 
+         nodeid/nickname should be extracted
   @return {number} nodeid/nickname
 */
 
@@ -1757,13 +1758,13 @@ var convertEventToCanMsg = function(ev) {
                                       ev.vscpType );
   msg.id += getNodeId(ev.vscpGuid);
   msg.flags = 1; //CANAL extended id
-  msg.obid = ev.obid;
+  msg.obid = ev.vscpObId || 0;
   msg.timestamp = ev.vscpTimeStamp;
   msg.data = ev.vscpData;
-  // msg.dlc = ev.vscpData.length;
-  // if ( msg.dlc > 8 ) {
-  //   throw(new Error("Data length is > 8 [" + msg.dlc + "]"));
-  // }
+  msg.dlc = ev.vscpData.length;
+  if ( msg.dlc > 8 ) {
+    throw("Data length is > 8 [" + msg.dlc + "]");
+  }
   
   
   return msg;
@@ -1780,7 +1781,7 @@ var convertEventToCanMsg = function(ev) {
       ext: false,
       rtr: false,
       timestamp: 1233,
-      canid: 123,
+      id: 123,
       dlc: 4,
       data: [1,2,3,4]
    }
@@ -1793,21 +1794,18 @@ var convertCanMsgToEvent = function(msg) {
     throw(new Error("Parameter error: 'msg' should be canmsg object."));
   } 
 
-  // VSCP use id not canid
-  if ('undefined' === typeof msg.canid) {
-    msg.canid = msg.id;
-  }
-  
   var ev = {};
   ev.vscpGuid  = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
-  ev.vscpHead  = getVscpHeadFromCANALid(msg.canid);
-  ev.vscpClass = getVscpClassFromCANALid(msg.canid);
-  ev.vscpType  = getVscpTypeFromCANALid(msg.canid);
+  ev.vscpHead  = getVscpHeadFromCANALid(msg.id);
+  ev.vscpClass = getVscpClassFromCANALid(msg.id);
+  ev.vscpType  = getVscpTypeFromCANALid(msg.id);
   ev.vscpTimeStamp = msg.timestamp || new Date().getTime();
   var d = new Date(new Date().toUTCString());
   ev.vscpDateTime = d.toISOString();
-  ev.vscpGuid = setNickName(ev.vscpGuid, getNicknameFromCANALid(msg.canid));
-  ev.obid = msg.obid || 0;
+  ev.vscpGuid = setNickName(ev.vscpGuid, getNicknameFromCANALid(msg.id));
+  console.log(ev);
+  ev.vscpObId = msg.obid || 0;
+
   // Handle data
   if (msg.data) { 
     if ( 'string' === typeof msg.data ) {
