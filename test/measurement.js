@@ -15,9 +15,14 @@ describe('VSCP Measurements', function() {
 
     describe('vscp.varInt2BigInt(data)', function() {
 
-        it('Decimal number should return 11', function() {
+        it('Decimal number should return 11 (bigint)', function() {
             var data = [11];
             assert.equal(vscp.varInt2BigInt(data), 11n);
+        });
+
+        it('Decimal number should return 11 (number)', function() {
+            var data = [11];
+            assert.equal(parseFloat(vscp.varInt2BigInt(data)), 11);
         });
 
         it('Decimal number should return -1', function() {

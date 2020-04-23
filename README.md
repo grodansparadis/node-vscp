@@ -1,5 +1,8 @@
 # node-vscp
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Node.js CI](https://github.com/grodansparadis/node-vscp/workflows/Node.js%20CI/badge.svg)
+
 <img src="https://vscp.org/images/logo.png" width="100">
 
 Utility and constant package for VSCP programming with node.js
@@ -224,7 +227,7 @@ see setFromString below.
 The full definitions is like this
 
 ```javascript
- * @param {object} options                              - Options
+ * @param {object} options | string                     - Options object or event on string form
  * @param {number} options.vscpHead                     - Event head
  * @param {boolean} options.guidIsIpV6Addr              - GUID is a IPv6 address
  * @param {boolean} options.dumbNode                    - Node is a dumb node
@@ -242,6 +245,41 @@ The full definitions is like this
  text
  * @param {string} options.text
 ```
+### Constructors
+
+#### Option object
+
+```javascript
+var ev = new vscp.Event();
+ev.vscpHead = 0x0007;
+ev.vscpClass = 10;
+ev.vscpType = 6;
+ev.vscpData = [1,2,3,4,5];
+ev.vscpGuid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01"
+```
+
+or
+
+```javascript
+var ev = new vscp.Event( {
+    "vscpHead": 0x0007,
+    "vscpClass": 10,
+    "vscpType": 6,
+    "vscpData": [1,2,3,4,5],
+    "vscpGuid": "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01"
+});
+```
+
+#### String
+
+```javascript
+var ev = new vscp.Event('3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
+```
+
+```javascript
+var ev = new vscp.Event({
+    text : '3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32'
+});
 
 ### Methods
 
@@ -687,7 +725,13 @@ Get rolling index (0-7) for a node.
 
 ## Measurement event helpers
 
-### toFixedvalue, precision
+### toFixed
+
+```javascript
+var value = 999,678;
+toFixed(value);
+```
+
 Round a **value** to fixed **precision** and output as a string.
 
 **Example**
@@ -697,20 +741,59 @@ This will output "1.2"
 console.log(vscp.toFixed(1.234, 1));
 ```
 
-### varInteger2Float(data)
+### varInt2BigInt(data)
 
-Convert an integer value to floating point value. The integer is stored in a byte array with MSB to LSB storage order.
+```javascript
+varInt2BigInt(data);
+```
+
+
+Convert VSCP data bytes to a bigint value. The data that make up the bigint is stored in a byte array with MSB to LSB storage order.
+
+If you want to convert a bigint to a number use **number(bigint-value)**. So
+
+```javascript
+console.log(vscp.varInt2BigInt([123]));
+```
+
+and
+
+```javascript
+console.log(number(vscp.varInt2BigInt([123])));
+```
+
+will both output 123 but in the first case it is a bugint (123n) amd in the second case a standard JavaScript number (123).
 
 **Example**
 This will output -292
 
 ```javascript
-console.log(vscp.varInteger2Float([0xFE,0xDC]));
+console.log(vscp.varInt2BigInt([0xFE,0xDC]));
+```
+
+**Example**
+This will output -1
+
+```javascript
+console.log(vscp.varInt2BigInt([0xFF]));
+```
+
+**Example**
+This will output 0x7fffffffffffffff
+
+```javascript
+console.log(vscp.varInt2BigInt([0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff]));
 ```
 
 ### getDataCoding(code)
 
-Get data coding from a measurement coding byte.
+```javascript
+getDataCoding(code);
+```
+
+Get data coding from a measurement coding byte. The data coding tells how the measurement is encoded in the VSCP databytes.
+See [measurementDataCoding](#measurementDataCoding) above for possible return values.
+
 
 **Example**
 This will output 4 which is a normalized integer.
@@ -722,9 +805,15 @@ console.log("Datacoding: ",
     vscp.getDataCoding(d[0]));
 ```
 
-### getUnit(code)
+### getUnit
 
-Get unit from data coding.
+```javascript
+getUnit(code);
+```
+
+Get the measurement unit from data coding byte. This is is the encoded measurement unit. See the [specification](https://docs.vscp.org/spec/latest/#/./class1.measurement) for encodings.  
+
+**Example**
 
 ```javascript
 // Value = -2.92 C
@@ -732,10 +821,15 @@ var d = [0x89,0x82,0xFE,0xDC];
 console.log("Unit: ",
     vscp.getUnit(d[0]));
 ```
+will return 1 for degrees Celsius.
 
-### getSensorIndex(code)
+### getSensorIndex
 
-Get sensor index from data coding.
+```javascript
+getSensorIndex(code);
+```
+
+Get sensor index from the data coding byte. The returned value is 0-7 and is the index for an onboard sensor from which the measurement is originated.
 
 ```javascript
 // Value = -2.92 C
@@ -744,9 +838,38 @@ console.log("Sensor index: ",
     vscp.getSensorIndex(d[0]));
 ```
 
-### decodeClass10(dataarray)
+### isMeasurement
 
-Decode a class=10 measurement. Result is a floating point value.
+```javascript
+isMeasurement(vscpClass)
+```
+
+Check if a VSCP class is a measurement class and 
+returns true if it is.
+
+### decodeMeasurementClass10
+
+```javascript
+// var data = [1,2,3...];
+// var data = Buffer.from([1,2,3...]);
+decodeMeasurementClass10(data);
+```
+
+Decode a [CLASS1.MEASUREMENT](https://docs.vscp.org/spec/latest/#/./class1.measurement) (class=10) measurement. What the function return will vary on the coding of the measurement as below
+
+
+| Coding | Return value |
+| :------ | :------------ |
+| Bytes | Array of byte values |
+| Bits | Array with logical values for the bits (MSB -> LSB) |
+| Integer | BigInt |
+| Normalized | Number |
+| String | Number |
+| Single | Number |
+
+**data** parameter can be array or buffer.
+
+Also decodes measurement data for CLASS1.MEASUREMENTX1, CLASS1.MEASUREMENTX2, CLASS1.MEASUREMENTX3 and CLASS1.MEASUREMENTX4 
 
 **Example**
 
@@ -756,18 +879,202 @@ Will output a floating point value of -2.92
 // Value = -2.92 C
 var d = [0x89,0x82,0xFE,0xDC];
 console.log("Measurement data [0x89,0x82,0xFE,0xDC]is ",
-            vscp.decodeClass10(d));
+             vscp.decodeMeasurementClass10(d));
 ```
 
-### decodeClass60Number(dataarray)
+**Example**
 
-Decode a class=60 measurement (single precision floating point value). Result is a floating point value.
+The returned value 0x55aa55aa55aa55n is as bigint.
 
-### decodeClass65Number(dataarray)
-Decode a class=65 measurement (measurement with zone). Result is a floating point value.
+```javascript
+var data = [0x60,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55];
+var val = vscp.decodeMeasurementClass10(data);
+assert(val === 0x55aa55aa55aa55n);
+```
 
-### isMeasurement(vscpClass)
-Returns true if vscpClass is a measurement class
+**Example**
+
+The returned value 0x55aa55aa55aa55n is a bigint.
+
+```javascript
+var data = [0x60,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55];
+var val = vscp.decodeMeasurementClass10(data);
+assert(val === 0x55aa55aa55aa55n);
+```
+
+**Example**
+
+The returned value 9.909819 as a number.
+
+```javascript
+var data = [0xA0,65,30,142,158];
+var val = vscp.decodeMeasurementClass10(data);
+assert.equal(vscp.toFixed(val,6),9.909819);
+```
+
+### decodeMeasurementClass60
+
+```javascript
+// var data = [1,2,3...];
+// var data = Buffer.from([1,2,3...]);
+decodeMeasurementClass60(data);
+```
+
+Decode a [CLASS1.MEASUREMENT64](https://docs.vscp.org/spec/latest/#/./class1.measurement64) (class=60) measurement (64-bit double precision floating point value) stored MSB first (big endian). Return value is a number.
+
+Also decodes measurement data for CLASS1.MEASUREMENT64X1, CLASS1.MEASUREMENT64X2, CLASS1.MEASUREMENT64X3 and CLASS1.MEASUREMENT64X4 
+
+**Example**
+
+Return 124.372 as number.
+
+```javascript
+var data = [64,95,23,206,217,22,135,43];
+var val = vscp.decodeMeasurementClass60(data);
+assert.equal(vscp.toFixed(val,3), 124.372);
+```
+
+### decodeMeasurementClass65
+
+```javascript
+// var data = [1,2,3...];
+// var data = Buffer.from([1,2,3...]);
+decodeMeasurementClass65(data);
+```
+
+Decode a [CLASS1.MEASUREZONE](https://docs.vscp.org/spec/latest/#/./class1.measurezone) (class=65) measurement (measurement with zone). Return value is the same as for [decodeMeasurementClass10](#decodeMeasurementClass10) above.
+
+Also decodes measurement data for CLASS1.MEASUREZONEX1, CLASS1.MEASUREZONEX2, CLASS1.MEASUREZONEX3 and CLASS1.MEASUREZONEX4 
+
+**Example**
+
+Return array with 16 elements true,false....
+
+```javascript
+var data = [0,1,2,0x00,0xAA,0xAA];
+var bitarray = vscp.decodeMeasurementClass65(data);
+assert.equal(bitarray[0], true);
+assert.equal(bitarray[1], false);
+assert.equal(bitarray[2], true);
+assert.equal(bitarray[3], false);
+assert.equal(bitarray[4], true);
+assert.equal(bitarray[5], false);
+assert.equal(bitarray[6], true);
+assert.equal(bitarray[7], false);
+assert.equal(bitarray[8], true);
+assert.equal(bitarray[9], false);
+assert.equal(bitarray[10], true);
+assert.equal(bitarray[11], false);
+assert.equal(bitarray[12], true);
+assert.equal(bitarray[13], false);
+assert.equal(bitarray[14], true);
+assert.equal(bitarray[15], false);
+```
+
+**Example**
+
+Return two bytes 0xAA and 0+x55
+
+```javascript
+var data = [0,1,2,0x20,0xAA,0x55];
+var bitarray = vscp.decodeMeasurementClass65(data);
+assert.equal(bitarray[0], 0xAA);
+assert.equal(bitarray[1], 0x55);
+```
+
+**Example**
+
+Return 10.8 as number.
+
+```javascript
+var data = [0,1,2,0x40,0x31,0x30,0x2e,0x38];
+var val = vscp.decodeMeasurementClass65(data);
+assert(val === 10.8);
+```
+
+### decodeMeasurementClass70
+
+```javascript
+// var data = [1,2,3...];
+// var data = Buffer.from([1,2,3...]);
+decodeMeasurementClass70(data);
+```
+
+Decode a [CLASS1.MEASUREMENT32](https://docs.vscp.org/spec/latest/#/./class1.measurement32) (class=70) measurement (32-bit single precision floating point value) stored MSB first (big endian). Return value is a number.
+
+Also decodes measurement data for CLASS1.MEASUREMENT32X1, CLASS1.MEASUREMENT32X2, CLASS1.MEASUREMENT32X3 and CLASS1.MEASUREMENT32X4 
+
+**Example**
+
+Return 9.909819 as number.
+
+```javascript
+var data = [65,30,142,158];
+var val = vscp.decodeMeasurementClass70(data);
+assert.equal(vscp.toFixed(val,6),9.909819);
+```
+
+### decodeMeasurementClass85
+
+```javascript
+// var data = [1,2,3...];
+// var data = Buffer.from([1,2,3...]);
+decodeMeasurementClass85(data);
+```
+
+Decode a [CLASS1.SETVALUEZONE](https://docs.vscp.org/spec/latest/#/./class1.setvaluezone) (class=85) measurement (set value with zone). Return value is the same as for [decodeMeasurementClass10](#decodeMeasurementClass10) above.
+
+Also decodes measurement data for CLASS1.SETVALUEZONEX1, CLASS1.SETVALUEZONEX2, CLASS1.SETVALUEZONEX3 and CLASS1.SETVALUEZONEX4
+
+**Example**
+
+Return 10.8 as number.
+
+```javascript
+var data = [0,1,2,0x40,0x31,0x30,0x2e,0x38];
+var val = vscp.decodeMeasurementClass85(data);
+assert(val === 10.8);
+```
+
+### decodeMeasurementClass1040
+
+```javascript
+// var data = [1,2,3...];
+// var data = Buffer.from([1,2,3...]);
+decodeMeasurementClass1040(data);
+```
+
+Decode a [CLASS2.MEASUREMENT_STR](https://docs.vscp.org/spec/latest/#/./class2.measurement_str) (class=1040) measurement, string representing a floating point value. Return value is a number.
+
+**Example**
+
+Return 12345678.9 as number.
+
+```javascript
+var data = [0,1,2,0,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x2E,0x39];
+var val = vscp.decodeMeasurementClass1040(data);
+assert.equal(val, 12345678.9);
+```
+
+### decodeMeasurementClass1060
+
+```javascript
+// var data = [1,2,3...];
+// var data = Buffer.from([1,2,3...]);
+decodeMeasurementClass1060(data);
+```
+
+Decode a [CLASS2.MEASUREMENT_FLOAT](https://docs.vscp.org/spec/latest/#/./class2.measurement_float) (class=1060) measurement 64-bit double precision floating point value stored MSB first (big endian). Return value is a number
+
+**Example**
+
+Return -876.12 as number.
+
+```javascript
+var data = [0,1,2,0,192,139,96,245,194,143,92,41];
+var val = vscp.decodeMeasurementClass1060(data);
+assert.equal(vscp.toFixed(val,2), -876.12);
+```
 
 ## CANAL <--> VSCP conversions
 
@@ -785,7 +1092,7 @@ Get VSCP type from extended CAN id.
 
 ### getNicknameFromCANALid(canid)
 
-Get node id / nicjname form CAN id.
+Get node id / nickname from CAN id.
 
 ### getCANALid(vscpHead, vscpClass, vscpType)
 

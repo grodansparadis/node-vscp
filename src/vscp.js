@@ -1188,11 +1188,11 @@ var toFixed = function(value, precision) {
 
 /*! 
   varInt2BigInt
-  Convert an integer value to floating point value. 
-  The integer is stored in a byte array with MSB to LSB 
-  storage order.
+  Convert VSCP data to a BigInt value. 
+  The byte that make up the BigInt is stored in a byte array 
+  with MSB to LSB storage order.
 
-  @param {number[]} data - Byte array
+  @param {array[]|buffer[]} data - Byte array/buffer
   @return {bigint} BigInt value
 */
 
