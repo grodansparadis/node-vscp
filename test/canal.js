@@ -162,11 +162,11 @@ describe('CANAL helpers', function() {
 
         it('should return 10.', function() {
             var canmsg = {
-                id: vscp.getCANALid(7,10,6)+42,
-                ext: true,
-                rtr: false,
-                dlc: 4,
-                data: "1,2,3,4"
+                "id": vscp.getCANALid(7,10,6)+42,
+                "ext": true,
+                "rtr": false,
+                "dlc": 4,
+                "data": "1,2,3,4"
             };
             var ev = vscp.convertCanMsgToEvent(canmsg);
             assert.equal(ev.vscpClass, 10);
@@ -174,11 +174,11 @@ describe('CANAL helpers', function() {
 
         it('should return 6.', function() {
             var canmsg = {
-                id: vscp.getCANALid(7,10,6)+42,
-                ext: true,
-                rtr: false,
-                dlc: 4,
-                data: "1,2,3,4"
+                "id": vscp.getCANALid(7,10,6)+42,
+                "ext": true,
+                "rtr": false,
+                "dlc": 4,
+                "data": "1,2,3,4"
             };
             var ev = vscp.convertCanMsgToEvent(canmsg);
             assert.equal(ev.vscpType, 6);
@@ -186,11 +186,11 @@ describe('CANAL helpers', function() {
 
         it('should return 42.', function() {
             var canmsg = {
-                id: vscp.getCANALid(7,10,6)+42,
-                ext: true,
-                rtr: false,
-                dlc: 4,
-                data: "1,2,3,4"
+                "id": vscp.getCANALid(7,10,6)+42,
+                "ext": true,
+                "rtr": false,
+                "dlc": 4,
+                "data": "1,2,3,4"
             };
             var ev = vscp.convertCanMsgToEvent(canmsg);
             assert.equal(vscp.getNickName(ev.vscpGuid), 42);
@@ -198,11 +198,11 @@ describe('CANAL helpers', function() {
 
         it('should return 0xE0.', function() {
             var canmsg = {
-                id: vscp.getCANALid(7,10,6)+42,
-                ext: true,
-                rtr: false,
-                dlc: 4,
-                data: "1,2,3,4"
+                "id": vscp.getCANALid(7,10,6)+42,
+                "ext": true,
+                "rtr": false,
+                "dlc": 4,
+                "data": "1,2,3,4"
             };
             var ev = vscp.convertCanMsgToEvent(canmsg);
             assert.equal(ev.vscpHead, 0xE0);
@@ -210,11 +210,11 @@ describe('CANAL helpers', function() {
 
         it('should return 0xE0.', function() {
             var canmsg = {
-                id: vscp.getCANALid(1,10,6)+42,
-                ext: true,
-                rtr: false,
-                dlc: 4,
-                data: "1,2,3,4"
+                "id": vscp.getCANALid(1,10,6)+42,
+                "ext": true,
+                "rtr": false,
+                "dlc": 4,
+                "data": "1,2,3,4"
             };
             var ev = vscp.convertCanMsgToEvent(canmsg);
             assert.equal(ev.vscpHead, 0x20);
@@ -222,11 +222,11 @@ describe('CANAL helpers', function() {
 
         it('should return [1,2,3,4].', function() {
             var canmsg = {
-                id: vscp.getCANALid(7,10,6)+42,
-                ext: true,
-                rtr: false,
-                dlc: 4,
-                data: "1,2,3,4"
+                "id": vscp.getCANALid(7,10,6)+42,
+                "ext": true,
+                "rtr": false,
+                "dlc": 4,
+                "data": "1,2,3,4"
             };
             var ev = vscp.convertCanMsgToEvent(canmsg);
             assert.equal(ev.vscpData.length, 4);

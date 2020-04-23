@@ -803,11 +803,11 @@ Output is an object with the following format
 
 ```json
 {
-  canid: 656897,
-  flags: 1,
-  timestamp: 0,
-  obid: 0,
-  data: [ 137, 130, 254, 220 ]
+  "canid": 656897,
+  "flags": 1,
+  "timestamp": 0,
+  "obid": 0,
+  "data": [ 137, 130, 254, 220 ]
 }
 ```
 
@@ -819,12 +819,12 @@ A canmsg is an object with the following format
 
 ```json
 {
-  id: 656897,
-  timestamp: 0,
-  flags: 1,
-  obid: 0,
-  timestamp: 0,
-  data: [ 137, 130, 254, 220 ]
+  "id": 656897,
+  "timestamp": 0,
+  "flags": 1,
+  "obid": 0,
+  "timestamp": 0,
+  "data": [ 137, 130, 254, 220 ]
 }
 ```
 
@@ -835,14 +835,14 @@ If timestamp is not given it will get sensible default.
 The resulting GUID will be all nills with the nickname in the LSB.
 
 **Example**
-```javsacript
+```javascript
 console.log( vscp.convertCanMsgToEvent(
   {
-   canid: vscp.getCANALid(7,10,6)+42,
-   ext: true,
-   rtr: false,
-   dlc: 4,
-   data: new Buffer.from([1,2,3,4])
+   "id": vscp.getCANALid(7,10,6)+42,
+   "ext": true,
+   "rtr": false,
+   "dlc": 4,
+   "data": new Buffer.from([1,2,3,4])
   }
 ));
 ```

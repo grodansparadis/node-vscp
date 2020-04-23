@@ -1,8 +1,8 @@
 const vscp_class = require('node-vscp-class');
 const vscp_type = require('node-vscp-type');
 
-const vscp = require("../src/vscp.js");
-const {priority:ttt} = require("../src/vscp.js");
+const vscp = require("./vscp.js");
+const {priority:ttt} = require("./vscp.js");
 
 var ev = new vscp.Event();
 console.log("Module version: " + vscp.version.major + "."+ vscp.version.minor + "." + vscp.version.release);
