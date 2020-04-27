@@ -1653,6 +1653,107 @@ var decodeMeasurementClass1060 = function(data) {
 
 // ----------------------------------------------------------------------------
 
+/*!
+  Create CLASS1.MEASUREMENT event
+
+  @param {number} code - VSCP code for measurment coding
+  @param {number} sensorindex - Index for sensor (0-7)
+  @param {number} unit - Unit for value
+  @param {array|buffer|number|bigint} value Measurement value
+  @return VSCP Event or null
+
+*/
+
+/*!
+  createMeasurementClass10
+
+  Create CLASS1.MEASUREMENT event
+
+  @param {number} code - VSCP code for measurment coding
+  @param {number} sensorindex - Index for sensor (0-7)
+  @param {number} unit - Unit for value
+  @param {array|buffer|number|bigint} value Measurement value
+  @return VSCP Event or null
+
+*/
+
+/*!
+  createMeasurementClass60
+
+  CLASS1.MEASUREMENT64 event
+
+  @param {number} value Measurement value
+  @return VSCP Event or null
+
+*/
+
+/*!
+  createMeasurementClass65
+
+  CLASS1.MEASUREZONE event
+
+  @param {number} device index - Index for device. 
+  @param {number} code - VSCP code for measurment coding
+  @param {number} sensorindex - Index for sensor (0-7)
+  @param {number} unit - Unit for value
+  @param {number} value Measurement value
+  @return VSCP Event or null
+
+*/
+
+/*!
+  createMeasurementClass70
+
+  CLASS1.MEASUREMENT32 event
+
+  @param {number} value Measurement value
+  @return VSCP Event or null
+
+*/
+
+/*!
+  createMeasurementClass85
+
+  CLASS1.SETVALUEZONE2 event
+
+  @param {number} device index - Index for device. 
+  @param {number} zone - Zone to set value for.
+  @param {number} subzone - Subzone to set value for.
+  @param {number} code - VSCP code for measurment coding
+  @param {number} sensorindex - Index for sensor (0-7)
+  @param {number} unit - Unit for value
+  @param {number} value Measurement value
+  @return VSCP Event or null
+*/
+
+/*!
+  createMeasurementClass1040
+
+  CLASS2.MEASUREMENT_STR event
+
+  @param {number} sensorindex - Index for sensor (0-255) 
+  @param {number} zone - Zone to set value for )0-255).
+  @param {number} subzone - Subzone to set value for (0-255).
+  @param {number} unit - Unit for value (0-255)
+  @param {number} value Measurement value
+  @return VSCP Event or null
+*/
+
+/*!
+  createMeasurementClass1060
+
+  CLASS2.MEASUREMENT_FLOAT event
+
+  @param {number} sensorindex - Index for sensor (0-255) 
+  @param {number} zone - Zone to set value for )0-255).
+  @param {number} subzone - Subzone to set value for (0-255).
+  @param {number} unit - Unit for value (0-255)
+  @param {number} value Measurement value
+  @return VSCP Event or null
+*/
+
+// ----------------------------------------------------------------------------
+
 
 /*! 
   vscp_getVscpHeadFromCANALid
