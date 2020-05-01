@@ -1174,6 +1174,8 @@ functionGlobalContext: {
 }
 ```
 
+The _vscp_ before ':' is the name the imported module will be known as in the system
+
 Now restart node-red with
 
 ```
@@ -1338,7 +1340,7 @@ and add to
 ```javascript
 functionGlobalContext: {
     vscp:require('node-vscp')
-    vscp_class:require('node-vscp-class')
+    vscpclass:require('node-vscp-class')
     vscptype:require('node-vscp-type')
 }
 ```
@@ -1374,7 +1376,7 @@ The code for the flow is
         "type": "function",
         "z": "e12ba6da.b3f8e",
         "name": "Send VSCP Event",
-        "func": "var ev = new (global.get('vscp')).Event({\n    vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,\n    vscpClass: global.get('vscp_class').VSCP_CLASS1_MEASUREMENT,\n    vscpType: global.get('vscp_type').VSCP_TYPE_MEASUREMENT_TEMPERATURE,\n    vscpGuid: \"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01\",\n    vscpsizeData: 4,\n    vscpData: [0x89,0x82,0xFE,0xDC]\n});\nmsg.payload = ev;\nreturn msg;",
+        "func": "var ev = new (global.get('vscp')).Event({\n    vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,\n    vscpClass: global.get('vscpclass').VSCP_CLASS1_MEASUREMENT,\n    vscpType: global.get('vscptype').VSCP_TYPE_MEASUREMENT_TEMPERATURE,\n    vscpGuid: \"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01\",\n    vscpsizeData: 4,\n    vscpData: [0x89,0x82,0xFE,0xDC]\n});\nmsg.payload = ev;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 320,
@@ -1408,8 +1410,8 @@ If you look at the code in the function node you see
 ```javascript
 var ev = new (global.get('vscp')).Event({
     vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,
-    vscpClass: global.get('vscp_class').VSCP_CLASS1_MEASUREMENT,
-    vscpType: global.get('vscp_type').VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+    vscpClass: global.get('vscpclass').VSCP_CLASS1_MEASUREMENT,
+    vscpType: global.get('vscptype').VSCP_TYPE_MEASUREMENT_TEMPERATURE,
     vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
     vscpsizeData: 4,
     vscpData: [0x89,0x82,0xFE,0xDC]
@@ -1429,8 +1431,8 @@ In a real world example the debug node would be a VSCP send node such as the out
 ```javascript
 var ev = new (global.get('vscp')).Event({
     vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,
-    vscpClass: global.get('vscp_class').VSCP_CLASS1_CONTROL,
-    vscpType: global.get('vscp_type').VSCP_TYPE_CONTROL_ALL_LAMPS,
+    vscpClass: global.get('vscpclass').VSCP_CLASS1_CONTROL,
+    vscpType: global.get('vscptype').VSCP_TYPE_CONTROL_ALL_LAMPS,
     vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
     vscpsizeData: 4,
     vscpData: [0x00,0x11,0x01]
