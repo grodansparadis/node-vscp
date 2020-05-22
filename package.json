@@ -1,6 +1,6 @@
 {
   "name": "node-vscp",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "description": "Utility and constant package for VSCP",
   "main": "src/vscp.js",
   "scripts": {
@@ -28,10 +28,10 @@
   "homepage": "https://github.com/grodansparadis/node-vscp#readme",
   "dependencies": {},
   "devDependencies": {
-    "eslint": "^6.8.0",
+    "eslint": "^7.0.0",
     "mocha": "^7.1.2",
-    "node-vscp-class": "^1.0.9",
-    "node-vscp-type": "^1.0.7",
-    "npm-check-updates": "^4.1.2"
+    "node-vscp-class": "^1.0.10",
+    "node-vscp-type": "^1.0.8",
+    "npm-check-updates": "^6.0.1"
   }
 }
