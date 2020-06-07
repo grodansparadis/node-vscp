@@ -97,6 +97,7 @@ ev.setPriority(priority.PRIORITY_HIGH);
 console.log(priority.PRIORITY_HIGH);
 console.log(priority.PRIORITY_LOW);
 ```
+
 ### guidtype
 
 This is what type of GUID this event carries. 
@@ -245,6 +246,7 @@ The full definitions is like this
  text
  * @param {string} options.text
 ```
+
 ### Constructors
 
 #### Option object
@@ -280,6 +282,7 @@ var ev = new vscp.Event('3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF
 var ev = new vscp.Event({
     text : '3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32'
 });
+```
 
 ### Methods
 
@@ -575,6 +578,7 @@ if (true === (e instanceof vscp.Event)) {
 e.setFromString('3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
 console.log(e);
 ```
+
 #### toJSONObj
 
 Get event as a JSON object on the form
@@ -591,6 +595,7 @@ Get event as a JSON object on the form
   vscpData: [ 11, 22, 33, 44, 55 ]
 }
 ```
+
 **Example**
 ```javascript
 var e = new Event('3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
@@ -676,6 +681,7 @@ Set node id on a GUID string.
 ```javascript
 console.log(vscp.setNodeId(strguid1,255));
 ```
+
 ### setNickName(guid,nodeid)
 See setNodeId (this is a copy of that function)
 
@@ -821,6 +827,7 @@ var d = [0x89,0x82,0xFE,0xDC];
 console.log("Unit: ",
     vscp.getUnit(d[0]));
 ```
+
 will return 1 for degrees Celsius.
 
 ### getSensorIndex
