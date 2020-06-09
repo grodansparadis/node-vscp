@@ -811,6 +811,17 @@ console.log("Datacoding: ",
     vscp.getDataCoding(d[0]));
 ```
 
+### getDataCodingStr
+
+Returns a descriptive string for the data coding.
+
+```javascript
+// Value = -2.92 C
+var d = [0x89,0x82,0xFE,0xDC];
+console.log("Datacoding: ",
+    vscp.getDataCodingStr(d[0])); // "Datacoding: Normalized integer"
+```
+
 ### getUnit
 
 ```javascript
@@ -829,6 +840,7 @@ console.log("Unit: ",
 ```
 
 will return 1 for degrees Celsius.
+
 
 ### getSensorIndex
 

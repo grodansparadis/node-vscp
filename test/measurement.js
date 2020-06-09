@@ -156,6 +156,39 @@ describe('VSCP Measurements', function() {
 
     });
 
+    describe('vscp.getDataCodingStr(datacoding)', function() {
+
+        it('should return "Unknown data coding"', function() {
+            var datacodingstr = "Unknown data coding";
+            assert.equal(vscp.getDataCodingStr(99), "Unknown data coding");
+        });
+
+        it('should return "Bits"', function() {
+            assert.equal(vscp.getDataCodingStr(vscp.measurementDataCoding.DATACODING_BIT), "Bits");
+        });
+
+        it('should return "Bytes"', function() {
+            assert.equal(vscp.getDataCodingStr(vscp.measurementDataCoding.DATACODING_BYTE), "Bytes");
+        });
+
+        it('should return "Integer"', function() {
+            assert.equal(vscp.getDataCodingStr(vscp.measurementDataCoding.DATACODING_INTEGER), "Integer");
+        });
+
+        it('should return "Normalized integer"', function() {
+            assert.equal(vscp.getDataCodingStr(vscp.measurementDataCoding.DATACODING_NORMALIZED), "Normalized integer");
+        });
+
+        it('should return "String"', function() {
+            assert.equal(vscp.getDataCodingStr(vscp.measurementDataCoding.DATACODING_STRING), "String");
+        });
+
+        it('should return Floating point (single)', function() {
+            assert.equal(vscp.getDataCodingStr(vscp.measurementDataCoding.DATACODING_SINGLE), "Floating point (single)");
+        });
+
+    });    
+
     describe('vscp.getUnit(unit)', function() {
 
         it('should return 0', function() {
