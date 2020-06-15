@@ -139,7 +139,7 @@ const measurementDataCoding = {
   DATACODING_INTEGER:    0x60,
   DATACODING_NORMALIZED: 0x80,
   DATACODING_SINGLE:     0xA0, /* single precision float */
-  DATACODING_RESERVED1:  0xC0,
+  DATACODING_DOUBLE:     0xC0, /* double precision float */
   DATACODING_RESERVED2:  0xE0
 };
 
@@ -1210,7 +1210,7 @@ var varInt2BigInt = function(data) {
 
   // We must have a buffer
   if ( !Buffer.isBuffer(data) ) {
-    throw(new Error("Parameter error: 'data' should be a numeric array or buffer."))
+    throw(new Error("Parameter error: 'data' should be a numeric array or buffer."));
   }
 
   if (0 !== (data[0] & 0x80)) {
@@ -1232,6 +1232,73 @@ var varInt2BigInt = function(data) {
 
   return work;
 };
+
+/*!
+*/
+
+var getByteDataCoding = function(vscpClass,vscpData) {
+
+  var rv = 0;
+  
+  // Check parameters
+  if ( vscpClass !== number ) {
+    throw(new Error("Parameter error: 'vscpClass' should be a numeric."));
+  }
+
+  if ( !Array.isArray(vscpData) && !Buffer.isBuffer(vscpData)) {
+    throw(new Error("Parameter error: 'vscpData' should be a numeric array or buffer."));
+  }
+
+  if ( ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) && 
+         (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) ) {
+    rv = vscpData[0];
+  }
+  else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
+            (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) {
+    // Always float, unit=0,sensorindex=0
+    rv = measurementDataCoding.DATACODING_DOUBLE;  
+  }
+  else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
+            (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) {
+    rv = vscpData[3];
+  }
+  else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
+            (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) {
+    rv = measurementDataCoding.DATACODING_SINGLE; // Always unit=0,sensorindex=0 
+  }
+  else if ( (vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
+            (vscpClass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) {
+    rv = vscpData[3];
+  }
+  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
+            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) {
+    rv = vscpData[16];  // offset 16
+  } 
+  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
+            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) {
+    rv = measurementDataCoding.DATACODING_DOUBLE; // Always unit=0,sensorindex=0       
+  }
+  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
+            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) {
+    rv = vscpData[16+3];
+  }
+  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
+            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) {
+    rv = measurementDataCoding.DATACODING_SINGLE; // Always unit=0,sensorindex=0 
+  }
+  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
+            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) {
+    rv = vscpData[16+3];
+  } 
+  else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_STR == vscpClass) ) {
+    rv = measurementDataCoding.DATACODING_STRING;;
+  }
+  else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT == vscpClass) ) {
+    rv = measurementDataCoding.DATACODING_DOUBLE;
+  }
+
+  return rv;
+}
 
 /*! 
   getDataCoding
