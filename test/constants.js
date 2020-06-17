@@ -300,9 +300,9 @@ describe('VSCP Constants', function() {
             });
         });
 
-        describe('#DATACODING_RESERVED1', function() {
+        describe('#DATACODING_DOUBLE', function() {
             it('should return 0xC0', function() {
-                assert.equal(vscp.measurementDataCoding.DATACODING_RESERVED1, 0xC0);
+                assert.equal(vscp.measurementDataCoding.DATACODING_DOUBLE, 0xC0);
             });
         });
 

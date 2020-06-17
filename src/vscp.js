@@ -1234,11 +1234,35 @@ var varInt2BigInt = function(data) {
 };
 
 /*!
+  Get the data coding for all measurements even for
+  measurements where the data coding is just implied
+
+  Note! unit and sensor index is not valid for level II measurement
+  events.For level II they are both frull bytes and must be read from 
+  the data.
+
+  {
+    datacoding:
+    unit:
+    sensorindex:
+  }
+
+  @param vscpClass {number} One of the valid measurement classes
+  @param vscpData  {array | buffer } Event data.
+  @return Data coding byte. See measurementDataCoding above.
 */
 
-var getByteDataCoding = function(vscpClass,vscpData) {
+var getMeasurementDataCoding = function(vscpClass,vscpData) {
 
-  var rv = 0;
+  // -1 means not defined. 
+  var rvobj = {
+    datacoding: 0,
+    unit: 0,
+    sensorindex: 0,
+    index: -1,
+    zone: -1,
+    subzone: -1
+  };
   
   // Check parameters
   if ( vscpClass !== number ) {
@@ -1251,53 +1275,100 @@ var getByteDataCoding = function(vscpClass,vscpData) {
 
   if ( ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) && 
          (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) ) {
-    rv = vscpData[0];
+    rvobj.datacoding = getDataCoding(vscpData[0]);
+    rvobj.unit = getUnit(vscpData[0]);
+    rvobj.sensorindex = getSensorIndex(vscpData[0]);
   }
   else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
             (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) {
-    // Always float, unit=0,sensorindex=0
-    rv = measurementDataCoding.DATACODING_DOUBLE;  
+    // Always double, unit=0,sensorindex=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
+    rvobj.unit = 0;
+    rvobj.sensorindex = 0;  
   }
   else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
             (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) {
-    rv = vscpData[3];
+    rvobj.datacoding = getDataCoding(vscpData[3]);
+    rvobj.unit = getUnit(vscpData[3]);
+    rvobj.sensorindex = getSensorIndex(vscpData[3]);
   }
   else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
             (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) {
-    rv = measurementDataCoding.DATACODING_SINGLE; // Always unit=0,sensorindex=0 
+    // Always single, unit=0,sensorindex=0 
+    rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
+    rvobj.unit = 0;
+    rvobj.sensorindex = 0;
   }
   else if ( (vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
             (vscpClass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) {
-    rv = vscpData[3];
+    rvobj.datacoding = getDataCoding(vscpData[3]);
+    rvobj.unit = getUnit(vscpData[3]);
+    rvobj.sensorindex = getSensorIndex(vscpData[3]);
+    rvobj.index = vscpData[0];
+    rvobj.zone = vscpData[1];
+    rvobj.subzone = vscpData[2];
   }
   else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) {
-    rv = vscpData[16];  // offset 16
+    // At offset 16
+    rvobj.datacoding = getDataCoding(vscpData[16]);
+    rvobj.unit = getUnit(vscpData[16]);
+    rvobj.sensorindex = getSensorIndex(vscpData[16]);
   } 
   else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) {
-    rv = measurementDataCoding.DATACODING_DOUBLE; // Always unit=0,sensorindex=0       
+    // Offset 16, Always double, unit=0,sensorindex=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
+    rvobj.unit = 0;
+    rvobj.sensorindex = 0;       
   }
   else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) {
-    rv = vscpData[16+3];
+    // At offset 16
+    rvobj.datacoding = getDataCoding(vscpData[16+3]);
+    rvobj.unit = getUnit(vscpData[16+3]);
+    rvobj.sensorindex = getSensorIndex(vscpData[16+3]);
+    rvobj.index = vscpData[0];
+    rvobj.zone = vscpData[1];
+    rvobj.subzone = vscpData[2];
   }
   else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) {
-    rv = measurementDataCoding.DATACODING_SINGLE; // Always unit=0,sensorindex=0 
+    // Offset 16, Always double, unit=0,sensorindex=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
+    rvobj.unit = 0;
+    rvobj.sensorindex = 0;
   }
   else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) {
-    rv = vscpData[16+3];
+    rvobj.datacoding = vscpData[16+3];
+    rvobj.unit = getUnit(vscpData[16+3]);
+    rvobj.sensorindex = getSensorIndex(vscpData[16+3]);
+    rvobj.index = vscpData[16];
+    rvobj.zone = vscpData[16+1];
+    rvobj.subzone = vscpData[16+2];
   } 
   else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_STR == vscpClass) ) {
-    rv = measurementDataCoding.DATACODING_STRING;;
+    rv = measurementDataCoding.DATACODING_STRING;
+    // Always string, index=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_STRING;
+    rvobj.sensorindex = vscpData[0];
+    rvobj.index = 0;
+    rvobj.zone = vscpData[1];
+    rvobj.subzone = vscpData[2];
+    rvobj.unit = vscpData[3];    
   }
   else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT == vscpClass) ) {
-    rv = measurementDataCoding.DATACODING_DOUBLE;
+    // Always double, index=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
+    rvobj.sensorindex = vscpData[0];
+    rvobj.index = 0;
+    rvobj.zone = vscpData[1];
+    rvobj.subzone = vscpData[2];
+    rvobj.unit = vscpData[3];
   }
 
-  return rv;
+  return rvobj;
 }
 
 /*! 
@@ -1370,6 +1441,7 @@ var getDataCodingStr = function(datacoding) {
 
  }
 
+
 /*! 
   getUnit
 
@@ -1420,6 +1492,11 @@ var isMeasurement = function(vscpClass) {
 
   let rv = false;
 
+  // Allow for event object 
+  // if ( typeof vscpClass !== 'object') {
+  //   vscpClass = vscpClass.vscpClass;
+  // }
+
   if (( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) && 
         (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) || 
       ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
@@ -1457,7 +1534,7 @@ var isMeasurement = function(vscpClass) {
 
   @param {number[]} data - Data (event data array/buffer 
     where first data byte is the VSCP data coding)
-  @return bits    -  {logical[]} Array of bits
+  @return bits    - {logical[]} Array of bits
           bytes   - {number[]} Array of bytes
           integer . {bigint} Integer as bigint
           string  - {number} String value as number.
@@ -1541,10 +1618,13 @@ var decodeMeasurementClass10 = function(data) {
       }
       break;
 
-    case measurementDataCoding.DATACODING_RESERVED1:  // Reserved
+    case measurementDataCoding.DATACODING_DOUBLE:
+      if (8 === data.length) {
+        rval = data.readDoubleBE(1);
+      }
       break;
 
-    case measurementDataCoding.DATACODING_RESERVED1:  // Reserved
+    case measurementDataCoding.DATACODING_RESERVED2:  // Reserved
       break;
 
     default:
@@ -1771,6 +1851,163 @@ var decodeMeasurementClass1060 = function(data) {
   return data.readDoubleBE(4);
 }
 
+/*!
+  getMeasurementData
+
+  Return measurement information including value for a 
+  measurement event.
+
+  @param {object} e Measurement event object
+  @return a measurement object on the following form
+
+  {
+    unit: {number}
+    sensorindex: {number}
+    datacoding: {number}
+    index: {number}
+    zone: {number}
+    subzone: {number}
+    value: {number}
+  }
+
+  Items that are not defined for a particular event is not returned
+  and will be left undefined. This is typical for zone/subzone that 
+  is only available for a few of the measurement events.
+
+  If the event is not a measurement event an empty object 
+  is returned. 
+*/
+var getMeasurementData = function(e) {
+
+  var rvobj = {};
+  //   unit: {number},
+  //   sensorindex: {number},
+  //   datacoding: {number},
+  //   index: {number},
+  //   zone: {number},
+  //   subzone: {number},
+  //   value: {number}
+
+  // Check parameters
+  if ( typeof e !== 'object' ) {
+    throw(new Error("Parameter error: 'e' should be a VSCP event object."));
+  }
+
+  if ( !isMeasurement(e.vscpClass) ) {
+    throw(new Error("Parameter error: 'e' should be a VSCP measurement event."));
+  }
+
+  if ( ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) && 
+         (e.vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) ) {
+    rvobj.datacoding = getDataCoding(e.vscpData[0]);
+    rvobj.unit = getUnit(e.vscpData[0]);
+    rvobj.sensorindex = getSensorIndex(e.vscpData[0]);
+    rvobj.value = decodeMeasurementClass10(e.vscpData);
+  }
+  else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
+            (e.vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) {
+    // Always double, unit=0,sensorindex=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
+    rvobj.unit = 0;
+    rvobj.sensorindex = 0;
+    rvobj.value = decodeMeasurementClass60(e.vscpData);
+  }
+  else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
+            (e.vscpClass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) {
+    rvobj.datacoding = getDataCoding(e.vscpData[3]);
+    rvobj.unit = getUnit(e.vscpData[3]);
+    rvobj.sensorindex = getSensorIndex(e.vscpData[3]);
+    rvobj.index = e.vscpData[0];
+    rvobj.zone = e.vscpData[1];
+    rvobj.subzone = e.vscpData[2];
+    rvobj.value = decodeMeasurementClass65(e.vscpData);
+  }
+  else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
+            (e.vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) {
+    // Always single, unit=0,sensorindex=0 
+    rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;    
+    rvobj.unit = 0;
+    rvobj.sensorindex = 0;
+    rvobj.value = decodeMeasurementClass70(e.vscpData);
+  }
+  else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
+            (e.vscpClass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) {
+    rvobj.datacoding = getDataCoding(e.vscpData[3]);
+    rvobj.unit = getUnit(e.vscpData[3]);
+    rvobj.sensorindex = getSensorIndex(e.vscpData[3]);
+    rvobj.index = e.vscpData[0];
+    rvobj.zone = e.vscpData[1];
+    rvobj.subzone = e.vscpData[2];
+    rvobj.value = decodeMeasurementClass85(e.vscpData);
+  }
+  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
+            (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) {
+    // At offset 16
+    rvobj.datacoding = getDataCoding(e.vscpData[16]);
+    rvobj.unit = getUnit(e.vscpData[16]);
+    rvobj.sensorindex = getSensorIndex(e.vscpData[16]);
+    rvobj.value = decodeMeasurementClass10(e.vscpData.slice(16));
+  } 
+  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
+            (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) {
+    // Offset 16, Always double, unit=0,sensorindex=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
+    rvobj.unit = 0;
+    rvobj.sensorindex = 0;
+    rvobj.value = decodeMeasurementClass60(e.vscpData.slice(16));  
+  }
+  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
+            (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) {
+    // At offset 16
+    rvobj.datacoding = getDataCoding(e.vscpData[16+3]);
+    rvobj.unit = getUnit(e.vscpData[16+3]);
+    rvobj.sensorindex = getSensorIndex(e.vscpData[16+3]);
+    rvobj.index = e.vscpData[16];
+    rvobj.zone = e.vscpData[16+1];
+    rvobj.subzone = e.vscpData[16+2];
+    rvobj.value = decodeMeasurementClass65(e.vscpData.slice(16));
+  }
+  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
+            (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) {
+    // Offset 16, Always double, unit=0,sensorindex=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
+    rvobj.unit = 0;
+    rvobj.sensorindex = 0;
+    rvobj.value = decodeMeasurementClass70(e.vscpData.slice(16));
+  }
+  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
+            (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) {
+    rvobj.datacoding = e.vscpData[16+3];
+    rvobj.unit = getUnit(e.vscpData[16+3]);
+    rvobj.sensorindex = getSensorIndex(e.vscpData[16+3]);
+    rvobj.index = e.vscpData[16];
+    rvobj.zone = e.vscpData[16+1];
+    rvobj.subzone = e.vscpData[16+2];
+    rvobj.value = decodeMeasurementClass85(e.vscpData.slice(16));
+  } 
+  else if ( e.vscpClass == vscp_class.VSCP_CLASS2_MEASUREMENT_STR ) {
+    // Always string, index=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_STRING;
+    rvobj.sensorindex = e.vscpData[0];
+    rvobj.index = 0;
+    rvobj.zone = e.vscpData[1];
+    rvobj.subzone = e.vscpData[2];
+    rvobj.unit = e.vscpData[3];
+    rvobj.value = decodeMeasurementClass1040(e.vscpData);   
+  }
+  else if ( e.vscpClass == vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT ) {
+    // Always double, index=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
+    rvobj.sensorindex = e.vscpData[0];
+    rvobj.index = 0;
+    rvobj.zone = e.vscpData[1];
+    rvobj.subzone = e.vscpData[2];
+    rvobj.unit = e.vscpData[3];
+    rvobj.value = decodeMeasurementClass1060(e.vscpData);
+  }
+
+  return rvobj;
+}
 
 // ----------------------------------------------------------------------------
 
@@ -2102,6 +2339,7 @@ module.exports = {
   decodeMeasurementClass85,
   decodeMeasurementClass1040,
   decodeMeasurementClass1060,
+  getMeasurementData,
 
   // CANAL conversions
   getVscpHeadFromCANALid,

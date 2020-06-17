@@ -176,8 +176,8 @@ console.log("Measurement sensor index",
  * **measurementDataCoding.DATACODING_STRING** - measurement data is a string
  * **measurementDataCoding.DATACODING_INTEGER** - measurement data is an integer (MSB first)
  * **measurementDataCoding.DATACODING_NORMALIZED** - measurement data is a normalized integer
- * **measurementDataCoding.DATACODING_SINGLE** - measurement data is a  single precision floating point value
- * **measurementDataCoding.DATACODING_RESERVED1** - reserved for future use
+ * **measurementDataCoding.DATACODING_SINGLE** - measurement data is a single precision floating point value
+ * **measurementDataCoding.DATACODING_DOUBLE** - measurement data is a double precision floating point value
  * **DATACODING_RESERVED2 .reserved for future use
 
 ```javascript
