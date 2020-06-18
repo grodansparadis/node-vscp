@@ -1336,6 +1336,279 @@ describe('VSCP Measurements', function() {
 
     });
 
+    describe('vscp.getMeasurementData(event) - 15', function() {
+    
+        // DATACODING_BIT
+
+        it('should return true as return value is array.', function() {
+            var e = new vscp.Event({   
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x00,0xAA,0xAA]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(Array.isArray(rv.value), true);
+        });
+
+        it('should return 16 as length of array', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x00,0xAA,0xAA]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value.length, 16);
+        });
+
+        it('should return array with 16 elements true,false...', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x00,0xAA,0xAA]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value[0], true);
+            assert.equal(rv.value[1], false);
+            assert.equal(rv.value[2], true);
+            assert.equal(rv.value[3], false);
+            assert.equal(rv.value[4], true);
+            assert.equal(rv.value[5], false);
+            assert.equal(rv.value[6], true);
+            assert.equal(rv.value[7], false);
+            assert.equal(rv.value[8], true);
+            assert.equal(rv.value[9], false);
+            assert.equal(rv.value[10], true);
+            assert.equal(rv.value[11], false);
+            assert.equal(rv.value[12], true);
+            assert.equal(rv.value[13], false);
+            assert.equal(rv.value[14], true);
+            assert.equal(rv.value[15], false);
+        });
+
+        // DATACODING_BYTE
+
+        it('should return true as return value is array.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x20,0xAA,0xAA]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(Array.isArray(rv.value), true);
+        });
+
+        it('should return 2 as length of array', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x20,0xAA,0x55]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value.length, 2);
+        });
+
+        it('should return two bytes 0xAA and 0+x55', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x20,0xAA,0x55]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value[0], 0xAA);
+            assert.equal(rv.value[1], 0x55);
+        });
+
+        // DATACODING_STRING
+
+        it('should return true as return value is number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x40,0x31,0x30,0x2e,0x38]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert(typeof rv.value === 'number');
+        });
+
+        it('should return 10.8 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x40,0x31,0x30,0x2e,0x38]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert(rv.value === 10.8);
+        });
+
+        it('should return 10.8127 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x40,0x31,0x30,0x2e,0x38,0x31,0x32,0x37]
+            });
+
+            var rv = vscp.getMeasurementData(e);
+            assert(rv.value === 10.8127);
+        });
+
+        it('should return 0 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x40,0x30]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert(rv.value === 0);
+        });
+
+        // DATACODING_INTEGER
+
+        it('should return true as return value is bigint.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x60,0x55,0xAA]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert(typeof rv.value === 'bigint');
+        });
+
+        it('should return 0x55AAn as bigint.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x60,0x55,0xAA]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert(rv.value === 0x55aan);
+        });
+
+        it('should return 0x55aa55aa55aa55n as bigint.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x60,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert(rv.value === 0x55aa55aa55aa55n);
+        });
+
+        // DATACODING_NORMALIZED
+
+        it('should return true as return value is number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x80,0x02,0x1B,0x22]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert(typeof rv.value === 'number');
+        });
+
+        it('should return 6946 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x80,0x02,0x1B,0x22]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value,694600);
+        });
+
+        it('should return -0.00115 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x80,0x85,0x8d]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value,-0.00115);
+        });
+
+        it('should return 26.3 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x80,0x81,0x01,0x07]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value,26.3);
+        });
+
+        it('should return 26.3 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x80,0x00,0x01,0x07]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value,263);
+        });
+
+        it('should return -1 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x80,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value,-1);
+        });
+
+        it('should return -1 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x80,0x00,0xFF,0xFF]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value,-1);
+        });
+
+        it('should return -100 as number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0x80,0x02,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(rv.value,-100);
+        });
+
+        // DATACODING_SINGLE
+
+        it('should return true as return value is number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0xA0,158,142,30,65]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(typeof rv.value,'number');
+        });
+
+        it('should return 9.909819 as return value is number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0xA0,65,30,142,158]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(vscp.toFixed(rv.value,6),9.909819);
+        });
+        
+        it('should return -21489.32 as return value is number.', function() {
+            var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_DATA,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0xA0,198,167,226,164]
+            });
+            var rv = vscp.getMeasurementData(e);
+            assert.equal(vscp.toFixed(rv.value,2),-21489.32);
+        });
+
+    });
+
     describe('vscp.getMeasurementData(e) - 60', function() {
 
         it('should return true as return value is number.', function() {
