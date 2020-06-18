@@ -19,6 +19,16 @@ npm install node-vscp
 
 optionally with '--save' to save dependency in the package.json file.
 
+## Test
+
+Run
+
+```javascript
+npm test
+```
+
+to run the tests.
+
 ## Usage
 
 Reference the module in the beginning of your file like this
@@ -1093,6 +1103,64 @@ Return -876.12 as number.
 var data = [0,1,2,0,192,139,96,245,194,143,92,41];
 var val = vscp.decodeMeasurementClass1060(data);
 assert.equal(vscp.toFixed(val,2), -876.12);
+```
+
+### getMeasurementData(event)
+
+```javascript
+var e = new vscp.Event({
+                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpData : [0,1,2,0x40,0x30]
+            });
+var rv = vscp.getMeasurementData(e);
+```
+
+This method combine all the decode methods above into one. A measurement event is given as the argument and the result is an object with measurement data on the following form
+
+```javascript
+{
+    datacoding: {number},
+    unit: {number},
+    sensorindex: {number},
+    index: {number},
+    zone: {number},
+    subzone: {number},
+    value: {number | array | bigint}
+}
+```
+
+*value, datacoding, unit and sensorindex* is always present and set to defaults if they are not part of the event information. 
+
+*datacoding holds information* about the origin of value while the value itself is a Javascript number value in the absolute majority of cases, BigInt in one case, an array of booleans in one case and an array of bytes in one case.  
+
+**Example**
+
+Return 
+
+```javascript
+{
+    index: 0,
+    zone: 1,
+    subzone: 2,
+    sensorindex: 33,
+    unit: 0,
+    value: 12345678.9
+}
+```
+
+in rvobj. 
+
+Note that the VSCP_CLASS2_MEASUREMENT_STR class have **sensorindex** in byte, 0 NOT **index** (they are different things). **index** is set to it's default value (0).
+
+```javascript
+var e = new vscp.Event({
+        vscpClass : vscp_class.VSCP_CLASS2_MEASUREMENT_STR,
+        vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+        vscpData : [33,1,2,0,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x2E,0x39]
+    });
+var rv = vscp.getMeasurementData(e);
+assert.equal(rv.value, 12345678.9);
 ```
 
 ## CANAL <--> VSCP conversions
