@@ -26,12 +26,14 @@
     "url": "https://github.com/grodansparadis/node-vscp/issues"
   },
   "homepage": "https://github.com/grodansparadis/node-vscp#readme",
-  "dependencies": {},
+  "dependencies": {
+    "ini": "^2.0.0"
+  },
   "devDependencies": {
-    "eslint": "^7.8.1",
+    "eslint": "^7.15.0",
     "mocha": "^7.2.0",
-    "node-vscp-class": "^1.0.10",
-    "node-vscp-type": "^1.0.8",
+    "node-vscp-class": "^1.0.14",
+    "node-vscp-type": "^1.0.12",
     "npm-check-updates": "^6.0.1"
   }
 }
