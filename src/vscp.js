@@ -690,16 +690,13 @@ var readValue = function(input) {
   } else if (-1 != poshex) {
     txtvalue = txtvalue.substring(poshex + 2);
     return parseInt(txtvalue, 16);
-  }
-  else if (-1 != posbin) {
+  } else if (-1 != posbin) {
     txtvalue = txtvalue.substring(posbin + 2);
     return parseInt(txtvalue, 2);
-  }
-  else if (-1 != posoct) {
+  } else if (-1 != posoct) {
     txtvalue = txtvalue.substring(posoct + 2);
     return parseInt(txtvalue, 8);
-  }
-  else {
+  } else {
     return NaN;
   }
 };
@@ -1278,33 +1275,28 @@ var getMeasurementDataCoding = function(vscpClass,vscpData) {
     rvobj.datacoding = getDataCoding(vscpData[0]);
     rvobj.unit = getUnit(vscpData[0]);
     rvobj.sensorindex = getSensorIndex(vscpData[0]);
-  }
-  else if ( vscpClass == vscp_class.VSCP_CLASS1_DATA ) {
+  } else if ( vscpClass == vscp_class.VSCP_CLASS1_DATA ) {
     rvobj.datacoding = getDataCoding(vscpData[0]);
     rvobj.unit = getUnit(vscpData[0]);
     rvobj.sensorindex = getSensorIndex(vscpData[0]);
-  }
-  else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
+  } else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
             (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) {
     // Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;  
-  }
-  else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
+  } else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
             (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) {
     rvobj.datacoding = getDataCoding(vscpData[3]);
     rvobj.unit = getUnit(vscpData[3]);
     rvobj.sensorindex = getSensorIndex(vscpData[3]);
-  }
-  else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
+  } else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
             (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) {
     // Always single, unit=0,sensorindex=0 
     rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
-  }
-  else if ( (vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
+  } else if ( (vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
             (vscpClass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) {
     rvobj.datacoding = getDataCoding(vscpData[3]);
     rvobj.unit = getUnit(vscpData[3]);
@@ -1312,28 +1304,24 @@ var getMeasurementDataCoding = function(vscpClass,vscpData) {
     rvobj.index = vscpData[0];
     rvobj.zone = vscpData[1];
     rvobj.subzone = vscpData[2];
-  }
-  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
+  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(vscpData[16]);
     rvobj.unit = getUnit(vscpData[16]);
     rvobj.sensorindex = getSensorIndex(vscpData[16]);
-  } 
-  else if ( vscpClass == (512 + vscp_class.VSCP_CLASS1_DATA ) ) {
+  } else if ( vscpClass == (512 + vscp_class.VSCP_CLASS1_DATA ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(vscpData[16]);
     rvobj.unit = getUnit(vscpData[16]);
     rvobj.sensorindex = getSensorIndex(vscpData[16]);
-  }
-  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
+  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) {
     // Offset 16, Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;       
-  }
-  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
+  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(vscpData[16+3]);
@@ -1342,15 +1330,13 @@ var getMeasurementDataCoding = function(vscpClass,vscpData) {
     rvobj.index = vscpData[0];
     rvobj.zone = vscpData[1];
     rvobj.subzone = vscpData[2];
-  }
-  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
+  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) {
     // Offset 16, Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
-  }
-  else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
+  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
             (vscpClass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) {
     rvobj.datacoding = vscpData[16+3];
     rvobj.unit = getUnit(vscpData[16+3]);
@@ -1358,8 +1344,7 @@ var getMeasurementDataCoding = function(vscpClass,vscpData) {
     rvobj.index = vscpData[16];
     rvobj.zone = vscpData[16+1];
     rvobj.subzone = vscpData[16+2];
-  } 
-  else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_STR == vscpClass) ) {
+  } else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_STR == vscpClass) ) {
     rv = measurementDataCoding.DATACODING_STRING;
     // Always string, index=0
     rvobj.datacoding = measurementDataCoding.DATACODING_STRING;
@@ -1368,8 +1353,7 @@ var getMeasurementDataCoding = function(vscpClass,vscpData) {
     rvobj.zone = vscpData[1];
     rvobj.subzone = vscpData[2];
     rvobj.unit = vscpData[3];    
-  }
-  else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT == vscpClass) ) {
+  } else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT == vscpClass) ) {
     // Always double, index=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.sensorindex = vscpData[0];
@@ -1916,22 +1900,19 @@ var getMeasurementData = function(e) {
     rvobj.unit = getUnit(e.vscpData[0]);
     rvobj.sensorindex = getSensorIndex(e.vscpData[0]);
     rvobj.value = decodeMeasurementClass10(e.vscpData);
-  }
-  else if ( e.vscpClass == vscp_class.VSCP_CLASS1_DATA ) {
+  } else if ( e.vscpClass == vscp_class.VSCP_CLASS1_DATA ) {
     rvobj.datacoding = getDataCoding(e.vscpData[0]);
     rvobj.unit = getUnit(e.vscpData[0]);
     rvobj.sensorindex = getSensorIndex(e.vscpData[0]);
     rvobj.value = decodeMeasurementClass10(e.vscpData);
-  }
-  else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
+  } else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
             (e.vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) {
     // Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
     rvobj.value = decodeMeasurementClass60(e.vscpData);
-  }
-  else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
+  } else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
             (e.vscpClass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) {
     rvobj.datacoding = getDataCoding(e.vscpData[3]);
     rvobj.unit = getUnit(e.vscpData[3]);
@@ -1940,16 +1921,14 @@ var getMeasurementData = function(e) {
     rvobj.zone = e.vscpData[1];
     rvobj.subzone = e.vscpData[2];
     rvobj.value = decodeMeasurementClass65(e.vscpData);
-  }
-  else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
+  } else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
             (e.vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) {
     // Always single, unit=0,sensorindex=0 
     rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;    
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
     rvobj.value = decodeMeasurementClass70(e.vscpData);
-  }
-  else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
+  } else if ( (e.vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
             (e.vscpClass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) {
     rvobj.datacoding = getDataCoding(e.vscpData[3]);
     rvobj.unit = getUnit(e.vscpData[3]);
@@ -1958,30 +1937,26 @@ var getMeasurementData = function(e) {
     rvobj.zone = e.vscpData[1];
     rvobj.subzone = e.vscpData[2];
     rvobj.value = decodeMeasurementClass85(e.vscpData);
-  }
-  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
+  } else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
             (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(e.vscpData[16]);
     rvobj.unit = getUnit(e.vscpData[16]);
     rvobj.sensorindex = getSensorIndex(e.vscpData[16]);
     rvobj.value = decodeMeasurementClass10(e.vscpData.slice(16));
-  }
-  else if ( e.vscpClass == (512 + vscp_class.VSCP_CLASS1_DATA ) ) {
+  } else if ( e.vscpClass == (512 + vscp_class.VSCP_CLASS1_DATA ) ) {
     rvobj.datacoding = getDataCoding(e.vscpData[0]);
     rvobj.unit = getUnit(e.vscpData[0]);
     rvobj.sensorindex = getSensorIndex(e.vscpData[0]);
     rvobj.value = decodeMeasurementClass10(e.vscpData.slice(16));
-  } 
-  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
+  } else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
             (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) {
     // Offset 16, Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
     rvobj.value = decodeMeasurementClass60(e.vscpData.slice(16));  
-  }
-  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
+  } else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
             (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(e.vscpData[16+3]);
@@ -1991,16 +1966,14 @@ var getMeasurementData = function(e) {
     rvobj.zone = e.vscpData[16+1];
     rvobj.subzone = e.vscpData[16+2];
     rvobj.value = decodeMeasurementClass65(e.vscpData.slice(16));
-  }
-  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
+  } else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
             (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) {
     // Offset 16, Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
     rvobj.value = decodeMeasurementClass70(e.vscpData.slice(16));
-  }
-  else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
+  } else if ( (e.vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
             (e.vscpClass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) {
     rvobj.datacoding = e.vscpData[16+3];
     rvobj.unit = getUnit(e.vscpData[16+3]);
@@ -2009,8 +1982,7 @@ var getMeasurementData = function(e) {
     rvobj.zone = e.vscpData[16+1];
     rvobj.subzone = e.vscpData[16+2];
     rvobj.value = decodeMeasurementClass85(e.vscpData.slice(16));
-  } 
-  else if ( e.vscpClass == vscp_class.VSCP_CLASS2_MEASUREMENT_STR ) {
+  } else if ( e.vscpClass == vscp_class.VSCP_CLASS2_MEASUREMENT_STR ) {
     // Always string, index=0
     rvobj.datacoding = measurementDataCoding.DATACODING_STRING;
     rvobj.sensorindex = e.vscpData[0];
@@ -2019,8 +1991,7 @@ var getMeasurementData = function(e) {
     rvobj.subzone = e.vscpData[2];
     rvobj.unit = e.vscpData[3];
     rvobj.value = decodeMeasurementClass1040(e.vscpData);   
-  }
-  else if ( e.vscpClass == vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT ) {
+  } else if ( e.vscpClass == vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT ) {
     // Always double, index=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.sensorindex = e.vscpData[0];
@@ -2229,14 +2200,13 @@ var convertEventToCanMsg = function(ev) {
 
   if ( ('object' === typeof ev ) && !(ev instanceof Event)) {
     ev = new Event(ev);
-  }
-  else if (!(ev instanceof Event)) {
+  } else if (!(ev instanceof Event)) {
     throw(new Error("Parameter should be VSCP Event"));
   }
 
   var msg = {};         // CAN message
-  // msg.ext = true;   // VSCP CAN messages are always extended
-  // msg.rtr = false;  // This is no remote transmission request
+  // msg.ext = true;   	// VSCP CAN messages are always extended
+  // msg.rtr = false;  	// This is no remote transmission request
   msg.id = getCANALid( getPriority(ev.vscpHead), 
                                       ev.vscpClass,
                                       ev.vscpType );
@@ -2295,17 +2265,14 @@ var convertCanMsgToEvent = function(msg) {
     if ( 'string' === typeof msg.data ) {
       ev.vscpData = msg.data.split(',');
       ev.sizeData = ev.vscpData.length;
-    }
-    else if ( Array.isArray(msg.data) ) {
+    } else if ( Array.isArray(msg.data) ) {
       ev.vscpData = msg.data;
       ev.sizeData = ev.vscpData.length;
-    }
-    else if ( Buffer.isBuffer(msg.data) ) {
+    } else if ( Buffer.isBuffer(msg.data) ) {
       ev.vscpData = Array.prototype.slice.call(msg.data, 0)
       ev.sizeData = ev.vscpData.length;
     }
-  }
-  else {
+  } else {
     if ( msg.dlc && (msg.dlc > 0 )) {
       console.error("CAN message has no message data but dlc =",msg.dlc);
       console.error("Setting to length zero");
