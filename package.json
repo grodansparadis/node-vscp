@@ -5,8 +5,7 @@
   "main": "src/vscp.js",
   "scripts": {
     "test": "mocha",
-    "readme2html": "./node_modules/.bin/markdown README.md -f gfm",
-    "update-dependencies": "./node_modules/.bin/ncu -u && npm install"
+    "readme2html": "./node_modules/.bin/markdown README.md -f gfm"
   },
   "repository": {
     "type": "git",
@@ -27,13 +26,13 @@
   },
   "homepage": "https://github.com/grodansparadis/node-vscp#readme",
   "dependencies": {
-    "ini": "^2.0.0"
+    "ini": ">=2.0.0"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
-    "mocha": "^9.1.1",
-    "node-vscp-class": "^1.0.16",
-    "node-vscp-type": "^1.0.15",
-    "npm-check-updates": "^11.8.5"
+    "eslint": ">=7.32.0",
+    "mocha": ">=9.1.1",
+    "node-vscp-class": ">=1.0.16",
+    "node-vscp-type": ">=1.0.15",
+    "npm-check-updates": ">=11.8.5"
   }
 }
