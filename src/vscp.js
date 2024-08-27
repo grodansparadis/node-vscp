@@ -1,6 +1,6 @@
 // VSCP common javascript library
 //
-// Copyright © 2012-2021 Ake Hedman, Grodans Paradis AB
+// Copyright © 2012-2024 Ake Hedman, Grodans Paradis AB
 // <akhe@grodansparadis.com>
 // Copyright © 2015-2020 Andreas Merkle
 // <vscp@blue-andi.de>
@@ -11,7 +11,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright © 2015-2021 Åke Hedman, Grodans Paradis AB (Paradise of the Frog)
+// Copyright © 2015-2024 Åke Hedman, Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
