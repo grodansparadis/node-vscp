@@ -26,13 +26,13 @@
   },
   "homepage": "https://github.com/grodansparadis/node-vscp#readme",
   "dependencies": {
-    "ini": ">=3.0.0"
+    "ini": ">=5.0.0"
   },
   "devDependencies": {
-    "eslint": ">=8.17.0",
-    "mocha": ">=10.0.0",
-    "node-vscp-class": ">=1.0.19",
-    "node-vscp-type": ">=1.0.20",
-    "npm-check-updates": ">=13.1.1"
+    "eslint": ">=9.21.0",
+    "mocha": ">=11.1.0",
+    "node-vscp-class": ">=1.0.21",
+    "node-vscp-type": ">=1.0.21",
+    "npm-check-updates": ">=17.1.15"
   }
 }
