@@ -31,8 +31,8 @@
   "devDependencies": {
     "eslint": ">=9.21.0",
     "mocha": ">=11.1.0",
-    "node-vscp-class": ">=1.0.21",
-    "node-vscp-type": ">=1.0.21",
+    "node-vscp-class": ">=1.0.23",
+    "node-vscp-type": ">=1.0.22",
     "npm-check-updates": ">=17.1.15"
   }
 }
