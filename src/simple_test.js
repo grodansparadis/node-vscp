@@ -8,7 +8,7 @@ var ev = new vscp.Event();
 console.log("Module version: " + vscp.version.major + "."+ vscp.version.minor + "." + vscp.version.release);
 
 console.log(vscp.getPriority(0x88));
-console.log(vscp.isHardCoded(0x88));
+console.log(vscp.isHardCodedAddr(0x88));
 
 // Define event by setting from string
 e = new vscp.Event();
@@ -20,9 +20,9 @@ console.log(e);
 
 // Define event with members
 e2 = new vscp.Event();
-e2.vscpClass = 10;
-e2.vscpType = 6;
-e2.vscpData = [1,2,3,4,5];
+e2.class = 10;
+e2.type = 6;
+e2.data = [1,2,3,4,5];
 console.log(e2);
 
 // Define event with string in constructor
@@ -32,10 +32,10 @@ console.log(e3);
 
 // Define event with object in constructor and data in array
 e4 = new vscp.Event({
-    vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
-    vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
+    head: 0,
+    class: 10,
+    type: 6,
+    data: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 console.log(e4);
 
@@ -50,38 +50,38 @@ console.log("----------------------------------------------");
 // Format: Normalized integer
 // Value = -2.92 C
 e5 = new vscp.Event({
-    vscpHead: vscp.priority.PRIORITY_6 << 5,
-    vscpClass: vscp_class.VSCP_CLASS1_MEASUREMENT,
-    vscpType: vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-    vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
+    head: vscp.priority.PRIORITY_6 << 5,
+    class: vscp_class.VSCP_CLASS1_MEASUREMENT,
+    type: vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+    guid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
     vscpsizeData: 4,
-    vscpData: [0x89,0x82,0xFE,0xDC]
+    data: [0x89,0x82,0xFE,0xDC]
 });
 
 console.log(e5);
 
 console.log("Event on string form: ", e5.getAsString());
-console.log("Type of:" + typeof e5.vscpDateTime);
+console.log("Type of:" + typeof e5.datetime);
 
 console.log("\nisIPV6Addr");
-console.log("IP v6 address :", (e5.isIPV6Addr() ? "yes" : "no" ), " - vscpHead", e5.vscpHead );
+console.log("IP v6 address :", (e5.isIPV6Addr() ? "yes" : "no" ), " - head", e5.head );
 e5.setIPV6Addr();
-console.log("IP v6 address :", (e5.isIPV6Addr() ? "yes" : "no" ), " - vscpHead", e5.vscpHead );
+console.log("IP v6 address :", (e5.isIPV6Addr() ? "yes" : "no" ), " - head", e5.head );
 
 console.log("\nisDumbNode");
-console.log("Dumb node :", (e5.isDumbNode() ? "yes" : "no" ), " - vscpHead", e5.vscpHead );
+console.log("Dumb node :", (e5.isDumbNode() ? "yes" : "no" ), " - head", e5.head );
 e5.setDumbNode();
-console.log("Dumb node :", (e5.isDumbNode() ? "yes" : "no" ), " - vscpHead", e5.vscpHead );
+console.log("Dumb node :", (e5.isDumbNode() ? "yes" : "no" ), " - head", e5.head );
 
 console.log("\nisHardCodedAddr");
-console.log("Hardcoded address :", (e5.isHardCodedAddr() ? "yes" : "no" ), " - vscpHead", e5.vscpHead );
+console.log("Hardcoded address :", (e5.isHardCodedAddr() ? "yes" : "no" ), " - head", e5.head );
 e5.setHardCodedAddr();
-console.log("Hardcoded address :", (e5.isHardCodedAddr() ? "yes" : "no" ), " - vscpHead", e5.vscpHead );
+console.log("Hardcoded address :", (e5.isHardCodedAddr() ? "yes" : "no" ), " - head", e5.head );
 
 console.log("\nisDoNotCalcCRC");
-console.log("Calculate CRC :", (e5.isDoNotCalcCRC() ? "yes" : "no" ), " - vscpHead", e5.vscpHead );
+console.log("Calculate CRC :", (e5.isDoNotCalcCRC() ? "yes" : "no" ), " - head", e5.head );
 e5.setDoNotCalcCRC();
-console.log("Calculate CRC :", (e5.isDoNotCalcCRC() ? "yes" : "no" ), " - vscpHead", e5.vscpHead );
+console.log("Calculate CRC :", (e5.isDoNotCalcCRC() ? "yes" : "no" ), " - head", e5.head );
 
 console.log("\nPriority");
 console.log("--------");
@@ -91,7 +91,7 @@ console.log("Priority is", e5.getPriority()  );
 
 console.log("\nGUID Type");
 console.log("--------");
-e5.vscpHead = 0;
+e5.head = 0;
 console.log("GUID type is", e5.getGuidType()  );
 e5.setGuidType(vscp.guidtype.GUIDTYPE_IPV6);
 console.log("GUID type is", e5.getGuidType()  );
@@ -107,18 +107,18 @@ console.log("readValue(\"0y77\")",vscp.readValue("0y77"));
 console.log("\nCANAL conversion functionality");
 console.log("------------------------------");
 
-console.log("vscpHead = " + vscp.getVscpHeadFromCANALid(470418944 + 9));
-console.log("vscpClass = " + vscp.getVscpClassFromCANALid(470418944 + 9));
-console.log("vscpType = " + vscp.getVscpTypeFromCANALid(470418944 + 9));
+console.log("head = " + vscp.getVscpHeadFromCANALid(470418944 + 9));
+console.log("class = " + vscp.getVscpClassFromCANALid(470418944 + 9));
+console.log("type = " + vscp.getVscpTypeFromCANALid(470418944 + 9));
 console.log("Nickname = " + vscp.getNicknameFromCANALid(470418944 + 9) )
 
-console.log("priority=7, vscpClass=10, vscpType=6  canid=" + vscp.getCANALid(7,10,6) );
+console.log("priority=7, class=10, type=6  canid=" + vscp.getCANALid(7,10,6) );
 try {
-    console.log("priority=7, vscpClass=10, vscpType=600  canid=" + vscp.getCANALid(7,10,600) );
+    console.log("priority=7, class=10, type=600  canid=" + vscp.getCANALid(7,10,600) );
     console.log("* * * Should give error...");
 }
 catch(err) {
-    console.log("Test catch - OK : Catches invalid parameter error: (vscpType value is to big)", err.message );
+    console.log("Test catch - OK : Catches invalid parameter error: (type value is to big)", err.message );
 }
 
 console.log("\nTesting Event conversions\n\n",e5);
@@ -138,7 +138,7 @@ console.log("Is standard GUID?",
 // know what capabilities it have
 var what_can_you_do = 0x000f;
 console.log( "Does server accept more than one connection? ", 
-(what_can_you_do & vscp.hostCapability.TWO_CONNECTIONS) ? "yes" : no );
+(what_can_you_do & (1 << vscp.hostCapability.TWO_CONNECTIONS)) ? "yes" : "no" );
 
 
 // Gettime
@@ -170,7 +170,7 @@ console.log(vscp.b64EncodeUnicode("This is a test string"));
 
 console.log(vscp.b64DecodeUnicode("Q2FycGUgRGllbQo="));
 
-console.log("Is this an Ipv6 node: " + vscp.isGuidIpv6(0xff00) );
+console.log("Is this an Ipv6 node: " + vscp.isIPV6Addr(0xff00) );
 console.log("Is this an dumb node: " + vscp.isDumbNode(0xff00) );
 
 console.log("Priority: " + vscp.getPriority(0xffff) );
@@ -178,9 +178,9 @@ console.log("GUID type: " + vscp.getGuidType(0x1f00) );
 console.log("Rolling index: " + vscp.getRollingIndex(0x1234) );
 
 // Value = -2.92 C
-// vscpData: [0x89,0x82,0xFE,0xDC]
+// data: [0x89,0x82,0xFE,0xDC]
 console.log("Fixed precision is " + vscp.toFixed(1.234, 1));
-console.log("Integer value is " + vscp.varInteger2Float([0xFE,0xDC]));
+console.log("Integer value is " + vscp.varInt2BigInt([0xFE,0xDC]));
 console.log("Data coding is " + vscp.getDataCoding(0x89) );
 
 var d = [0x89,0x82,0xFE,0xDC];
@@ -248,10 +248,11 @@ console.log( vscp.convertCanMsgToEvent({
     id: vscp.getCANALid(7,10,6)+42,
     ext: true,
     rtr: false,
+    timestamp: 12345
   }
 ));
 
-// This one should give error
+// This one should give a note about dlc=4 and data is not set. dlc is set to 0
 console.log(" --- convertCanMsgToEvent 5");
 console.log( vscp.convertCanMsgToEvent({
     id: vscp.getCANALid(7,10,6)+42,
@@ -261,6 +262,20 @@ console.log( vscp.convertCanMsgToEvent({
   }
 ));
 
+// This one should give a note about dlc=4 and data is not set. dlc is set to 0
+console.log(" --- convertCanMsgToEvent 6");
+console.log( vscp.convertCanMsgToEvent({
+    id: vscp.getCANALid(7,10,6)+42,
+    ext: true,
+    rtr: false,
+    dlc: 22,
+    data: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+  }
+));
+
+// --------------------------------------------------------------
+// convertEventToCanMsg
+// --------------------------------------------------------------
 
 // convertEventToCanMsg
 
@@ -270,56 +285,59 @@ console.log(vscp.convertEventToCanMsg(e5));
 console.log(" --- convertEventToCanMsg 2");
 console.log(vscp.convertEventToCanMsg(
     {
-        "vscpHead": 80,
-        "vscpClass": 10,
-        "vscpType": 6,
-        "vscpData": [
+        "head": 80,
+        "class": 10,
+        "type": 6,
+        "data": [
             11,
             22,
             33,
             44,
             55
         ],
-        "vscpTimeStamp": 3456
+        "timestamp_ns": 3456
     }
 ));
 
 var e6 = new vscp.Event();
 
+console.log("\n\nsetFromString()");
+console.log("-------------------------------------------------------------------------------------------");
+
 e6.setFromString('3,10,6,4,2000-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x08,0x35,0x31,0x2E,0x39,0x32');
-console.log(e6);
+console.log("e6.setFromString() = " + e6);
 
 e6.setFromString("0,20,3,,2001-11-02T18:00:01,,-,0x88,1,35");
-console.log(e6);
+console.log("e6.setFromString() = " + e6);
 console.log(vscp.convertEventToCanMsg(e6));
 
 var e7 = new vscp.Event({
-    "vscpHead": 80,
-    "vscpClass": 10,
-    "vscpType": 6,
-    "vscpData": "100,200,99",
-    "vscpTimeStamp": 3456
+    "head": 80,
+    "class": 10,
+    "type": 6,
+    "data": "100,200,99",
+    "timestamp": 3456
 });
-console.log(vscp.convertEventToCanMsg(e7));
+console.log("vscp.convertEventToCanMsg(e7) = " + vscp.convertEventToCanMsg(e7));
 
 var e7 = new vscp.Event({
-    "vscpHead": 80,
-    "vscpClass": 10,
-    "vscpType": 6,
-    "vscpGuid": "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:2a",
-    "vscpObid": 0,
-    "vscpData": [
+    "head": 80,
+    "class": 10,
+    "type": 6,
+    "guid": "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:2a",
+    "obid": 0,
+    "data": [
         11,
         22,
         33,
         44,
         55
     ],
-    "vscpTimeStamp": 34565634,
-    "vscpDateTime": "2020-02-24T11:10:59.807Z"
+    "timestamp": 34565634,
+    "datetime": "2020-02-24T11:10:59.807Z"
 });
 
-console.log(e7.toJSONObj());
+console.log("e7.toJSONObj() = " + e7.toJSONObj());
 
 e8 = new vscp.Event({
     text : '3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32'

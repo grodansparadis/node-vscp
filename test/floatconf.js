@@ -3,6 +3,10 @@ const vscp_class = require('node-vscp-class');
 const vscp_type = require('node-vscp-type');
 const vscp = require("../src/vscp.js");
 
+// ----------------------------------------------------------------------------
+// VSCP floating point tests
+// ----------------------------------------------------------------------------
+
 describe('Javascript floating point', function() {
 
     it('should return 3.14159 as number.', function() {

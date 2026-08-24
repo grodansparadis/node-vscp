@@ -3,6 +3,10 @@ const vscp_class = require('node-vscp-class');
 const vscp_type = require('node-vscp-type');
 const vscp = require("../src/vscp.js");
 
+// ----------------------------------------------------------------------------
+// VSCP measurement tests
+// ----------------------------------------------------------------------------
+
 describe('VSCP Measurements', function() {
 
     describe('vscp.toFixed(value, precision)', function() {
@@ -257,7 +261,7 @@ describe('VSCP Measurements', function() {
 
     });
 
-    describe('vscp.isMeasurement(vscpClass)', function() {
+    describe('vscp.isMeasurement(class)', function() {
 
         it('VSCP_CLASS1_MEASUREMENT should return true', function() {
             assert.equal(vscp.isMeasurement(vscp_class.VSCP_CLASS1_MEASUREMENT), true);
@@ -1057,9 +1061,9 @@ describe('VSCP Measurements', function() {
     
         it('should return 12345678.9 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_MEASUREMENT_STR,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x2E,0x39]
+                class : vscp_class.VSCP_CLASS2_MEASUREMENT_STR,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x2E,0x39]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value, 12345678.9);
@@ -1069,9 +1073,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({   
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -1079,9 +1083,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 16 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 16);
@@ -1089,9 +1093,9 @@ describe('VSCP Measurements', function() {
 
         it('should return array with 16 elements true,false...', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], true);
@@ -1116,9 +1120,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x20,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x20,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -1126,9 +1130,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 2 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 2);
@@ -1136,9 +1140,9 @@ describe('VSCP Measurements', function() {
 
         it('should return two bytes 0xAA and 0+x55', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], 0xAA);
@@ -1149,9 +1153,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -1159,9 +1163,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -1169,9 +1173,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8127 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x40,0x31,0x30,0x2e,0x38,0x31,0x32,0x37]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x40,0x31,0x30,0x2e,0x38,0x31,0x32,0x37]
             });
 
             var rv = vscp.getMeasurementData(e);
@@ -1180,9 +1184,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x40,0x30]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x40,0x30]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0);
@@ -1192,9 +1196,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'bigint');
@@ -1202,9 +1206,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55AAn as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aan);
@@ -1212,9 +1216,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55aa55aa55aa55n as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x60,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x60,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aa55aa55aa55n);
@@ -1224,9 +1228,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -1234,9 +1238,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 6946 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,694600);
@@ -1244,9 +1248,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -0.00115 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x85,0x8d]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x85,0x8d]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-0.00115);
@@ -1254,9 +1258,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x81,0x01,0x07]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x81,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,26.3);
@@ -1264,9 +1268,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x00,0x01,0x07]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x00,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,263);
@@ -1274,9 +1278,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -1284,9 +1288,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x00,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x00,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -1294,9 +1298,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -100 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x02,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x02,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-100);
@@ -1306,9 +1310,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0xA0,158,142,30,65]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0xA0,158,142,30,65]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value,'number');
@@ -1316,9 +1320,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 9.909819 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0xA0,65,30,142,158]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0xA0,65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,6),9.909819);
@@ -1326,9 +1330,9 @@ describe('VSCP Measurements', function() {
         
         it('should return -21489.32 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0xA0,198,167,226,164]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0xA0,198,167,226,164]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2),-21489.32);
@@ -1342,9 +1346,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({   
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -1352,9 +1356,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 16 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 16);
@@ -1362,9 +1366,9 @@ describe('VSCP Measurements', function() {
 
         it('should return array with 16 elements true,false...', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], true);
@@ -1389,9 +1393,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x20,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x20,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -1399,9 +1403,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 2 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 2);
@@ -1409,9 +1413,9 @@ describe('VSCP Measurements', function() {
 
         it('should return two bytes 0xAA and 0+x55', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], 0xAA);
@@ -1422,9 +1426,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -1432,9 +1436,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -1442,9 +1446,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8127 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x40,0x31,0x30,0x2e,0x38,0x31,0x32,0x37]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x40,0x31,0x30,0x2e,0x38,0x31,0x32,0x37]
             });
 
             var rv = vscp.getMeasurementData(e);
@@ -1453,9 +1457,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x40,0x30]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x40,0x30]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0);
@@ -1465,9 +1469,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'bigint');
@@ -1475,9 +1479,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55AAn as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aan);
@@ -1485,9 +1489,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55aa55aa55aa55n as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x60,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x60,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aa55aa55aa55n);
@@ -1497,9 +1501,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -1507,9 +1511,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 6946 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,694600);
@@ -1517,9 +1521,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -0.00115 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x85,0x8d]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x85,0x8d]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-0.00115);
@@ -1527,9 +1531,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x81,0x01,0x07]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x81,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,26.3);
@@ -1537,9 +1541,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x00,0x01,0x07]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x00,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,263);
@@ -1547,9 +1551,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -1557,9 +1561,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x00,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x00,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -1567,9 +1571,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -100 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0x80,0x02,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0x80,0x02,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-100);
@@ -1579,9 +1583,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0xA0,158,142,30,65]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0xA0,158,142,30,65]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value,'number');
@@ -1589,9 +1593,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 9.909819 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0xA0,65,30,142,158]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0xA0,65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,6),9.909819);
@@ -1599,9 +1603,9 @@ describe('VSCP Measurements', function() {
         
         it('should return -21489.32 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_DATA,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0xA0,198,167,226,164]
+                class : vscp_class.VSCP_CLASS1_DATA,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0xA0,198,167,226,164]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2),-21489.32);
@@ -1613,9 +1617,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT64,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [64,95,23,206,217,22,135,43]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT64,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [64,95,23,206,217,22,135,43]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value, 'number');
@@ -1623,9 +1627,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 124.372 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT64,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [64,95,23,206,217,22,135,43]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT64,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [64,95,23,206,217,22,135,43]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,3), 124.372);
@@ -1633,9 +1637,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -876.12 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT64,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [192,139,96,245,194,143,92,41]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT64,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [192,139,96,245,194,143,92,41]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2), -876.12);
@@ -1649,9 +1653,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -1659,9 +1663,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 16 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 16);
@@ -1669,9 +1673,9 @@ describe('VSCP Measurements', function() {
 
         it('should return array with 16 elements true,false...', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], true);
@@ -1696,9 +1700,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x20,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x20,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -1706,9 +1710,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 2 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 2);
@@ -1716,9 +1720,9 @@ describe('VSCP Measurements', function() {
 
         it('should return two bytes 0xAA and 0+x55', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], 0xAA);
@@ -1729,9 +1733,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -1739,9 +1743,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -1749,9 +1753,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8127 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -1759,9 +1763,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x40,0x30]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x40,0x30]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0);
@@ -1771,9 +1775,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'bigint');
@@ -1781,9 +1785,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55AAn as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aan);
@@ -1791,9 +1795,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55aa55aa55aa55n as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x60,0x55,0xAA,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x60,0x55,0xAA,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aa55aan);
@@ -1803,9 +1807,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -1813,9 +1817,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 6946 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,694600);
@@ -1823,9 +1827,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -0.00115 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x85,0x8d]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x85,0x8d]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-0.00115);
@@ -1833,9 +1837,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x81,0x01,0x07]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x81,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,26.3);
@@ -1843,9 +1847,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x00,0x01,0x07]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x00,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,263);
@@ -1853,9 +1857,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x00,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x00,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -1863,9 +1867,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x00,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x00,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -1873,9 +1877,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -100 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x02,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x02,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-100);
@@ -1885,9 +1889,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0xA0,158,142,30,65]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0xA0,158,142,30,65]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value,'number');
@@ -1895,9 +1899,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 9.909819 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0xA0,65,30,142,158]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0xA0,65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,6),9.909819);
@@ -1905,9 +1909,9 @@ describe('VSCP Measurements', function() {
         
         it('should return -21489.32 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0xA0,198,167,226,164]
+                class : vscp_class.VSCP_CLASS1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0xA0,198,167,226,164]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2),-21489.32);
@@ -1919,9 +1923,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT32,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [65,30,142,158]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT32,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value, 'number');
@@ -1929,9 +1933,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 9.909819 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT32,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [65,30,142,158]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT32,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,6),9.909819);
@@ -1939,9 +1943,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -21489.32 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_MEASUREMENT32,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [198,167,226,164]
+                class : vscp_class.VSCP_CLASS1_MEASUREMENT32,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [198,167,226,164]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2),-21489.32);
@@ -1955,9 +1959,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -1965,9 +1969,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 16 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 16);
@@ -1975,9 +1979,9 @@ describe('VSCP Measurements', function() {
 
         it('should return array with 16 elements true,false...', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], true);
@@ -2002,9 +2006,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x20,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x20,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -2012,9 +2016,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 2 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 2);
@@ -2022,9 +2026,9 @@ describe('VSCP Measurements', function() {
 
         it('should return two bytes 0xAA and 0+x55', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], 0xAA);
@@ -2035,9 +2039,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -2045,9 +2049,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -2055,9 +2059,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8127 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -2065,9 +2069,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x40,0x30]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x40,0x30]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0);
@@ -2077,9 +2081,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'bigint');
@@ -2087,9 +2091,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55AAn as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aan);
@@ -2097,9 +2101,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55aa55aa55aa55n as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x60,0x55,0xAA,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x60,0x55,0xAA,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aa55aan);
@@ -2109,9 +2113,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -2119,9 +2123,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 6946 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,694600);
@@ -2129,9 +2133,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -0.00115 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x85,0x8d]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x85,0x8d]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-0.00115);
@@ -2139,9 +2143,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x81,0x01,0x07]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x81,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,26.3);
@@ -2149,9 +2153,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x00,0x01,0x07]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x00,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,263);
@@ -2159,9 +2163,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x00,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x00,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -2169,9 +2173,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x00,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x00,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -2179,9 +2183,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -100 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0x80,0x02,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0x80,0x02,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-100);
@@ -2191,9 +2195,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0xA0,158,142,30,65]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0xA0,158,142,30,65]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value,'number');
@@ -2201,9 +2205,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 9.909819 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0xA0,65,30,142,158]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0xA0,65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,6),9.909819);
@@ -2211,9 +2215,9 @@ describe('VSCP Measurements', function() {
         
         it('should return -21489.32 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0xA0,198,167,226,164]
+                class : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0xA0,198,167,226,164]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2),-21489.32);
@@ -2225,9 +2229,9 @@ describe('VSCP Measurements', function() {
     
         it('should return 12345678.9 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_MEASUREMENT_STR,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x2E,0x39]
+                class : vscp_class.VSCP_CLASS2_MEASUREMENT_STR,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x2E,0x39]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value, 12345678.9);
@@ -2235,9 +2239,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -0.9123 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_MEASUREMENT_STR,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [99,1,2,0,0x2D,0x30,0x2e,0x39,0x31,0x32,0x33]
+                class : vscp_class.VSCP_CLASS2_MEASUREMENT_STR,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [99,1,2,0,0x2D,0x30,0x2e,0x39,0x31,0x32,0x33]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value, -0.9123);  
@@ -2254,18 +2258,18 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is an object.', function() {                       
             var e = new vscp.Event();
-            e.vscpClass = vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
-            e.vscpType = vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-            e.vscpData = [0,1,2,0,64,95,23,206,217,22,135,43]
+            e.class = vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
+            e.type = vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+            e.data = [0,1,2,0,64,95,23,206,217,22,135,43]
             var rvobj = vscp.getMeasurementData(e);
             assert.equal(typeof rvobj, 'object');
         });
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0,64,95,23,206,217,22,135,43]
+                class : vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0,64,95,23,206,217,22,135,43]
             });
             var rvobj = vscp.getMeasurementData(e);
             assert.equal(typeof rvobj.value, 'number');
@@ -2273,9 +2277,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 124.372 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [0,1,2,0,64,95,23,206,217,22,135,43]
+                class : vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [0,1,2,0,64,95,23,206,217,22,135,43]
             });
             var rvobj = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rvobj.value,3), 124.372);
@@ -2283,9 +2287,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -876.12 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [44,1,2,0,192,139,96,245,194,143,92,41]
+                class : vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [44,1,2,0,192,139,96,245,194,143,92,41]
             });
             var rvobj = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rvobj.value,2), -876.12);
@@ -2308,9 +2312,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({   
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -2318,9 +2322,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 16 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 16);
@@ -2328,9 +2332,9 @@ describe('VSCP Measurements', function() {
 
         it('should return array with 16 elements true,false...', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], true);
@@ -2355,9 +2359,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x20,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x20,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -2365,9 +2369,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 2 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 2);
@@ -2375,9 +2379,9 @@ describe('VSCP Measurements', function() {
 
         it('should return two bytes 0xAA and 0+x55', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], 0xAA);
@@ -2388,9 +2392,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -2398,9 +2402,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -2408,9 +2412,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8127 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x40,0x31,0x30,0x2e,0x38,0x31,0x32,0x37]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x40,0x31,0x30,0x2e,0x38,0x31,0x32,0x37]
             });
 
             var rv = vscp.getMeasurementData(e);
@@ -2419,9 +2423,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x40,0x30]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x40,0x30]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0);
@@ -2431,9 +2435,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'bigint');
@@ -2441,9 +2445,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55AAn as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aan);
@@ -2451,9 +2455,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55aa55aa55aa55n as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x60,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x60,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aa55aa55aa55n);
@@ -2463,9 +2467,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -2473,9 +2477,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 6946 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,694600);
@@ -2483,9 +2487,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -0.00115 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x85,0x8d]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x85,0x8d]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-0.00115);
@@ -2493,9 +2497,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x81,0x01,0x07]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x81,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,26.3);
@@ -2503,9 +2507,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x00,0x01,0x07]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x00,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,263);
@@ -2513,9 +2517,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -2523,9 +2527,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x00,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x00,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -2533,9 +2537,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -100 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x02,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0x80,0x02,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-100);
@@ -2545,9 +2549,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0xA0,158,142,30,65]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0xA0,158,142,30,65]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value,'number');
@@ -2555,9 +2559,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 9.909819 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0xA0,65,30,142,158]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0xA0,65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,6),9.909819);
@@ -2565,9 +2569,9 @@ describe('VSCP Measurements', function() {
         
         it('should return -21489.32 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0xA0,198,167,226,164]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0xA0,198,167,226,164]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2),-21489.32);
@@ -2579,9 +2583,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT64,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,64,95,23,206,217,22,135,43]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT64,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,64,95,23,206,217,22,135,43]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value, 'number');
@@ -2589,9 +2593,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 124.372 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT64,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,64,95,23,206,217,22,135,43]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT64,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,64,95,23,206,217,22,135,43]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,3), 124.372);
@@ -2599,9 +2603,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -876.12 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT64,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,192,139,96,245,194,143,92,41]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT64,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,192,139,96,245,194,143,92,41]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2), -876.12);
@@ -2615,9 +2619,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -2625,9 +2629,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 16 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 16);
@@ -2635,9 +2639,9 @@ describe('VSCP Measurements', function() {
 
         it('should return array with 16 elements true,false...', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], true);
@@ -2662,9 +2666,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -2672,9 +2676,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 2 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 2);
@@ -2682,9 +2686,9 @@ describe('VSCP Measurements', function() {
 
         it('should return two bytes 0xAA and 0+x55', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], 0xAA);
@@ -2695,9 +2699,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -2705,9 +2709,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -2715,9 +2719,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8127 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -2725,9 +2729,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x30]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x30]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0);
@@ -2737,9 +2741,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'bigint');
@@ -2747,9 +2751,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55AAn as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aan);
@@ -2757,9 +2761,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55aa55aa55aa55n as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aa55aan);
@@ -2769,9 +2773,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -2779,9 +2783,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 6946 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,694600);
@@ -2789,9 +2793,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -0.00115 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x85,0x8d]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x85,0x8d]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-0.00115);
@@ -2799,9 +2803,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x81,0x01,0x07]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x81,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,26.3);
@@ -2809,9 +2813,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0x01,0x07]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,263);
@@ -2819,9 +2823,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -2829,9 +2833,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -2839,9 +2843,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -100 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-100);
@@ -2851,9 +2855,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,158,142,30,65]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,158,142,30,65]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value,'number');
@@ -2861,9 +2865,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 9.909819 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,65,30,142,158]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,6),9.909819);
@@ -2871,9 +2875,9 @@ describe('VSCP Measurements', function() {
         
         it('should return -21489.32 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,198,167,226,164]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,198,167,226,164]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2),-21489.32);
@@ -2885,9 +2889,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT32,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,65,30,142,158]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT32,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value, 'number');
@@ -2895,9 +2899,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 9.909819 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT32,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,65,30,142,158]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT32,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,6),9.909819);
@@ -2905,9 +2909,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -21489.32 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT32,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,198,167,226,164]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_MEASUREMENT32,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,198,167,226,164]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2),-21489.32);
@@ -2921,9 +2925,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -2931,9 +2935,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 16 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 16);
@@ -2941,9 +2945,9 @@ describe('VSCP Measurements', function() {
 
         it('should return array with 16 elements true,false...', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x00,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], true);
@@ -2968,9 +2972,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is array.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(Array.isArray(rv.value), true);
@@ -2978,9 +2982,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 2 as length of array', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value.length, 2);
@@ -2988,9 +2992,9 @@ describe('VSCP Measurements', function() {
 
         it('should return two bytes 0xAA and 0+x55', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0x55]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x20,0xAA,0x55]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value[0], 0xAA);
@@ -3001,9 +3005,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -3011,9 +3015,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -3021,9 +3025,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 10.8127 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x31,0x30,0x2e,0x38]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 10.8);
@@ -3031,9 +3035,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x30]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x40,0x30]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0);
@@ -3043,9 +3047,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'bigint');
@@ -3053,9 +3057,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55AAn as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aan);
@@ -3063,9 +3067,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 0x55aa55aa55aa55n as bigint.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA,0x55,0xAA]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x60,0x55,0xAA,0x55,0xAA]
             });
             var rv = vscp.getMeasurementData(e);
             assert(rv.value === 0x55aa55aan);
@@ -3075,9 +3079,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert(typeof rv.value === 'number');
@@ -3085,9 +3089,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 6946 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0x1B,0x22]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0x1B,0x22]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,694600);
@@ -3095,9 +3099,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -0.00115 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x85,0x8d]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x85,0x8d]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-0.00115);
@@ -3105,9 +3109,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x81,0x01,0x07]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x81,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,26.3);
@@ -3115,9 +3119,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 26.3 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0x01,0x07]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0x01,0x07]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,263);
@@ -3125,9 +3129,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0xFF,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0xFF,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -3135,9 +3139,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -1 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x00,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-1);
@@ -3145,9 +3149,9 @@ describe('VSCP Measurements', function() {
 
         it('should return -100 as number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0xFF,0xFF]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0x80,0x02,0xFF,0xFF]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(rv.value,-100);
@@ -3157,9 +3161,9 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,158,142,30,65]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,158,142,30,65]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(typeof rv.value,'number');
@@ -3167,9 +3171,9 @@ describe('VSCP Measurements', function() {
 
         it('should return 9.909819 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,65,30,142,158]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,65,30,142,158]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,6),9.909819);
@@ -3177,9 +3181,9 @@ describe('VSCP Measurements', function() {
         
         it('should return -21489.32 as return value is number.', function() {
             var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                vscpData : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,198,167,226,164]
+                class : vscp_class.VSCP_CLASS2_LEVEL1_SETVALUEZONE,
+                type : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                data : [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,1,2,0xA0,198,167,226,164]
             });
             var rv = vscp.getMeasurementData(e);
             assert.equal(vscp.toFixed(rv.value,2),-21489.32);

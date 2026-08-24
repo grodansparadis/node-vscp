@@ -206,10 +206,10 @@ This is a helper class that defines a VSCP event. You can use it in the followin
 ```javascript
 // Define event with object in constructor and data in array
 e2 = new vscp.Event({
-    vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
-    vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
+    head: 0,
+    class: 10,
+    type: 6,
+    data: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 ```
 
@@ -220,7 +220,7 @@ or
 e2 = new vscp.Event();
 e2.vscpClass = 10;
 e2.vscpType = 6;
-e2.data = [1,2,3,4,5];
+e2.vscpData = [1,2,3,4,5];
 ```
 
 or
@@ -228,7 +228,7 @@ or
 ```javascript
 // Define event from text form
 e2 = new vscp.Event({
-    text : '3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32'
+    text : '3,10,6,4,,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32'
 });
 console.log(e2);
 ```
@@ -246,15 +246,94 @@ The full definitions is like this
  * @param {number} options.vscpGuidType                 - GuidType
  * @param {boolean} options.vscpHardCoded               - Hard coded node id
  * @param {boolean} options.vscpCalcCRC                 - Calculate CRC
- * @param {number} options.vscpClass                    - VSCP class
- * @param {number} options.vscpType                     - VSCP type
- * @param {number} options.vscpObId                     - Object id
- * @param {string} options.vscpDateTime                 - ISO UTC Date + time  
- * @param {number} options.vscpTimeStamp                - Timestamp
- * @param {string} options.vscpGuid                     - GUID string
- * @param {(number[]|string)} options.vscpData
+ * @param {number} options.class                        - VSCP class
+ * @param {number} options.type                         - VSCP type
+ * @param {number} options.obid                         - Object id
+ * @param {string} options.datetime                     - ISO UTC Date + time (deprecated, input only)
+ * @param {number} options.timestamp                    - Relative time in microseconds (deprecated, input only)
+ * @param {(bigint|number|string)} options.timestamp_ns - Unix timestamp in nanoseconds (64-bit)
+ * @param {string} options.guid                         - GUID string
+ * @param {(number[]|string)} options.data
  text
  * @param {string} options.text
+```
+
+#### Nomenclature
+
+The JSON nomenclature and the older _vscpXxxx_ nomenclature can be used side by
+side. The following names are equivalent
+
+| JSON | Older form |
+| --- | --- |
+| head | vscpHead |
+| class | vscpClass |
+| type | vscpType |
+| obid | vscpObId |
+| guid | vscpGuid |
+| data | vscpData |
+| timestamp_ns | vscpTimeStamp_ns |
+| timestamp | vscpTimeStamp |
+| datetime | vscpDateTime |
+
+The event internally uses the current names (`head`, `class`, `type`, `obid`,
+`timestamp_ns`, `guid`, `data`). Deprecated aliases are still accepted and
+available through backward-compatible getters/setters. If both forms are given
+in the options object, the current JSON name takes precedence.
+
+```javascript
+// These two events are identical
+var ev1 = new vscp.Event({
+    head: 3,
+    class: 10,
+    type: 6,
+    timestamp_ns: "1755792180000000000",
+    guid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
+    data: [1,2,3,4,5]
+});
+
+var ev2 = new vscp.Event({
+    vscpHead: 3,
+    vscpClass: 10,
+    vscpType: 6,
+    vscpTimeStamp_ns: 1755792180000000000n,
+    vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
+    vscpData: [1,2,3,4,5]
+});
+```
+
+#### Time in events
+
+An event carries absolute time in `timestamp_ns`, a 64-bit unix timestamp with
+nanosecond resolution held internally as a `BigInt`.
+
+Deprecated input fields `datetime` (absolute UTC time) and `timestamp`
+(relative time in microseconds) are still accepted and converted to
+`timestamp_ns` when an event is created.
+For compatibility, `datestr` and `dateStr` are also accepted as aliases for
+`datetime`.
+
+```javascript
+var ev = new vscp.Event({
+    class: 10,
+    type: 6,
+    datetime: "2020-02-11T17:32:02Z",
+    timestamp: 1000000     // One second added to the datetime
+});
+console.log(ev.timestamp_ns);   // 1581442323000000000n
+```
+
+If `timestamp_ns` is given it is used as is and the legacy fields are ignored.
+If no time information is given, `timestamp_ns` defaults to `0n`.
+
+The legacy `timestamp` can be given as a number, as a BigInt or as a string
+with a decimal or a hexadecimal (prefix `0x`) value.
+
+```javascript
+// All of these add 329239 microseconds when converted together with datetime
+new vscp.Event({ timestamp: 329239 });
+new vscp.Event({ timestamp: 329239n });
+new vscp.Event({ timestamp: "329239" });
+new vscp.Event({ timestamp: "0x50617" });
 ```
 
 ### Constructors
@@ -274,23 +353,23 @@ or
 
 ```javascript
 var ev = new vscp.Event( {
-    "vscpHead": 0x0007,
-    "vscpClass": 10,
-    "vscpType": 6,
-    "vscpData": [1,2,3,4,5],
-    "vscpGuid": "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01"
+    "head": 0x0007,
+    "class": 10,
+    "type": 6,
+    "data": [1,2,3,4,5],
+    "guid": "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01"
 });
 ```
 
 #### String
 
 ```javascript
-var ev = new vscp.Event('3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
+var ev = new vscp.Event('3,10,6,4,,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
 ```
 
 ```javascript
 var ev = new vscp.Event({
-    text : '3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32'
+    text : '3,10,6,4,2020-02-11T17:00:02.123Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32'
 });
 ```
 
@@ -541,8 +620,11 @@ console.log("Calculate CRC :",
 Get event in string form on the following format
 
 ```javascript
-"vscpHead,vscpClass,vscpType,vscpObId,vscpDateTime,vscpTimeStamp,vscpGuid,vspData"
+"head,class,type,obid,,timestamp_ns,guid,data"
 ```
+
+The datetime field is left empty and the absolute time is written as
+`timestamp_ns` in hexadecimal form (`0x...`) in the sixth field.
 
 This is the standard form to send events in the [VSCP tcp/ip link interface](https://docs.vscp.org/spec/latest/#/./vscp_over_tcp_ip).
 
@@ -575,40 +657,49 @@ See **getAsString**
 Set the event data from a text string on the following format
 
 ```javascript
-"vscpHead,vscpClass,vscpType,vscpObId,vscpDateTime,vscpTimeStamp,vscpGuid,vspData"
+"head,class,type,obid,datetime,timestamp_or_timestamp_ns,guid,data"
 ```
+
+If the datetime field is set, the sixth field is read as the legacy relative
+timestamp in microseconds and `timestamp_ns` is calculated from the two values.
+If the datetime field is empty, the sixth field is read as `timestamp_ns`.
 
 **Example**
 ```javascript
-// Define event by setting from a string
+// Legacy form - timestamp_ns is calculated from datetime + timestamp
 e = new vscp.Event();
-if (true === (e instanceof vscp.Event)) {
-    console.log("YES! e is an instance of Event.");
-}
-e.setFromString('3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
+e.setFromString('3,10,6,4,2020-02-11T17:32:02Z,1000000,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
+console.log(e);
+
+// New form - the sixth field is timestamp_ns
+e = new vscp.Event();
+e.setFromString('3,10,6,4,,1755792180000000000,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
 console.log(e);
 ```
 
 #### toJSONObj
 
-Get event as a JSON object on the form
+Get event as a JSON string. Only the current nomenclature is present in the
+output (`head`, `class`, `type`, `guid`, `obid`, `timestamp_ns`, `data`).
 
 ```javascript
 {
-  vscpHead: 80,
-  vscpClass: 10,
-  vscpType: 6,
-  vscpGuid: '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:2a',
-  vscpObId: 0,
-  vscpTimeStamp: 34565634,
-  vscpDateTime: 2020-02-24T11:10:59.807Z,
-  vscpData: [ 11, 22, 33, 44, 55 ]
+  head: 80,
+  class: 10,
+  type: 6,
+  guid: '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:2a',
+  obid: 0,
+    timestamp_ns: '0x18676f0806fd0000',
+    data: [ 11, 22, 33, 44, 55 ]
 }
 ```
 
+`timestamp_ns` is written as a hexadecimal string (`0x...`) to avoid losing
+precision for 64-bit values.
+
 **Example**
 ```javascript
-var e = new Event('3,10,6,4,2020-02-11T17:00:02Z,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
+var e = new Event('3,10,6,4,,4074759495,FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01,0x48,0x35,0x31,0x2E,0x39,0x32');
 console.log(e.toJSONObj());
 ```
 
@@ -634,6 +725,54 @@ Utility function which returns the current time in the following format 'hh:mm:s
 **Example**
 ```javascript
 console.log(vscp.getTime());
+```
+
+### unixTimeToISO(unixtime)
+Convert a 64-bit unix timestamp given in seconds (number, BigInt or string) to
+an ISO 8601 UTC string.
+
+**Example**
+```javascript
+console.log(vscp.unixTimeToISO(1635872597n));   // 2021-11-02T17:03:17.000Z
+```
+
+### isoToUnixTime(isodatetime)
+Convert an ISO 8601 string, or a Date object, to a 64-bit unix timestamp in
+seconds. The value is returned as a BigInt.
+
+**Example**
+```javascript
+console.log(vscp.isoToUnixTime('2021-11-02T17:03:17Z'));   // 1635872597n
+```
+
+### unixTimeNsToISO(ns)
+Convert a 64-bit unix timestamp given in nanoseconds to an ISO 8601 UTC string.
+Sub millisecond resolution is lost in the conversion.
+
+**Example**
+```javascript
+console.log(vscp.unixTimeNsToISO(1581442322123000000n));  // 2020-02-11T17:32:02.123Z
+```
+
+### isoToUnixTimeNs(isodatetime)
+Convert an ISO 8601 string, or a Date object, to a 64-bit unix timestamp in
+nanoseconds. The value is returned as a BigInt.
+
+**Example**
+```javascript
+console.log(vscp.isoToUnixTimeNs('2020-02-11T17:32:02Z'));  // 1581442322000000000n
+```
+
+### legacyTimeToUnixTimeNs(datetime, timestamp)
+Convert the deprecated event time fields to a 64-bit unix timestamp in
+nanoseconds. The relative _timestamp_ is given in microseconds and is added to
+the absolute time given by _datetime_. This is the conversion that is done
+internally when an event is created from legacy time information.
+
+**Example**
+```javascript
+// One second is added to the datetime
+console.log(vscp.legacyTimeToUnixTimeNs('2020-02-11T17:32:02Z', 1000000));
 ```
 
 ### guidToStr({number}[])
@@ -1197,13 +1336,17 @@ Output is an object with the following format
 
 ```json
 {
-  "canid": 656897,
+    "id": 656897,
   "flags": 1,
   "timestamp": 0,
   "obid": 0,
   "data": [ 137, 130, 254, 220 ]
 }
 ```
+
+CANAL uses `timestamp` only. It is a 32-bit unsigned microsecond value.
+When converting from a VSCP event, the value is derived from
+`timestamp_ns * 1000` and wrapped to 32 bits.
 
 ### {event} convertCanMsgToEvent(canmsg)
 
@@ -1214,7 +1357,6 @@ A canmsg is an object with the following format
 ```json
 {
   "id": 656897,
-  "timestamp": 0,
   "flags": 1,
   "obid": 0,
   "timestamp": 0,
@@ -1224,7 +1366,11 @@ A canmsg is an object with the following format
 
 data can be _string_, _array_, _buffer_ or _null_. **ext** should always be true and **rtr** always false for a VSCP event. 
 
-If timestamp is not given it will get sensible default. 
+If `timestamp` is not given it defaults to 0.
+
+The resulting VSCP event uses only `timestamp_ns` for time on event form, and
+`timestamp_ns` is returned as a hexadecimal string (`0x...`). Legacy
+`timestamp` and `datetime` are not present in the returned event.
 
 The resulting GUID will be all nills with the nickname in the LSB.
 

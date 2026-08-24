@@ -3,6 +3,10 @@ const vscp_class = require('node-vscp-class');
 const vscp_type = require('node-vscp-type');
 const vscp = require("../src/vscp.js");
 
+// ----------------------------------------------------------------------------
+// VSCP utils tests
+// ----------------------------------------------------------------------------
+
 describe('VSCP Utils', function() {
 
     describe('vscp.readValue()', function() {
@@ -37,6 +41,162 @@ describe('VSCP Utils', function() {
 
         it('Non number should return string', function() {
             assert.equal(typeof vscp.getTime(), 'string');
+        });
+
+    });
+
+    describe('vscp.unixTimeToISO()', function() {
+
+        it('Zero should return epoch start', function() {
+            assert.equal(vscp.unixTimeToISO(0), '1970-01-01T00:00:00.000Z');
+        });
+
+        it('Number should return ISO 8601 string', function() {
+            assert.equal(vscp.unixTimeToISO(1635872597), '2021-11-02T17:03:17.000Z');
+        });
+
+        it('BigInt should return ISO 8601 string', function() {
+            assert.equal(vscp.unixTimeToISO(1635872597n), '2021-11-02T17:03:17.000Z');
+        });
+
+        it('String should return ISO 8601 string', function() {
+            assert.equal(vscp.unixTimeToISO("1635872597"), '2021-11-02T17:03:17.000Z');
+        });
+
+        it('Negative timestamp should return date before epoch', function() {
+            assert.equal(vscp.unixTimeToISO(-1), '1969-12-31T23:59:59.000Z');
+        });
+
+        it('Out of range timestamp should throw', function() {
+            assert.throws(function() {
+                vscp.unixTimeToISO(9223372036854775807n);
+            }, Error);
+        });
+
+        it('Invalid value should throw', function() {
+            assert.throws(function() {
+                vscp.unixTimeToISO("error");
+            }, Error);
+        });
+
+    });
+
+    describe('vscp.isoToUnixTime()', function() {
+
+        it('Epoch start should return 0n', function() {
+            assert.equal(vscp.isoToUnixTime('1970-01-01T00:00:00.000Z'), 0n);
+        });
+
+        it('ISO 8601 string should return BigInt seconds', function() {
+            var ts = vscp.isoToUnixTime('2021-11-02T17:03:17.000Z');
+            assert.equal(typeof ts, 'bigint');
+            assert.equal(ts, 1635872597n);
+        });
+
+        it('ISO 8601 string with offset should return UTC based seconds', function() {
+            assert.equal(vscp.isoToUnixTime('2021-11-02T18:03:17.000+01:00'), 1635872597n);
+        });
+
+        it('Date object should return BigInt seconds', function() {
+            assert.equal(vscp.isoToUnixTime(new Date('2021-11-02T17:03:17.000Z')), 1635872597n);
+        });
+
+        it('Date before epoch should return negative seconds', function() {
+            assert.equal(vscp.isoToUnixTime('1969-12-31T23:59:59.000Z'), -1n);
+        });
+
+        it('Invalid date should throw', function() {
+            assert.throws(function() {
+                vscp.isoToUnixTime('error');
+            }, Error);
+        });
+
+    });
+
+    describe('vscp.unixTimeToISO()/vscp.isoToUnixTime()', function() {
+
+        it('Roundtrip should return the original timestamp', function() {
+            var ts = 1635872597n;
+            assert.equal(vscp.isoToUnixTime(vscp.unixTimeToISO(ts)), ts);
+        });
+
+    });
+
+    describe('vscp.isoToUnixTimeNs()', function() {
+
+        it('Epoch start should return 0n', function() {
+            assert.equal(vscp.isoToUnixTimeNs('1970-01-01T00:00:00.000Z'), 0n);
+        });
+
+        it('ISO 8601 string should return BigInt nanoseconds', function() {
+            var ts = vscp.isoToUnixTimeNs('2020-02-11T17:32:02Z');
+            assert.equal(typeof ts, 'bigint');
+            assert.equal(ts, 1581442322000000000n);
+        });
+
+        it('Milliseconds should be kept', function() {
+            assert.equal(vscp.isoToUnixTimeNs('2020-02-11T17:32:02.123Z'),
+                1581442322123000000n);
+        });
+
+        it('Date object should return BigInt nanoseconds', function() {
+            assert.equal(vscp.isoToUnixTimeNs(new Date('2020-02-11T17:32:02Z')),
+                1581442322000000000n);
+        });
+
+        it('Invalid date should throw', function() {
+            assert.throws(function() {
+                vscp.isoToUnixTimeNs('error');
+            }, Error);
+        });
+
+    });
+
+    describe('vscp.unixTimeNsToISO()', function() {
+
+        it('BigInt should return ISO 8601 string', function() {
+            assert.equal(vscp.unixTimeNsToISO(1581442322000000000n),
+                '2020-02-11T17:32:02.000Z');
+        });
+
+        it('String should return ISO 8601 string', function() {
+            assert.equal(vscp.unixTimeNsToISO('1581442322123000000'),
+                '2020-02-11T17:32:02.123Z');
+        });
+
+        it('Roundtrip should return the original timestamp', function() {
+            var ts = 1581442322123000000n;
+            assert.equal(vscp.isoToUnixTimeNs(vscp.unixTimeNsToISO(ts)), ts);
+        });
+
+    });
+
+    describe('vscp.legacyTimeToUnixTimeNs()', function() {
+
+        it('Datetime without timestamp should return datetime in ns', function() {
+            assert.equal(vscp.legacyTimeToUnixTimeNs('2020-02-11T17:32:02Z'),
+                1581442322000000000n);
+        });
+
+        it('Timestamp of 1000000 us should add one second', function() {
+            assert.equal(vscp.legacyTimeToUnixTimeNs('2020-02-11T17:32:02Z', 1000000),
+                1581442323000000000n);
+        });
+
+        it('Timestamp on hex string form should be accepted', function() {
+            assert.equal(vscp.legacyTimeToUnixTimeNs('2020-02-11T17:32:02Z', '0x50817'),
+                1581442322000000000n + BigInt(0x50817) * 1000n);
+        });
+
+        it('Timestamp on BigInt form should be accepted', function() {
+            assert.equal(vscp.legacyTimeToUnixTimeNs('2020-02-11T17:32:02Z', 1000000n),
+                1581442323000000000n);
+        });
+
+        it('Invalid timestamp should throw', function() {
+            assert.throws(function() {
+                vscp.legacyTimeToUnixTimeNs('2020-02-11T17:32:02Z', 'error');
+            }, Error);
         });
 
     });
@@ -307,119 +467,119 @@ describe('VSCP Utils', function() {
     describe('#isIPV6Addr(hdr)', function() {
         it("should return true if bit 12 is set in VSCP head", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x1000
+                "head": 0x1000
             });
-            assert.equal(vscp.isIPV6Addr(ev.vscpHead), true);
+            assert.equal(vscp.isIPV6Addr(ev.head), true);
         });
 
         it("should return false if bit 12 is cleared in VSCP head", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x0000
+                "head": 0x0000
             });
-            assert.equal(vscp.isIPV6Addr(ev.vscpHead), false);
+            assert.equal(vscp.isIPV6Addr(ev.head), false);
         });
     });
 
     describe('#isDumbNode()', function() {
         it("should return true if bit 15 is set in VSCP head", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x8000
+                "head": 0x8000
             });
-            assert.equal(vscp.isDumbNode(ev.vscpHead), true);
+            assert.equal(vscp.isDumbNode(ev.head), true);
         });
 
         it("should return false if bit 15 is cleared in VSCP head", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x0000
+                "head": 0x0000
             });
-            assert.equal(vscp.isDumbNode(ev.vscpHead), false);
+            assert.equal(vscp.isDumbNode(ev.head), false);
         });
     });
 
     describe('#getPriority()', function() {
         it("should return 7 from VSCP head (0x00E0)", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x00E0
+                "head": 0x00E0
             });
-            assert.equal(vscp.getPriority(ev.vscpHead), 7);
+            assert.equal(vscp.getPriority(ev.head), 7);
         });
     });
 
     describe('#getPriority()', function() {
         it("should return 3 from VSCP head (0x0060)", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x0060
+                "head": 0x0060
             });
-            assert.equal(vscp.getPriority(ev.vscpHead), 3);
+            assert.equal(vscp.getPriority(ev.head), 3);
         });
     });
 
     describe('#getPriority()', function() {
         it("should return 0 from VSCP head (0x0000)", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x0000
+                "head": 0x0000
             });
-            assert.equal(vscp.getPriority(ev.vscpHead), 0);
+            assert.equal(vscp.getPriority(ev.head), 0);
         });
     });
 
     describe('#getGuidType()', function() {
         it("should return bit 14,13,12 set in VSCP head (0x7000)", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x7000
+                "head": 0x7000
             });
-            assert.equal(vscp.getGuidType(ev.vscpHead), 7);
+            assert.equal(vscp.getGuidType(ev.head), 7);
         });
     });
 
     describe('#getGuidType()', function() {
         it("should return bit 14,13,12 cleared in VSCP head (0x0000)", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x0000
+                "head": 0x0000
             });
-            assert.equal(vscp.getGuidType(ev.vscpHead), 0);
+            assert.equal(vscp.getGuidType(ev.head), 0);
         });
     });
 
     describe('#isHardCodedAddr()', function() {
         it("should return bit 5 set in VSCP head (0x0010)", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x0000
+                "head": 0x0000
             });
-            assert.equal(vscp.isHardCodedAddr(ev.vscpHead), false);
+            assert.equal(vscp.isHardCodedAddr(ev.head), false);
             ev.setHardCodedAddr();
-            assert.equal(vscp.isHardCodedAddr(ev.vscpHead), true);
-            assert.equal(ev.vscpHead, 0x0010);
+            assert.equal(vscp.isHardCodedAddr(ev.head), true);
+            assert.equal(ev.head, 0x0010);
         });
     });
 
     describe('#isDoNotCalcCRC()', function() {
         it("should return bit 5 set in VSCP head (0x0008)", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x0000
+                "head": 0x0000
             });
-            assert.equal(vscp.isDoNotCalcCRC(ev.vscpHead), false);
+            assert.equal(vscp.isDoNotCalcCRC(ev.head), false);
             ev.setDoNotCalcCRC();
-            assert.equal(vscp.isDoNotCalcCRC(ev.vscpHead), true);
-            assert.equal(ev.vscpHead, 0x0008);
+            assert.equal(vscp.isDoNotCalcCRC(ev.head), true);
+            assert.equal(ev.head, 0x0008);
         });
     });
 
     describe('#getRollingIndex()', function() {
         it("should return bit 3,2,1 cleared in VSCP head (0x0000)", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x0000
+                "head": 0x0000
             });
-            assert.equal(vscp.getRollingIndex(ev.vscpHead), 0);
+            assert.equal(vscp.getRollingIndex(ev.head), 0);
         });
     });
 
     describe('#getRollingIndex()', function() {
         it("should return bit 3,2,1 set to 3 in VSCP head (0x0003)", function() {
             var ev = new vscp.Event({
-                "vscpHead": 0x0003
+                "head": 0x0003
             });
-            assert.equal(vscp.getRollingIndex(ev.vscpHead), 3);
+            assert.equal(vscp.getRollingIndex(ev.head), 3);
         });
     });    
 
