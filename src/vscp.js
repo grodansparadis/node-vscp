@@ -773,6 +773,10 @@ class Event {
  */
 var readValue = function(input) {
 
+  if ('string' !== typeof input) {
+    return 0;
+  }
+
   var txtvalue = input.toLowerCase();
   var poshex = txtvalue.indexOf('0x');
   var posbin = txtvalue.indexOf('0b');
