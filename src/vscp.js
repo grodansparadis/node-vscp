@@ -49,7 +49,7 @@ const vscp_class = require('node-vscp-class');
  */
 const version = {
   major: 1,
-  minor: 2,
+  minor: 3,
   release: 0
 };
 
@@ -92,19 +92,19 @@ const guidtype = {
   GUIDTYPE_IPV6: 1,
   GUIDTYPE_2: 2, // GUID is RFC 4122 Version 1
   GUIDTYPE_RFC4122_1: 2,
-  GUIDTYPE_3: 3, // GUID is RFC 4122 Version 4 
+  GUIDTYPE_3: 3, // GUID is RFC 4122 Version 4
   GUIDTYPE_RFC4122_4: 3
 }
 
 /**
  * VSCP host capabilities (wcyd - What Can You Do)
- * 
+ *
  * Due to Javascripts incapability to handle 64-bit numbers
  * values are bit positions instead of proper constants. That is
- * the constant is gotten with 2^bit. The capabilitues 64-bit 
+ * the constant is gotten with 2^bit. The capabilitues 64-bit
  * integer can them be divided into two 32-bit integers and with
  * that be handle also in Javascript
- * 
+ *
  * @enum {number}
  * @const
  */
@@ -129,8 +129,8 @@ const hostCapability = {
   AES128: 0
 };
 
-/* 
-  Measurement data format masks 
+/*
+  Measurement data format masks
 */
 const measurementDataCodingMask = {
   MASK_DATACODING_TYPE:  0xE0, /* Bits 5,6,7 */
@@ -140,7 +140,7 @@ const measurementDataCodingMask = {
 
 /*
   These bits are coded in the three MSB bits of the first data byte
-  of measurement data and tells the type of the data that follows.             
+  of measurement data and tells the type of the data that follows.
 */
 const measurementDataCoding = {
   DATACODING_BIT:        0x00,
@@ -170,9 +170,9 @@ const measurementDataCoding = {
  * @param {number} options.guidtype                     - GUID Type
  * @param {boolean} options.hardcoded                   - Hard coded node id
  * @param {boolean} options.calccrc                     - Calculate CRC
- * @param {number} options.class                        - VSCP class
- * @param {number} options.type                         - VSCP type
- * @param {number} options.obid                         - Object id 
+ * @param {number} options.vscpclass                        - VSCP class
+ * @param {number} options.vscptype                        - VSCP type
+ * @param {number} options.obid                         - Object id
  * @param {BigInt} options.timestamp_ns                 - Absolute time in nanoseconds
  * @param {number} options.timestamp                    - Legacy relative time in microseconds
  * @param {(string|Date)} options.datetime              - Legacy absolute time (UTC)
@@ -186,7 +186,7 @@ const measurementDataCoding = {
  * used instead of the names above, both as options and as members.
  */
 class Event {
-  
+
   constructor(options) {
 
     /**
@@ -199,13 +199,13 @@ class Event {
      * VSCP class
      * @member {number}
      */
-    this.class = 0;
+    this.vscpclass = 0;
 
     /**
      * VSCP type
      * @member {number}
      */
-    this.type = 0;
+    this.vscptype = 0;
 
     /**
      * VSCP object id used by driver for channel info and etc.
@@ -247,10 +247,16 @@ class Event {
     if ('undefined' !== typeof options) {
 
       if ("string" === typeof options) {
-        this.setFromString(options);
-      } else {
-        // Allow the deprecated nomenclature as well
-        options = normalizeEventOptions(options);
+        if ('{' === options.trim()[0]) {
+          options = JSON.parse(options);
+        } else {
+          this.setFromString(options);
+          return;
+        }
+      }
+
+      // Allow the deprecated nomenclature as well
+      options = normalizeEventOptions(options);
 
         if ("number" === typeof options.head) {
           this.head = options.head;
@@ -328,16 +334,16 @@ class Event {
           }
         }
 
-        if ("number" === typeof options.class) {
-          this.class = options.class;
-        } else if ("string" === typeof options.class) {
-          this.class = parseInt(options.class);
+        if ("number" === typeof options.vscpclass) {
+          this.vscpclass = options.vscpclass;
+        } else if ("string" === typeof options.vscpclass) {
+          this.vscpclass = parseInt(options.vscpclass);
         }
 
-        if ("number" === typeof options.type) {
-          this.type = options.type;
-        } else if ("string" === typeof options.type) {
-          this.type = parseInt(options.type);
+        if ("number" === typeof options.vscptype) {
+          this.vscptype = options.vscptype;
+        } else if ("string" === typeof options.vscptype) {
+          this.vscptype = parseInt(options.vscptype);
         }
 
         if ("number" === typeof options.obid) {
@@ -364,7 +370,7 @@ class Event {
           this.timestamp = readValue(options.timestamp);
         }
 
-        // Legacy absolute time (deprecated)
+        // Legacy absolute time in string form (deprecated)
         if ("string" === typeof options.datetime) {
           // Time in UTC for events but conversion
           // is done in send routine
@@ -405,7 +411,6 @@ class Event {
         if ("string" === typeof options.text) {
           this.setFromString(options.text);
         }
-      }
 
     }
   }
@@ -559,8 +564,8 @@ class Event {
   }
 
   /*!
-    setRollingIndex 
-    
+    setRollingIndex
+
     Set rolling index (0-7)
 
     @param rindex Rolling index to set (0-7)
@@ -580,15 +585,15 @@ class Event {
    * head,class,type,obid,,timestamp_ns,guid,data
    */
   getAsString() {
-    
+
     var index = 0;
     var str = '';
 
     str += this.head.toString() + ',';
-    str += this.class.toString() + ',';
-    str += this.type.toString() + ',';
+    str += this.vscpclass.toString() + ',';
+    str += this.vscptype.toString() + ',';
     str += this.obid.toString() + ',';
-    str += ','; // Ignore the deprecated datetime 
+    str += ','; // Ignore the deprecated datetime
     str += '0x' + this.timestamp_ns.toString(16) + ',';
     str += this.guid;
 
@@ -634,6 +639,7 @@ class Event {
    * @return {string} Event as string
    */
   setFromString(str) {
+
     if ('string' !== typeof str) {
       console.error('VSCP event is not in string form.');
       throw('VSCP event is not in string form.');
@@ -648,12 +654,12 @@ class Event {
 
     // Get VSCP class
     if (ea.length > 1) {
-      this.class = readValue(ea[1]);
+      this.vscpclass = readValue(ea[1]);
     }
 
     // Get VSCP type
     if (ea.length > 2) {
-      this.type = readValue(ea[2]);
+      this.vscptype = readValue(ea[2]);
     }
 
     // Get VSCP obid
@@ -665,7 +671,7 @@ class Event {
       this.obid = readValue(ea[3]);
     }
 
-    // Get VSCP datetime
+    // Get VSCP datetime (deprecated)
     var bDateTime = (ea.length > 4) && (0 !== ea[4].length);
 
     if (!bDateTime) {
@@ -720,11 +726,11 @@ class Event {
   toJSONObj() {
         var ev = {};
         ev.head = this.head & 0xffff;
-        ev.class = this.class & 0xffff;
-        ev.type = this.type & 0xffff;
+        ev.vscpclass = this.vscpclass & 0xffff;
+        ev.vscptype = this.vscptype & 0xffff;
         ev.guid = this.guid;
         ev.obid = this.obid;
-      ev.timestamp_ns = '0x' + this.timestamp_ns.toString(16);
+        ev.timestamp_ns = '0x' + this.timestamp_ns.toString(16);
         ev.data = this.data;
 
         return JSON.stringify(ev);
@@ -735,11 +741,14 @@ class Event {
   get vscpHead() { return this.head; }
   set vscpHead(value) { this.head = value; }
 
-  get vscpClass() { return this.class; }
-  set vscpClass(value) { this.class = value; }
+  get vscpClass() { return this.vscpclass; }
+  set vscpClass(value) { this.vscpclass = value; }
 
-  get vscpType() { return this.type; }
-  set vscpType(value) { this.type = value; }
+  get vscpType() { return this.vscptype; }
+  set vscpType(value) { this.vscptype = value; }
+
+  get vscpptype() { return this.vscptype; }
+  set vscpptype(value) { this.vscptype = value; }
 
   get vscpObId() { return this.obid; }
   set vscpObId(value) { this.obid = value; }
@@ -766,14 +775,14 @@ class Event {
 
 
 /**
- * Read a hex, binary, octal or decimal value and return as 
+ * Read a hex, binary, octal or decimal value and return as
  * an integer.
  * @param {string} input    - Hex or decimal value as string
  * @return {number} Value
  */
 var readValue = function(input) {
 
-  if ('string' !== typeof input) {
+  if (('undefined' === typeof input) || ('string' !== typeof input)) {
     return 0;
   }
 
@@ -802,7 +811,7 @@ var readValue = function(input) {
  * Utility function which returns the current time in the following format:
  * hh:mm:ss.us
  *
- * @return {string} Current time in the format 
+ * @return {string} Current time in the format
  *                  hh:mm:ss.us
  */
 var getTime = function() {
@@ -959,8 +968,9 @@ var normalizeEventOptions = function(options) {
   };
 
   opt.head = pick(options.head, options.vscpHead);
-  opt.class = pick(options.class, options.vscpClass);
-  opt.type = pick(options.type, options.vscpType);
+  opt.vscpclass = pick(options.vscpclass, options.class, options.vscpClass);
+    opt.vscptype = pick(
+      options.vscptype, options.type, options.vscpType);
   opt.obid = pick(options.obid, options.obId, options.vscpObId);
   opt.guid = pick(options.guid, options.vscpGuid);
   opt.data = pick(options.data, options.vscpData);
@@ -997,7 +1007,7 @@ var guidToStr = function(guid) {
   // If buffer . convert to array
   if ( Buffer.isBuffer(guid) ) {
     var arr = Array.prototype.slice.call(guid, 0);
-    guid = arr;  
+    guid = arr;
   }
 
   if ( !Array.isArray(guid) ) {
@@ -1068,9 +1078,9 @@ var strToGuid = function(str) {
  */
 
 var isGuidZero = function(guid) {
-  
+
   var guidArray = [];
-  
+
   if ('undefined' === typeof guid) {
     throw(new Error("Parameter error: Missing argument"));
   }
@@ -1083,12 +1093,12 @@ var isGuidZero = function(guid) {
   }
   // If buffer . convert to array
   else if ( Buffer.isBuffer(guid) ) {
-    guidArray = Array.prototype.slice.call(guid, 0);  
+    guidArray = Array.prototype.slice.call(guid, 0);
   }
   else {
     throw(new Error("Parameter error: Argument must be of type string, array or buffer"));
   }
-  
+
 
   for (let i = 0; i < 16; i++) {
     if (guidArray[i]) return false;
@@ -1099,8 +1109,8 @@ var isGuidZero = function(guid) {
 
 /**
  * getNodeId
- * 
- * Get node id from a node GUID string. 
+ *
+ * Get node id from a node GUID string.
  *
  * @param {string|array|buffer} guid - GUID string, e.g.
  *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
@@ -1113,12 +1123,12 @@ var getNodeId = function(guid) {
   }
 
   if ('string' === typeof guid) {
-    // Short for all nulls?  
+    // Short for all nulls?
     if (('-' === guid)  || ('' === guid) ) {
       return 0;
     }
 
-    return ( (parseInt(guid.split(':')[14], 16) << 8) + 
+    return ( (parseInt(guid.split(':')[14], 16) << 8) +
             parseInt(guid.split(':')[15], 16));
   }
   else if ( Array.isArray(guid) ) {
@@ -1126,7 +1136,7 @@ var getNodeId = function(guid) {
   }
   // If buffer . convert to array
   else if ( Buffer.isBuffer(guid) ) {
-    var guidArray = Array.prototype.slice.call(guid, 0);  
+    var guidArray = Array.prototype.slice.call(guid, 0);
     return ((guidArray[14] << 8) + guidArray[15]);
   }
   else {
@@ -1137,8 +1147,8 @@ var getNodeId = function(guid) {
 
 /**
  * getNickName
- * 
- * Get node id from a node GUID string. 
+ *
+ * Get node id from a node GUID string.
  *
  * @param {string|array|buffer} guid - GUID string, e.g.
  *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
@@ -1151,12 +1161,12 @@ var getNickName = function(guid) {
 
 /**
  * setNodeId
- * 
+ *
  * Set node to a node GUID string. TODO should be 16-bit!
- * 
+ *
  * @param {string} guid - GUID string, e.g.
  *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
- * @param {number} nodeid - Node is to set (16-bit). 
+ * @param {number} nodeid - Node is to set (16-bit).
  * @return {string} guid with LSB set to node id, or null
  *                  on error.
  */
@@ -1186,7 +1196,7 @@ var setNodeId = function(guid, nodeid) {
   // If buffer . convert to array
   else if ( Buffer.isBuffer(guid) ) {
     rtype = 2; // Return buffer
-    guidArray = Array.prototype.slice.call(guid, 0);  
+    guidArray = Array.prototype.slice.call(guid, 0);
   }
   else {
     throw("guid argument should be a string,array or buffer");
@@ -1215,12 +1225,12 @@ var setNodeId = function(guid, nodeid) {
 
 /**
  * setNickName
- * 
+ *
  * Set node to a node GUID string. TODO should be 16-bit!
- * 
+ *
  * @param {string} guid - GUID string, e.g.
  *     00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
- * @param {number} nodeid - Node is to set (16-bit). 
+ * @param {number} nodeid - Node is to set (16-bit).
  * @return {string} guid with LSB set to node id, or null
  *                  on error.
  */
@@ -1230,15 +1240,15 @@ var setNickName = function(guid, nodeid) {
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#The_Unicode_Problem
-// Since DOMStrings are 16-bit-encoded strings, in most browsers 
-// calling window.btoa on a Unicode string will cause a Character 
-// Out Of Range exception if a character exceeds the range of a 
+// Since DOMStrings are 16-bit-encoded strings, in most browsers
+// calling window.btoa on a Unicode string will cause a Character
+// Out Of Range exception if a character exceeds the range of a
 // 8-bit ASCII-encoded character.
 
 /**
  * Encode base64 unicode safe.
  * https://stackabuse.com/encoding-and-decoding-base64-strings-in-node-js/
- * 
+ *
  * @param {string} str  - Unicode string
  * @return {string} Base64
  */
@@ -1264,7 +1274,7 @@ var b64DecodeUnicode = function(str) {
 /*!
   isIPV6Addr
 
-  A node that use an IPv6 address can use this address as its's 
+  A node that use an IPv6 address can use this address as its's
   GUID and then should set this bit to indicate this.
 
   @param {number} head VSCP head (16-bit)
@@ -1318,13 +1328,13 @@ var getPriority = function(head) {
   if ( 'number' !== typeof head ) {
     throw(new Error("Parameter error: 'head' should be a number."))
   }
-  head = (head & 0xff); // In case 16-bit head 
+  head = (head & 0xff); // In case 16-bit head
   return ((head >> 5) & 7);
 };
 
 /*!
   Get the VSCP event GUID type (0-7).
-  
+
   @return {number} Priority of the event.
 */
 
@@ -1338,7 +1348,7 @@ var getGuidType = function(vscpHead) {
 
   A hardcoded node is a node where the address is
   set and can not be changed. This is important for
-  CAN4VSCP and RS-485 systems where the nickname id 
+  CAN4VSCP and RS-485 systems where the nickname id
   is dynamic but the GUID for the node is not.
 
   @param {number} head VSCP head (16-bit or 8-bit)
@@ -1360,10 +1370,10 @@ var isHardCodedAddr = function(head) {
   return result;
 };
 
-/*! 
+/*!
   isDoNotCalcCRC
 
-  Check if the don't calculate CRC bit is set.  This is 
+  Check if the don't calculate CRC bit is set.  This is
   present for wireless devices and similar.
 
   @param {number} head VSCP head (16-bit or 8-bit)
@@ -1372,13 +1382,13 @@ var isHardCodedAddr = function(head) {
 */
 
 var isDoNotCalcCRC = function(head) {
-  
+
   var result = false;
-  
+
   if ( 'number' !== typeof head ) {
     throw(new Error("Parameter error: 'head' should be a number."))
   }
-  
+
   if (0 < (head & 0x0008)) {
     result = true;
   }
@@ -1408,7 +1418,7 @@ var getRollingIndex = function(head) {
 
 /*!
   toFixed
- 
+
   Round value to a fixed precision.
 
   @param {number} value        - Value
@@ -1418,7 +1428,7 @@ var getRollingIndex = function(head) {
 
 var toFixed = function(value, precision) {
 
-  if ( ('number' !== typeof value) || 
+  if ( ('number' !== typeof value) ||
        ('number' !== typeof precision) ) {
     throw(new Error("Parameter error: 'value' and precision' should be numbers."))
   }
@@ -1426,10 +1436,10 @@ var toFixed = function(value, precision) {
   return String((Math.round(value * power) / power).toFixed(precision));
 };
 
-/*! 
+/*!
   varInt2BigInt
-  Convert VSCP data to a BigInt value. 
-  The byte that make up the BigInt is stored in a byte array 
+  Convert VSCP data to a BigInt value.
+  The byte that make up the BigInt is stored in a byte array
   with MSB to LSB storage order.
 
   @param {array[]|buffer[]} data - Byte array/buffer
@@ -1439,7 +1449,7 @@ var toFixed = function(value, precision) {
 var varInt2BigInt = function(data) {
 
   var rval = 0.0;
-  var work = 0n;  
+  var work = 0n;
   var bNegative = false;
   var i = 0;
 
@@ -1478,7 +1488,7 @@ var varInt2BigInt = function(data) {
   measurements where the data coding is just implied
 
   Note! unit and sensor index is not valid for level II measurement
-  events.For level II they are both frull bytes and must be read from 
+  events.For level II they are both frull bytes and must be read from
   the data.
 
   {
@@ -1487,14 +1497,14 @@ var varInt2BigInt = function(data) {
     sensorindex:
   }
 
-  @param vscpClass {number} One of the valid measurement classes
+  @param vscpclass {number} One of the valid measurement classes
   @param vscpData  {array | buffer } Event data.
   @return Data coding byte. See measurementDataCoding above.
 */
 
-var getMeasurementDataCoding = function(vscpClass,vscpData) {
+var getMeasurementDataCoding = function(vscpclass,vscpData) {
 
-  // -1 means not defined. 
+  // -1 means not defined.
   var rvobj = {
     datacoding: 0,
     unit: 0,
@@ -1503,69 +1513,69 @@ var getMeasurementDataCoding = function(vscpClass,vscpData) {
     zone: -1,
     subzone: -1
   };
-  
+
   // Check parameters
-  if ( vscpClass !== number ) {
-    throw(new Error("Parameter error: 'vscpClass' should be a numeric."));
+  if ( vscpclass !== number ) {
+    throw(new Error("Parameter error: 'vscpclass' should be a numeric."));
   }
 
   if ( !Array.isArray(vscpData) && !Buffer.isBuffer(vscpData)) {
     throw(new Error("Parameter error: 'vscpData' should be a numeric array or buffer."));
   }
 
-  if ( ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) && 
-         (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) ) {
+  if ( ( (vscpclass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) &&
+         (vscpclass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) ) {
     rvobj.datacoding = getDataCoding(vscpData[0]);
     rvobj.unit = getUnit(vscpData[0]);
     rvobj.sensorindex = getSensorIndex(vscpData[0]);
-  } else if ( vscpClass == vscp_class.VSCP_CLASS1_DATA ) {
+  } else if ( vscpclass == vscp_class.VSCP_CLASS1_DATA ) {
     rvobj.datacoding = getDataCoding(vscpData[0]);
     rvobj.unit = getUnit(vscpData[0]);
     rvobj.sensorindex = getSensorIndex(vscpData[0]);
-  } else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
-            (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) {
+  } else if ( (vscpclass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) &&
+            (vscpclass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) {
     // Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.unit = 0;
-    rvobj.sensorindex = 0;  
-  } else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
-            (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) {
+    rvobj.sensorindex = 0;
+  } else if ( (vscpclass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) &&
+            (vscpclass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) {
     rvobj.datacoding = getDataCoding(vscpData[3]);
     rvobj.unit = getUnit(vscpData[3]);
     rvobj.sensorindex = getSensorIndex(vscpData[3]);
-  } else if ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
-            (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) {
-    // Always single, unit=0,sensorindex=0 
+  } else if ( (vscpclass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) &&
+            (vscpclass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) {
+    // Always single, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
-  } else if ( (vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
-            (vscpClass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) {
+  } else if ( (vscpclass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) &&
+            (vscpclass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) {
     rvobj.datacoding = getDataCoding(vscpData[3]);
     rvobj.unit = getUnit(vscpData[3]);
     rvobj.sensorindex = getSensorIndex(vscpData[3]);
     rvobj.index = vscpData[0];
     rvobj.zone = vscpData[1];
     rvobj.subzone = vscpData[2];
-  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
-            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) {
+  } else if ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) &&
+            (vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(vscpData[16]);
     rvobj.unit = getUnit(vscpData[16]);
     rvobj.sensorindex = getSensorIndex(vscpData[16]);
-  } else if ( vscpClass == (512 + vscp_class.VSCP_CLASS1_DATA ) ) {
+  } else if ( vscpclass == (512 + vscp_class.VSCP_CLASS1_DATA ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(vscpData[16]);
     rvobj.unit = getUnit(vscpData[16]);
     rvobj.sensorindex = getSensorIndex(vscpData[16]);
-  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
-            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) {
+  } else if ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) &&
+            (vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) {
     // Offset 16, Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.unit = 0;
-    rvobj.sensorindex = 0;       
-  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
-            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) {
+    rvobj.sensorindex = 0;
+  } else if ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) &&
+            (vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(vscpData[16+3]);
     rvobj.unit = getUnit(vscpData[16+3]);
@@ -1573,21 +1583,21 @@ var getMeasurementDataCoding = function(vscpClass,vscpData) {
     rvobj.index = vscpData[0];
     rvobj.zone = vscpData[1];
     rvobj.subzone = vscpData[2];
-  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
-            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) {
+  } else if ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) &&
+            (vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) {
     // Offset 16, Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
-  } else if ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
-            (vscpClass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) {
+  } else if ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) &&
+            (vscpclass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) {
     rvobj.datacoding = vscpData[16+3];
     rvobj.unit = getUnit(vscpData[16+3]);
     rvobj.sensorindex = getSensorIndex(vscpData[16+3]);
     rvobj.index = vscpData[16];
     rvobj.zone = vscpData[16+1];
     rvobj.subzone = vscpData[16+2];
-  } else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_STR == vscpClass) ) {
+  } else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_STR == vscpclass) ) {
     rv = measurementDataCoding.DATACODING_STRING;
     // Always string, index=0
     rvobj.datacoding = measurementDataCoding.DATACODING_STRING;
@@ -1595,8 +1605,8 @@ var getMeasurementDataCoding = function(vscpClass,vscpData) {
     rvobj.index = 0;
     rvobj.zone = vscpData[1];
     rvobj.subzone = vscpData[2];
-    rvobj.unit = vscpData[3];    
-  } else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT == vscpClass) ) {
+    rvobj.unit = vscpData[3];
+  } else if ( (vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT == vscpclass) ) {
     // Always double, index=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.sensorindex = vscpData[0];
@@ -1609,7 +1619,7 @@ var getMeasurementDataCoding = function(vscpClass,vscpData) {
   return rvobj;
 }
 
-/*! 
+/*!
   getDataCoding
 
   Get data coding.
@@ -1626,7 +1636,7 @@ var getDataCoding = function(datacoding) {
   return (datacoding & measurementDataCodingMask.MASK_DATACODING_TYPE);
 };
 
-/*! 
+/*!
   getDataCodingStr
 
   Get unit descriptive string from data coding.
@@ -1667,20 +1677,20 @@ var getDataCodingStr = function(datacoding) {
 
     case measurementDataCoding.DATACODING_SINGLE:
       datacodingtxt = "Floating point (single)";
-      break;   
+      break;
 
     default:
       datacodingtxt = "Unknown data coding";
-      break;          
-  
-  } 
+      break;
+
+  }
 
   return datacodingtxt;
 
  }
 
 
-/*! 
+/*!
   getUnit
 
   Get unit from data coding.
@@ -1699,7 +1709,7 @@ var getUnit = function(datacoding) {
 };
 
 
-/*! 
+/*!
   getSensorIndex
 
    Get sensor index from data coding.
@@ -1709,7 +1719,7 @@ var getUnit = function(datacoding) {
 */
 
 var getSensorIndex = function(datacoding) {
-  
+
   if ( 'number' !== typeof datacoding ) {
     throw("Parameter error: 'datacoding' should be a number.")
   }
@@ -1717,62 +1727,62 @@ var getSensorIndex = function(datacoding) {
   return (datacoding & measurementDataCodingMask.MASK_DATACODING_INDEX);
 };
 
-/*! 
+/*!
   isMeasurement
 
-  Returns true if vscpClass is a measurement class
+  Returns true if vscpclass is a measurement class
 
-  @param {number} vscpClass - VSCP class to check
-  @return {boolean True if vscpClass is a measurement class, false otherwise
+  @param {number} vscpclass - VSCP class to check
+  @return {boolean True if vscpclass is a measurement class, false otherwise
 */
 
-var isMeasurement = function(vscpClass) {
+var isMeasurement = function(vscpclass) {
 
   let rv = false;
 
-  // Allow for event object 
-  // if ( typeof vscpClass !== 'object') {
-  //   vscpClass = vscpClass.class;
+  // Allow for event object
+  // if ( typeof vscpclass !== 'object') {
+  //   vscpclass = vscpclass.vscpclass;
   // }
 
-  if (( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) && 
-        (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) || 
-        (vscpClass == vscp_class.VSCP_CLASS1_DATA ) ||
-      ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
-        (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) ||
-      ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
-        (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) ||
-      ( (vscpClass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
-        (vscpClass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) || 
-      ( (vscpClass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
-        (vscpClass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) ||
-      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
-        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) || 
-        (vscpClass == (512 + vscp_class.VSCP_CLASS1_DATA ) ) ||
-      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
-        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) ||
-      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
-        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) ||
-      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
-        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) || 
-      ( (vscpClass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
-        (vscpClass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) ||  
-      (vscp_class.VSCP_CLASS2_MEASUREMENT_STR == vscpClass) ||
-      (vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT == vscpClass)) {
+  if (( (vscpclass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) &&
+        (vscpclass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) ||
+        (vscpclass == vscp_class.VSCP_CLASS1_DATA ) ||
+      ( (vscpclass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) &&
+        (vscpclass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) ||
+      ( (vscpclass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) &&
+        (vscpclass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) ||
+      ( (vscpclass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) &&
+        (vscpclass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) ||
+      ( (vscpclass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) &&
+        (vscpclass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) ||
+      ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) &&
+        (vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) ||
+        (vscpclass == (512 + vscp_class.VSCP_CLASS1_DATA ) ) ||
+      ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) &&
+        (vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) ||
+      ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) &&
+        (vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) ||
+      ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) &&
+        (vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) ||
+      ( (vscpclass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) &&
+        (vscpclass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) ||
+      (vscp_class.VSCP_CLASS2_MEASUREMENT_STR == vscpclass) ||
+      (vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT == vscpclass)) {
     rv = true;
   }
 
   return rv;
 };
 
-/*! 
+/*!
   decodeMeasurementClass10
 
   Decode a class 10 measurement.
 
   CLASS1.MEASUREMENT
 
-  @param {number[]} data - Data (event data array/buffer 
+  @param {number[]} data - Data (event data array/buffer
     where first data byte is the VSCP data coding)
   @return bits    - {logical[]} Array of bits
           bytes   - {number[]} Array of bytes
@@ -1837,7 +1847,7 @@ var decodeMeasurementClass10 = function(data) {
       break;
 
     case measurementDataCoding.DATACODING_NORMALIZED:  // Normalized integer
-      
+
       exp = data[1];
       rval = Number(varInt2BigInt(data.slice(2)));
 
@@ -1845,7 +1855,7 @@ var decodeMeasurementClass10 = function(data) {
       if (0 !== (exp & 0x80)) {
         exp &= 0x7f;
         rval = rval / Math.pow(10, exp);
-      } 
+      }
       else {
         exp &= 0x7f;
         rval = rval * Math.pow(10, exp);
@@ -1874,12 +1884,12 @@ var decodeMeasurementClass10 = function(data) {
   return rval;
 };
 
-/*! 
+/*!
   decodeMeasurementClass60
 
   CLASS1.MEASUREMENT64
 
-  Decode a class 60 measurement. Data is a 
+  Decode a class 60 measurement. Data is a
   64-bit double floating point number.
 
   @param {number[]}  data - Data array/buffer
@@ -1906,7 +1916,7 @@ var decodeMeasurementClass60 = function(data) {
   return data.readDoubleBE(0);
 };
 
-/*! 
+/*!
   decodeMeasurementClass65
 
   Decode a class 65 measurement.
@@ -1917,7 +1927,7 @@ var decodeMeasurementClass60 = function(data) {
   1   - Zone
   2   - subzone
   3   - data coding
-  4-7 - Data with format defined by data 
+  4-7 - Data with format defined by data
         coding byte.
 
   @param {number[]} data - Data array/buffer
@@ -1950,12 +1960,12 @@ var decodeMeasurementClass65 = function(data) {
 
   CLASS1.MEASUREMENT32
 
-  Decode a class 70 measurement. 
+  Decode a class 70 measurement.
   Data is a 32-bit floating
   point value.
 
   @param {number[]} data - Data array/buffer
-  @return {number} Value as float  
+  @return {number} Value as float
 */
 
 var decodeMeasurementClass70 = function(data) {
@@ -1981,7 +1991,7 @@ var decodeMeasurementClass70 = function(data) {
 
 /*!
   decodeMeasurementClass85
-  
+
   CLASS1.SETVALUEZONE
 
   Decode a class 85 measurement (setvalue)
@@ -1993,7 +2003,7 @@ var decodeMeasurementClass70 = function(data) {
   4-7 - Data Value
 
   @param {number[]} data - Data array/buffer
-  @return {number} Value as float  
+  @return {number} Value as float
 */
 
 var decodeMeasurementClass85 = function(data) {
@@ -2015,12 +2025,12 @@ var decodeMeasurementClass85 = function(data) {
   2    - Subzone
   3    - Unit
   4..  - String up to the maximum data size of
-         483 digits including a possible decimal 
-         point. The decimal point should always be 
+         483 digits including a possible decimal
+         point. The decimal point should always be
          a "." independent of locale.
 
   @param {number[]} data - Data array/buffer
-  @return {number} Value as float  
+  @return {number} Value as float
 */
 
 var decodeMeasurementClass1040 = function(data) {
@@ -2057,18 +2067,18 @@ var decodeMeasurementClass1040 = function(data) {
 
   CLASS2.MEASUREMENT_FLOAT
 
-  Data is measurement in floating point 
+  Data is measurement in floating point
   double form.
 
   0    - Sensor index
   1    - Zone
   2    - Subzone
   3    - Unit
-  4-11 - 64-bit double precision floating point 
-       value stored MSB first. 
+  4-11 - 64-bit double precision floating point
+       value stored MSB first.
 
   @param {number[]} data - Data array/buffer
-  @return {number} Value as float  
+  @return {number} Value as float
 */
 
 var decodeMeasurementClass1060 = function(data) {
@@ -2094,7 +2104,7 @@ var decodeMeasurementClass1060 = function(data) {
 /*!
   getMeasurementData
 
-  Return measurement information including value for a 
+  Return measurement information including value for a
   measurement event.
 
   @param {object} e Measurement event object
@@ -2111,11 +2121,11 @@ var decodeMeasurementClass1060 = function(data) {
   }
 
   Items that are not defined for a particular event is not returned
-  and will be left undefined. This is typical for zone/subzone that 
+  and will be left undefined. This is typical for zone/subzone that
   is only available for a few of the measurement events.
 
-  If the event is not a measurement event an empty object 
-  is returned. 
+  If the event is not a measurement event an empty object
+  is returned.
 */
 var getMeasurementData = function(e) {
 
@@ -2136,30 +2146,30 @@ var getMeasurementData = function(e) {
   // Allow the deprecated nomenclature as well
   e = normalizeEventOptions(e);
 
-  if ( !isMeasurement(e.class) ) {
+  if ( !isMeasurement(e.vscpclass) ) {
     throw(new Error("Parameter error: 'e' should be a VSCP measurement event."));
   }
 
-  if ( ( (e.class >= vscp_class.VSCP_CLASS1_MEASUREMENT ) && 
-         (e.class <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) ) {
+  if ( ( (e.vscpclass >= vscp_class.VSCP_CLASS1_MEASUREMENT ) &&
+         (e.vscpclass <= vscp_class.VSCP_CLASS1_MEASUREMENTX4 ) ) ) {
     rvobj.datacoding = getDataCoding(e.data[0]);
     rvobj.unit = getUnit(e.data[0]);
     rvobj.sensorindex = getSensorIndex(e.data[0]);
     rvobj.value = decodeMeasurementClass10(e.data);
-  } else if ( e.class == vscp_class.VSCP_CLASS1_DATA ) {
+  } else if ( e.vscpclass == vscp_class.VSCP_CLASS1_DATA ) {
     rvobj.datacoding = getDataCoding(e.data[0]);
     rvobj.unit = getUnit(e.data[0]);
     rvobj.sensorindex = getSensorIndex(e.data[0]);
     rvobj.value = decodeMeasurementClass10(e.data);
-  } else if ( (e.class >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) && 
-            (e.class <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) {
+  } else if ( (e.vscpclass >= vscp_class.VSCP_CLASS1_MEASUREMENT64 ) &&
+            (e.vscpclass <= vscp_class.VSCP_CLASS1_MEASUREMENT64X4 ) ) {
     // Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
     rvobj.value = decodeMeasurementClass60(e.data);
-  } else if ( (e.class >= vscp_class.VSCP_CLASS1_MEASUREZONE ) && 
-            (e.class <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) {
+  } else if ( (e.vscpclass >= vscp_class.VSCP_CLASS1_MEASUREZONE ) &&
+            (e.vscpclass <= vscp_class.VSCP_CLASS1_MEASUREZONEX4 ) ) {
     rvobj.datacoding = getDataCoding(e.data[3]);
     rvobj.unit = getUnit(e.data[3]);
     rvobj.sensorindex = getSensorIndex(e.data[3]);
@@ -2167,15 +2177,15 @@ var getMeasurementData = function(e) {
     rvobj.zone = e.data[1];
     rvobj.subzone = e.data[2];
     rvobj.value = decodeMeasurementClass65(e.data);
-  } else if ( (e.class >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) && 
-            (e.class <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) {
-    // Always single, unit=0,sensorindex=0 
-    rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;    
+  } else if ( (e.vscpclass >= vscp_class.VSCP_CLASS1_MEASUREMENT32 ) &&
+            (e.vscpclass <= vscp_class.VSCP_CLASS1_MEASUREMENT32X4 ) ) {
+    // Always single, unit=0,sensorindex=0
+    rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
     rvobj.value = decodeMeasurementClass70(e.data);
-  } else if ( (e.class >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) && 
-            (e.class <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) {
+  } else if ( (e.vscpclass >= vscp_class.VSCP_CLASS1_SETVALUEZONE ) &&
+            (e.vscpclass <= vscp_class.VSCP_CLASS1_SETVALUEZONEX4 ) ) {
     rvobj.datacoding = getDataCoding(e.data[3]);
     rvobj.unit = getUnit(e.data[3]);
     rvobj.sensorindex = getSensorIndex(e.data[3]);
@@ -2183,27 +2193,27 @@ var getMeasurementData = function(e) {
     rvobj.zone = e.data[1];
     rvobj.subzone = e.data[2];
     rvobj.value = decodeMeasurementClass85(e.data);
-  } else if ( (e.class >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) && 
-            (e.class <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) {
+  } else if ( (e.vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT) ) &&
+            (e.vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENTX4) ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(e.data[16]);
     rvobj.unit = getUnit(e.data[16]);
     rvobj.sensorindex = getSensorIndex(e.data[16]);
     rvobj.value = decodeMeasurementClass10(e.data.slice(16));
-  } else if ( e.class == (512 + vscp_class.VSCP_CLASS1_DATA ) ) {
+  } else if ( e.vscpclass == (512 + vscp_class.VSCP_CLASS1_DATA ) ) {
     rvobj.datacoding = getDataCoding(e.data[0]);
     rvobj.unit = getUnit(e.data[0]);
     rvobj.sensorindex = getSensorIndex(e.data[0]);
     rvobj.value = decodeMeasurementClass10(e.data.slice(16));
-  } else if ( (e.class >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) && 
-            (e.class <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) {
+  } else if ( (e.vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64) ) &&
+            (e.vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT64X4) ) ) {
     // Offset 16, Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
-    rvobj.value = decodeMeasurementClass60(e.data.slice(16));  
-  } else if ( (e.class >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) && 
-            (e.class <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) {
+    rvobj.value = decodeMeasurementClass60(e.data.slice(16));
+  } else if ( (e.vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREZONE) ) &&
+            (e.vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREZONEX4) ) ) {
     // At offset 16
     rvobj.datacoding = getDataCoding(e.data[16+3]);
     rvobj.unit = getUnit(e.data[16+3]);
@@ -2212,15 +2222,15 @@ var getMeasurementData = function(e) {
     rvobj.zone = e.data[16+1];
     rvobj.subzone = e.data[16+2];
     rvobj.value = decodeMeasurementClass65(e.data.slice(16));
-  } else if ( (e.class >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) && 
-            (e.class <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) {
+  } else if ( (e.vscpclass >= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32) ) &&
+            (e.vscpclass <= (512 + vscp_class.VSCP_CLASS1_MEASUREMENT32X4) ) ) {
     // Offset 16, Always double, unit=0,sensorindex=0
     rvobj.datacoding = measurementDataCoding.DATACODING_SINGLE;
     rvobj.unit = 0;
     rvobj.sensorindex = 0;
     rvobj.value = decodeMeasurementClass70(e.data.slice(16));
-  } else if ( (e.class >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) && 
-            (e.class <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) {
+  } else if ( (e.vscpclass >= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONE) ) &&
+            (e.vscpclass <= (512 + vscp_class.VSCP_CLASS1_SETVALUEZONEX4) ) ) {
     rvobj.datacoding = e.data[16+3];
     rvobj.unit = getUnit(e.data[16+3]);
     rvobj.sensorindex = getSensorIndex(e.data[16+3]);
@@ -2228,7 +2238,7 @@ var getMeasurementData = function(e) {
     rvobj.zone = e.data[16+1];
     rvobj.subzone = e.data[16+2];
     rvobj.value = decodeMeasurementClass85(e.data.slice(16));
-  } else if ( e.class == vscp_class.VSCP_CLASS2_MEASUREMENT_STR ) {
+  } else if ( e.vscpclass == vscp_class.VSCP_CLASS2_MEASUREMENT_STR ) {
     // Always string, index=0
     rvobj.datacoding = measurementDataCoding.DATACODING_STRING;
     rvobj.sensorindex = e.data[0];
@@ -2236,8 +2246,8 @@ var getMeasurementData = function(e) {
     rvobj.zone = e.data[1];
     rvobj.subzone = e.data[2];
     rvobj.unit = e.data[3];
-    rvobj.value = decodeMeasurementClass1040(e.data);   
-  } else if ( e.class == vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT ) {
+    rvobj.value = decodeMeasurementClass1040(e.data);
+  } else if ( e.vscpclass == vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT ) {
     // Always double, index=0
     rvobj.datacoding = measurementDataCoding.DATACODING_DOUBLE;
     rvobj.sensorindex = e.data[0];
@@ -2292,7 +2302,7 @@ var getMeasurementData = function(e) {
 
   CLASS1.MEASUREZONE event
 
-  @param {number} device index - Index for device. 
+  @param {number} device index - Index for device.
   @param {number} code - VSCP code for measurment coding
   @param {number} sensorindex - Index for sensor (0-7)
   @param {number} unit - Unit for value
@@ -2316,7 +2326,7 @@ var getMeasurementData = function(e) {
 
   CLASS1.SETVALUEZONE2 event
 
-  @param {number} device index - Index for device. 
+  @param {number} device index - Index for device.
   @param {number} zone - Zone to set value for.
   @param {number} subzone - Subzone to set value for.
   @param {number} code - VSCP code for measurment coding
@@ -2331,7 +2341,7 @@ var getMeasurementData = function(e) {
 
   CLASS2.MEASUREMENT_STR event
 
-  @param {number} sensorindex - Index for sensor (0-255) 
+  @param {number} sensorindex - Index for sensor (0-255)
   @param {number} zone - Zone to set value for )0-255).
   @param {number} subzone - Subzone to set value for (0-255).
   @param {number} unit - Unit for value (0-255)
@@ -2344,7 +2354,7 @@ var getMeasurementData = function(e) {
 
   CLASS2.MEASUREMENT_FLOAT event
 
-  @param {number} sensorindex - Index for sensor (0-255) 
+  @param {number} sensorindex - Index for sensor (0-255)
   @param {number} zone - Zone to set value for )0-255).
   @param {number} subzone - Subzone to set value for (0-255).
   @param {number} unit - Unit for value (0-255)
@@ -2355,7 +2365,7 @@ var getMeasurementData = function(e) {
 // ----------------------------------------------------------------------------
 
 
-/*! 
+/*!
   vscp_getVscpHeadFromCANALid
 
   @param {number} id canid to get vscpHead from
@@ -2366,7 +2376,7 @@ var getVscpHeadFromCANALid = function(id) {
 
   var hardcoded = 0;
   var priority  = (0x07 & (id >> 26));
-  
+
   if (id & (1 << 25)) {
     hardcoded = 0x10;
   }
@@ -2377,8 +2387,8 @@ var getVscpHeadFromCANALid = function(id) {
 /*!
   getVscpClassFromCANALid
 
-  @param {number} id canid to get vscpClass from
-  @return  {number}  vscpClass
+  @param {number} id canid to get vscpclass from
+  @return  {number}  vscpclass
 */
 
 var getVscpClassFromCANALid = function(id) {
@@ -2388,8 +2398,8 @@ var getVscpClassFromCANALid = function(id) {
 /*!
   getVscpTypeFromCANALid
 
-  @param {number} id canid to get vscpType from
-  @return  {number}  vscpType
+  @param {number} id canid to get vscptype from
+  @return  {number}  vscptype
 */
 
 var getVscpTypeFromCANALid = function(id) {
@@ -2399,7 +2409,7 @@ var getVscpTypeFromCANALid = function(id) {
 /*!
   getNicknameFromCANALid
 
-  @param {number} id canid from which 
+  @param {number} id canid from which
          nodeid/nickname should be extracted
   @return {number} nodeid/nickname
 */
@@ -2408,37 +2418,37 @@ var getNicknameFromCANALid = function(id) {
   return (id & 0xff);
 };
 
-/*! 
+/*!
   getCANALid
 
   @param {number} vscpPriority VSCP priority (0-7)
-  @param {number} vscpClass VSCP class
-  @param {number} vscpType VSCP type
+  @param {number} vscpclass VSCP class
+  @param {number} vscptype VSCP type
 */
 
 var getCANALid = function(vscpPriority,
-                      vscpClass,
-                      vscpType)
+                      vscpclass,
+                      vscptype)
 {
     if ( ('number' !== typeof vscpPriority) ||
-         ('number' !== typeof vscpClass) ||
-         ('number' !== typeof vscpClass) || 
-         ( vscpPriority > 7 ) || 
-         ( vscpClass > 0x1fff ) || 
-         ( vscpType > 0xff ) ) {
+         ('number' !== typeof vscpclass) ||
+         ('number' !== typeof vscpclass) ||
+         ( vscpPriority > 7 ) ||
+         ( vscpclass > 0x1fff ) ||
+         ( vscptype > 0xff ) ) {
       throw( new Error("[getCANALid] Invalid parameter."));
     }
 
     return ((vscpPriority << 26) |
-            (vscpClass << 16) |
-            (vscpType << 8) | 0);
+            (vscpclass << 16) |
+            (vscptype << 8) | 0);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 // convertEventToCanMsg
 //
 // @param {Event} ev Event to convert
-// @return {object} Can message object on success or 
+// @return {object} Can message object on success or
 //                  null on failure.
 
 
@@ -2453,9 +2463,9 @@ var convertEventToCanMsg = function(ev) {
   var msg = {};         // CAN message
   // msg.ext = true;   	// VSCP CAN messages are always extended
   // msg.rtr = false;  	// This is no remote transmission request
-  msg.id = getCANALid( getPriority(ev.head), 
-                                      ev.class,
-                                      ev.type );
+  msg.id = getCANALid( getPriority(ev.head),
+                                      ev.vscpclass,
+                                      ev.vscptype );
   msg.id += getNodeId(ev.guid);
   msg.flags = 1; //CANAL extended id
   msg.obid = ev.obid || 0;
@@ -2471,12 +2481,12 @@ var convertEventToCanMsg = function(ev) {
   if ( msg.dlc > 8 ) {
     throw("Data length is > 8 [" + msg.dlc + "]");
   }
-  
-  
+
+
   return msg;
 };
 
-/*! 
+/*!
   convertCanMsgToEvent
 
    @param {object} msg CAN message object
@@ -2499,13 +2509,13 @@ var convertCanMsgToEvent = function(msg) {
   // must be object
   if ( typeof msg !== 'object') {
     throw(new Error("Parameter error: 'msg' should be canmsg object."));
-  } 
+  }
 
     var ev = {};
     ev.guid  = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
     ev.head  = getVscpHeadFromCANALid(msg.id);
-    ev.class = getVscpClassFromCANALid(msg.id);
-    ev.type  = getVscpTypeFromCANALid(msg.id);
+    ev.vscpclass = getVscpClassFromCANALid(msg.id);
+    ev.vscptype  = getVscpTypeFromCANALid(msg.id);
     // CANAL timestamp is represented on event form as timestamp_ns.
     var canTs = ('undefined' === typeof msg.timestamp) ?
       0 :
@@ -2515,7 +2525,7 @@ var convertCanMsgToEvent = function(msg) {
     ev.obid = msg.obid || 0;
 
   // Handle data
-  if (msg.data) { 
+  if (msg.data) {
     if ( 'string' === typeof msg.data ) {
       ev.data = msg.data.split(',');
       ev.sizeData = ev.data.length;
@@ -2555,7 +2565,7 @@ module.exports = {
   measurementDataCodingMask,
   measurementDataCoding,
 
-  // Helpers  
+  // Helpers
   readValue,
   getTime,
   unixTimeToISO,

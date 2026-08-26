@@ -207,8 +207,8 @@ This is a helper class that defines a VSCP event. You can use it in the followin
 // Define event with object in constructor and data in array
 e2 = new vscp.Event({
     head: 0,
-    class: 10,
-    type: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     data: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 ```
@@ -218,8 +218,8 @@ or
 ```javascript
 // Define event with members
 e2 = new vscp.Event();
-e2.vscpClass = 10;
-e2.vscpType = 6;
+e2.vscpclass = 10;
+e2.vscpptype = 6;
 e2.vscpData = [1,2,3,4,5];
 ```
 
@@ -266,8 +266,8 @@ side. The following names are equivalent
 | JSON | Older form |
 | --- | --- |
 | head | vscpHead |
-| class | vscpClass |
-| type | vscpType |
+| class | vscpclass |
+| type | vscpptype |
 | obid | vscpObId |
 | guid | vscpGuid |
 | data | vscpData |
@@ -284,8 +284,8 @@ in the options object, the current JSON name takes precedence.
 // These two events are identical
 var ev1 = new vscp.Event({
     head: 3,
-    class: 10,
-    type: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     timestamp_ns: "1755792180000000000",
     guid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
     data: [1,2,3,4,5]
@@ -293,8 +293,8 @@ var ev1 = new vscp.Event({
 
 var ev2 = new vscp.Event({
     vscpHead: 3,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpTimeStamp_ns: 1755792180000000000n,
     vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
     vscpData: [1,2,3,4,5]
@@ -314,8 +314,8 @@ For compatibility, `datestr` and `dateStr` are also accepted as aliases for
 
 ```javascript
 var ev = new vscp.Event({
-    class: 10,
-    type: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     datetime: "2020-02-11T17:32:02Z",
     timestamp: 1000000     // One second added to the datetime
 });
@@ -343,8 +343,8 @@ new vscp.Event({ timestamp: "0x50617" });
 ```javascript
 var ev = new vscp.Event();
 ev.vscpHead = 0x0007;
-ev.vscpClass = 10;
-ev.vscpType = 6;
+ev.vscpclass = 10;
+ev.vscpptype = 6;
 ev.vscpData = [1,2,3,4,5];
 ev.vscpGuid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01"
 ```
@@ -382,8 +382,8 @@ Set priority for the event (0-7). Lower value is higher priority.
 ```javascript
 e5 = new vscp.Event({
     vscpHead: 6 << 5,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -399,8 +399,8 @@ Get priority for event (0-7). Lower value is higher priority.
 ```javascript
 e5 = new vscp.Event({
     vscpHead: 6 << 5,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -416,8 +416,8 @@ Set GUID type for the event (0-7).
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 6 << 5,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -433,8 +433,8 @@ Get GUID type for event (0-7).
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 6 << 5,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -450,8 +450,8 @@ Set bit in header that mark GUID as IP v6 address
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -472,8 +472,8 @@ Check if GUID for this event is a IP v6 address or not. Return {boolean}*true* i
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -494,8 +494,8 @@ Set bit that mark this event as coming from a dumb node (No MDF, registers, noth
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -515,8 +515,8 @@ Check if this event is marked as coming from a dumb node. Return {boolean} *true
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -536,8 +536,8 @@ Set bit that mark this event as a hardcoded address.
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -558,8 +558,8 @@ Check if hardcoded address.
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -581,8 +581,8 @@ Set bit that mark that no CRC calculations should be done. Typically used by som
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -602,8 +602,8 @@ Return {boolean} *true* if no CRC calculations should be performed. Typically us
 ```javascript
 e4 = new vscp.Event({
     vscpHead: 0,
-    vscpClass: 10,
-    vscpType: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     vscpData: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 
@@ -639,8 +639,8 @@ This is the standard form to send events in the [VSCP tcp/ip link interface](htt
 // Value = -2.92 C
 e5 = new vscp.Event({
     vscpHead: 3,
-    vscpClass: vscp_class.VSCP_CLASS1_MEASUREMENT,
-    vscpType: vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+    vscpclass: vscp_class.VSCP_CLASS1_MEASUREMENT,
+    vscpptype: vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
     vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
     vscpsizeData: 4,
     vscpData: [0x89,0x82,0xFE,0xDC]
@@ -685,8 +685,8 @@ output (`head`, `class`, `type`, `guid`, `obid`, `timestamp_ns`, `data`).
 ```javascript
 {
   head: 80,
-  class: 10,
-  type: 6,
+  vscpclass: 10,
+  vscpptype: 6,
   guid: '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:2a',
   obid: 0,
     timestamp_ns: '0x18676f0806fd0000',
@@ -1009,7 +1009,7 @@ console.log("Sensor index: ",
 ### isMeasurement
 
 ```javascript
-isMeasurement(vscpClass)
+isMeasurement(vscpclass)
 ```
 
 Check if a VSCP class is a measurement class and 
@@ -1248,8 +1248,8 @@ assert.equal(vscp.toFixed(val,2), -876.12);
 
 ```javascript
 var e = new vscp.Event({
-                vscpClass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
-                vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                vscpclass : vscp_class.VSCP_CLASS1_SETVALUEZONE,
+                vscpptype : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
                 vscpData : [0,1,2,0x40,0x30]
             });
 var rv = vscp.getMeasurementData(e);
@@ -1294,8 +1294,8 @@ Note that the VSCP_CLASS2_MEASUREMENT_STR class have **sensorindex** in byte, 0 
 
 ```javascript
 var e = new vscp.Event({
-        vscpClass : vscp_class.VSCP_CLASS2_MEASUREMENT_STR,
-        vscpType : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+        vscpclass : vscp_class.VSCP_CLASS2_MEASUREMENT_STR,
+        vscpptype : vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
         vscpData : [33,1,2,0,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x2E,0x39]
     });
 var rv = vscp.getMeasurementData(e);
@@ -1320,7 +1320,7 @@ Get VSCP type from extended CAN id.
 
 Get node id / nickname from CAN id.
 
-### getCANALid(vscpHead, vscpClass, vscpType)
+### getCANALid(vscpHead, vscpclass, vscpptype)
 
 Get extened canid from VSCP data.
 
@@ -1574,7 +1574,7 @@ and add to
 functionGlobalContext: {
     vscp:require('node-vscp')
     vscpclass:require('node-vscp-class')
-    vscptype:require('node-vscp-type')
+    vscpptype:require('node-vscp-type')
 }
 ```
 
@@ -1609,7 +1609,7 @@ The code for the flow is
         "type": "function",
         "z": "e12ba6da.b3f8e",
         "name": "Send VSCP Event",
-        "func": "var ev = new (global.get('vscp')).Event({\n    vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,\n    vscpClass: global.get('vscpclass').VSCP_CLASS1_MEASUREMENT,\n    vscpType: global.get('vscptype').VSCP_TYPE_MEASUREMENT_TEMPERATURE,\n    vscpGuid: \"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01\",\n    vscpsizeData: 4,\n    vscpData: [0x89,0x82,0xFE,0xDC]\n});\nmsg.payload = ev;\nreturn msg;",
+        "func": "var ev = new (global.get('vscp')).Event({\n    vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,\n    vscpclass: global.get('vscpclass').VSCP_CLASS1_MEASUREMENT,\n    vscpptype: global.get('vscptype').VSCP_TYPE_MEASUREMENT_TEMPERATURE,\n    vscpGuid: \"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01\",\n    vscpsizeData: 4,\n    vscpData: [0x89,0x82,0xFE,0xDC]\n});\nmsg.payload = ev;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 320,
@@ -1643,8 +1643,8 @@ If you look at the code in the function node you see
 ```javascript
 var ev = new (global.get('vscp')).Event({
     vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,
-    vscpClass: global.get('vscpclass').VSCP_CLASS1_MEASUREMENT,
-    vscpType: global.get('vscptype').VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+    vscpclass: global.get('vscpclass').VSCP_CLASS1_MEASUREMENT,
+    vscpptype: global.get('vscptype').VSCP_TYPE_MEASUREMENT_TEMPERATURE,
     vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
     vscpsizeData: 4,
     vscpData: [0x89,0x82,0xFE,0xDC]
@@ -1664,8 +1664,8 @@ In a real world example the debug node would be a VSCP send node such as the out
 ```javascript
 var ev = new (global.get('vscp')).Event({
     vscpHead: global.get('vscp').priority.PRIORITY_6 << 5,
-    vscpClass: global.get('vscpclass').VSCP_CLASS1_CONTROL,
-    vscpType: global.get('vscptype').VSCP_TYPE_CONTROL_ALL_LAMPS,
+    vscpclass: global.get('vscpclass').VSCP_CLASS1_CONTROL,
+    vscpptype: global.get('vscptype').VSCP_TYPE_CONTROL_ALL_LAMPS,
     vscpGuid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
     vscpsizeData: 4,
     vscpData: [0x00,0x11,0x01]

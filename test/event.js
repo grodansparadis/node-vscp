@@ -25,7 +25,7 @@ describe('VSCP Event', function() {
 
     describe('#class', function() {
         it("should return 0 for new vscp.Event", function() {
-            assert.equal(ev.class, 0 );
+            assert.equal(ev.vscpclass, 0 );
         });
     });
 
@@ -43,15 +43,9 @@ describe('VSCP Event', function() {
 
     describe('#type', function() {
         it("should return 0 for new vscp.Event", function() {
-            assert.equal(ev.type, 0);
+            assert.equal(ev.vscptype, 0);
         });
     });
-
-    // describe('#datetime', function() {
-    //     it('should return true when when instance is Date', function() {
-    //         assert.equal(ev.datetime instanceof Date, true);
-    //     });
-    // });
 
     describe('#guid', function() {
         it("should return '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00' for new vscp.Event", function() {
@@ -86,6 +80,11 @@ describe('VSCP Event', function() {
                 "head": 0xAA55
             });
             assert.equal(ev.head, 0xAA55);
+        });
+
+        it("should apply object options from a JSON string", function() {
+            var ev = new vscp.Event('  {"head":0,"priority":3,"frameversion":1,"guidtype":2,"hardcoded":true,"calccrc":true}');
+            assert.equal(ev.head, 0x2178);
         });
     });
 
@@ -339,11 +338,11 @@ describe('VSCP Event', function() {
         });
 
         it("should return 10", function() {            
-            assert.equal(ev.class, 10);
+            assert.equal(ev.vscpclass, 10);
         });
 
         it("should return 6", function() {            
-            assert.equal(ev.type, 6);
+            assert.equal(ev.vscptype, 6);
         });
 
         it("should return 4", function() {
@@ -414,8 +413,8 @@ describe('VSCP Event', function() {
         
         var ev = new vscp.Event();
         ev.head = 0x0007;
-        ev.class = 10;
-        ev.type = 6;
+        ev.vscpclass = 10;
+        ev.vscptype = 6;
         ev.data = [1,2,3,4,5];
         var obj = JSON.parse(ev.toJSONObj());
         
@@ -424,11 +423,20 @@ describe('VSCP Event', function() {
         });
 
         it("should return class set to 10", function() {    
-            assert.equal(obj.class, 10);
+            assert.equal(obj.vscpclass, 10);
         });
 
         it("should return type set to 6", function() {    
-            assert.equal(obj.type, 6);
+            assert.equal(obj.vscptype, 6);
+        });
+
+        it("should initialize an event from a JSON object string", function() {
+            var jsonEvent = new vscp.Event('  ' + ev.toJSONObj());
+            assert.equal(jsonEvent.head, ev.head);
+            assert.equal(jsonEvent.vscpclass, ev.vscpclass);
+            assert.equal(jsonEvent.vscptype, ev.vscptype);
+            assert.deepEqual(jsonEvent.data, ev.data);
+            assert.equal(jsonEvent.timestamp_ns, ev.timestamp_ns);
         });
 
         it("should return true, data is array", function() {    
@@ -455,8 +463,8 @@ describe('VSCP Event', function() {
         
         var ev = new vscp.Event();
         ev.head = 0x0007;
-        ev.class = 10;
-        ev.type = 6;
+        ev.vscpclass = 10;
+        ev.vscptype = 6;
         ev.data = [1,2,3,4,5];
 
         var str = ev.getAsString();
@@ -471,11 +479,11 @@ describe('VSCP Event', function() {
         });
 
         it("should return class set to 10", function() {    
-            assert.equal(ev2.class, 10);
+            assert.equal(ev2.vscpclass, 10);
         });
 
         it("should return type set to 6", function() {    
-            assert.equal(ev2.type, 6);
+            assert.equal(ev2.vscptype, 6);
         });
 
         it("should return true, data is array", function() {    
@@ -501,8 +509,8 @@ describe('VSCP Event', function() {
         
         var ev = new vscp.Event();
         ev.head = 0x0007;
-        ev.class = 10;
-        ev.type = 6;
+        ev.vscpclass = 10;
+        ev.vscptype = 6;
         ev.data = [1,2,3,4,5];
 
         var str = ev.toString();
@@ -517,11 +525,11 @@ describe('VSCP Event', function() {
         });
 
         it("should return class set to 10", function() {    
-            assert.equal(ev2.class, 10);
+            assert.equal(ev2.vscpclass, 10);
         });
 
         it("should return type set to 6", function() {    
-            assert.equal(ev2.type, 6);
+            assert.equal(ev2.vscptype, 6);
         });
 
         it("should return true, data is array", function() {    
@@ -721,13 +729,13 @@ describe('VSCP Event', function() {
         });
 
         it("should set class from both nomenclatures", function() {
-            assert.equal(ev.class, 10);
-            assert.equal(deprecatedEv.class, ev.class);
+            assert.equal(ev.vscpclass, 10);
+            assert.equal(deprecatedEv.vscpclass, ev.vscpclass);
         });
 
         it("should set type from both nomenclatures", function() {
-            assert.equal(ev.type, 6);
-            assert.equal(deprecatedEv.type, ev.type);
+            assert.equal(ev.vscptype, 6);
+            assert.equal(deprecatedEv.vscptype, ev.vscptype);
         });
 
         it("should set guid from both nomenclatures", function() {
@@ -747,8 +755,8 @@ describe('VSCP Event', function() {
         it("should read the members through the deprecated names", function() {
             assert.equal(ev.vscpHead, ev.head);
             assert.equal(ev.vscpObId, ev.obid);
-            assert.equal(ev.vscpClass, ev.class);
-            assert.equal(ev.vscpType, ev.type);
+            assert.equal(ev.vscpClass, ev.vscpclass);
+            assert.equal(ev.vscpType, ev.vscptype);
             assert.equal(ev.vscpGuid, ev.guid);
             assert.equal(ev.vscpTimeStamp, ev.timestamp);
             assert.equal(ev.vscpTimeStamp_ns, ev.timestamp_ns);
@@ -768,8 +776,8 @@ describe('VSCP Event', function() {
             ev.vscpTimeStamp_ns = 1755792180000000000n;
 
             assert.equal(ev.head, 0x0007);
-            assert.equal(ev.class, 10);
-            assert.equal(ev.type, 6);
+            assert.equal(ev.vscpclass, 10);
+            assert.equal(ev.vscptype, 6);
             assert.equal(ev.obid, 4);
             assert.equal(ev.guid, "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01");
             assert.deepEqual(ev.data, [1,2,3,4,5]);
@@ -780,9 +788,9 @@ describe('VSCP Event', function() {
         it("should let the current nomenclature win if both are given", function() {
             var ev = new vscp.Event({
                 "class": 10,
-                "vscpClass": 20
+                "vscpclass": 20
             });
-            assert.equal(ev.class, 10);
+            assert.equal(ev.vscpclass, 20);
         });
 
         it("should accept the legacy JSON event form", function() {
@@ -798,8 +806,8 @@ describe('VSCP Event', function() {
             });
             assert.equal(ev.head, 2);
             assert.equal(ev.obid, 123);
-            assert.equal(ev.class, 10);
-            assert.equal(ev.type, 8);
+            assert.equal(ev.vscpclass, 10);
+            assert.equal(ev.vscptype, 8);
             assert.equal(ev.timestamp, 0x50817);
             assert.equal(ev.datetime.toISOString(), "2017-01-13T10:16:02.000Z");
             assert.equal(ev.timestamp_ns,
@@ -807,13 +815,35 @@ describe('VSCP Event', function() {
             assert.equal(ev.data.length, 7);
         });
 
+        it("should normalize a legacy JSON event string", function() {
+            var ev = new vscp.Event(JSON.stringify({
+                "vscpHead": 2,
+                "vscpObId": 123,
+                "vscpDateTime": "2017-01-13T10:16:02Z",
+                "vscpTimeStamp": "0x50817",
+                "vscpClass": 10,
+                "vscpType": 8,
+                "vscpGuid": "00:00:00:00:00:00:00:00:00:01:00:02:00:03:00:04:00:05",
+                "vscpData": [1,2,3,4,5,6,7]
+            }));
+            assert.equal(ev.head, 2);
+            assert.equal(ev.obid, 123);
+            assert.equal(ev.vscpclass, 10);
+            assert.equal(ev.vscptype, 8);
+            assert.equal(ev.timestamp, 0x50817);
+            assert.equal(ev.datetime.toISOString(), "2017-01-13T10:16:02.000Z");
+            assert.equal(ev.timestamp_ns,
+                vscp.isoToUnixTimeNs("2017-01-13T10:16:02Z") + BigInt(0x50817) * 1000n);
+            assert.deepEqual(ev.data, [1,2,3,4,5,6,7]);
+        });
+
         it("should emit only the new nomenclature from toJSONObj()", function() {
             var obj = JSON.parse(ev.toJSONObj());
 
             assert.equal(obj.head, 3);
             assert.equal(obj.obid, 1234);
-            assert.equal(obj.class, 10);
-            assert.equal(obj.type, 6);
+            assert.equal(obj.vscpclass, 10);
+            assert.equal(obj.vscptype, 6);
             assert.equal(obj.guid, "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01");
             assert.equal(obj.timestamp_ns, "0x" + ev.timestamp_ns.toString(16));
             assert.equal(typeof obj.timestamp, 'undefined');
@@ -835,8 +865,8 @@ describe('VSCP Event', function() {
             var ev2 = new vscp.Event(JSON.parse(ev.toJSONObj()));
             assert.equal(ev2.head, ev.head);
             assert.equal(ev2.obid, ev.obid);
-            assert.equal(ev2.class, ev.class);
-            assert.equal(ev2.type, ev.type);
+            assert.equal(ev2.vscpclass, ev.vscpclass);
+            assert.equal(ev2.vscptype, ev.vscptype);
             assert.equal(ev2.guid, ev.guid);
             assert.equal(ev2.timestamp_ns, ev.timestamp_ns);
             assert.deepEqual(ev2.data, ev.data);

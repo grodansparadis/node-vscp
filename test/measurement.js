@@ -2258,8 +2258,8 @@ describe('VSCP Measurements', function() {
 
         it('should return true as return value is an object.', function() {                       
             var e = new vscp.Event();
-            e.class = vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
-            e.type = vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+            e.vscpclass = vscp_class.VSCP_CLASS2_MEASUREMENT_FLOAT,
+            e.vscpptype = vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
             e.data = [0,1,2,0,64,95,23,206,217,22,135,43]
             var rvobj = vscp.getMeasurementData(e);
             assert.equal(typeof rvobj, 'object');

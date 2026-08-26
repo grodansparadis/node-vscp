@@ -20,8 +20,8 @@ console.log(e);
 
 // Define event with members
 e2 = new vscp.Event();
-e2.class = 10;
-e2.type = 6;
+e2.vscpclass = 10;
+e2.vscpptype = 6;
 e2.data = [1,2,3,4,5];
 console.log(e2);
 
@@ -33,8 +33,8 @@ console.log(e3);
 // Define event with object in constructor and data in array
 e4 = new vscp.Event({
     head: 0,
-    class: 10,
-    type: 6,
+    vscpclass: 10,
+    vscpptype: 6,
     data: [15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,0,1,35]
 });
 console.log(e4);
@@ -51,8 +51,8 @@ console.log("----------------------------------------------");
 // Value = -2.92 C
 e5 = new vscp.Event({
     head: vscp.priority.PRIORITY_6 << 5,
-    class: vscp_class.VSCP_CLASS1_MEASUREMENT,
-    type: vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+    vscpclass: vscp_class.VSCP_CLASS1_MEASUREMENT,
+    vscpptype: vscp_type.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
     guid: "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:01",
     vscpsizeData: 4,
     data: [0x89,0x82,0xFE,0xDC]
@@ -174,7 +174,7 @@ console.log("Is this an Ipv6 node: " + vscp.isIPV6Addr(0xff00) );
 console.log("Is this an dumb node: " + vscp.isDumbNode(0xff00) );
 
 console.log("Priority: " + vscp.getPriority(0xffff) );
-console.log("GUID type: " + vscp.getGuidType(0x1f00) );
+console.log("GUID vscpptype: " + vscp.getGuidType(0x1f00) );
 console.log("Rolling index: " + vscp.getRollingIndex(0x1234) );
 
 // Value = -2.92 C

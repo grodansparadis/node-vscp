@@ -86,8 +86,8 @@ describe('CANAL helpers', function() {
       // Define event with members
       var ev = new vscp.Event();
       ev.obid = 1234;
-      ev.class = 10;
-      ev.type = 6;
+      ev.vscpclass = 10;
+      ev.vscpptype = 6;
       ev.data = [1, 2, 3, 4, 5];
       ev.guid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:32";
       var canmsg = vscp.convertEventToCanMsg(ev);
@@ -98,8 +98,8 @@ describe('CANAL helpers', function() {
       // Define event with members
       var ev = new vscp.Event();
       ev.obid = 1234;
-      ev.class = 10;
-      ev.type = 6;
+      ev.vscpclass = 10;
+      ev.vscpptype = 6;
       ev.data = [1, 2, 3, 4, 5];
       ev.guid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:32";
       var canmsg = vscp.convertEventToCanMsg(ev);
@@ -110,8 +110,8 @@ describe('CANAL helpers', function() {
       // Define event with members
       var ev = new vscp.Event();
       ev.obid = 1234;
-      ev.class = 10;
-      ev.type = 6;
+      ev.vscpclass = 10;
+      ev.vscpptype = 6;
       ev.data = [1, 2, 3, 4, 5];
       ev.guid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:32";
       var canmsg = vscp.convertEventToCanMsg(ev);
@@ -120,8 +120,8 @@ describe('CANAL helpers', function() {
 
     it("should return 32-bit unsigned timestamp.", function () {
       var ev = new vscp.Event();
-      ev.class = 10;
-      ev.type = 6;
+      ev.vscpclass = 10;
+      ev.vscpptype = 6;
       ev.data = [1, 2, 3, 4, 5];
       ev.guid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:32";
       ev.timestamp_ns = 0x1ffffffffn;
@@ -131,8 +131,8 @@ describe('CANAL helpers', function() {
 
     it("should derive timestamp from timestamp_ns * 1000.", function () {
       var ev = new vscp.Event();
-      ev.class = 10;
-      ev.type = 6;
+      ev.vscpclass = 10;
+      ev.vscpptype = 6;
       ev.data = [1, 2, 3, 4, 5];
       ev.guid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:32";
       ev.timestamp_ns = 3456n;
@@ -142,8 +142,8 @@ describe('CANAL helpers', function() {
 
     it("should not include timestamp_ns in CANAL message.", function () {
       var ev = new vscp.Event();
-      ev.class = 10;
-      ev.type = 6;
+      ev.vscpclass = 10;
+      ev.vscpptype = 6;
       ev.data = [1, 2, 3, 4, 5];
       ev.guid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:32";
       var canmsg = vscp.convertEventToCanMsg(ev);
@@ -154,8 +154,8 @@ describe('CANAL helpers', function() {
       // Define event with members
       var ev = new vscp.Event();
       ev.obid = 1234;
-      ev.class = 10;
-      ev.type = 6;
+      ev.vscpclass = 10;
+      ev.vscpptype = 6;
       ev.data = [1, 2, 3, 4, 5];
       ev.guid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:32";
       var canmsg = vscp.convertEventToCanMsg(ev);
@@ -171,8 +171,8 @@ describe('CANAL helpers', function() {
       // Define event with members
       var ev = new vscp.Event();
       ev.obid = 1234;
-      ev.class = 10;
-      ev.type = 6;
+      ev.vscpclass = 10;
+      ev.vscpptype = 6;
       ev.data = [1, 2, 3, 4, 5];
       ev.guid = "FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:40:59:96:00:32";
       var canmsg = vscp.convertEventToCanMsg(ev);
@@ -190,7 +190,7 @@ describe('CANAL helpers', function() {
         data: "1,2,3,4",
       };
       var ev = vscp.convertCanMsgToEvent(canmsg);
-      assert.equal(ev.class, 10);
+      assert.equal(ev.vscpclass, 10);
     });
 
     it("should return 6.", function () {
@@ -202,7 +202,7 @@ describe('CANAL helpers', function() {
         data: "1,2,3,4",
       };
       var ev = vscp.convertCanMsgToEvent(canmsg);
-      assert.equal(ev.type, 6);
+      assert.equal(ev.vscpptype, 6);
     });
 
     it("should return 42.", function () {
